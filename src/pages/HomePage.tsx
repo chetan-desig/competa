@@ -1,12 +1,14 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Bell } from "lucide-react";
+import { MapPin, Bell, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import EventCard from "@/components/EventCard";
 import CategoryChips from "@/components/CategoryChips";
 import BottomNav from "@/components/BottomNav";
 import { mockEvents, categories, cities } from "@/data/mockData";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCity, setSelectedCity] = useState("hyd");
 
@@ -53,6 +55,25 @@ const HomePage = () => {
           onSelect={setSelectedCategory}
         />
       </header>
+
+      {/* Team Matching CTA */}
+      <div className="px-5 pt-4">
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate("/team-matching")}
+          className="w-full gradient-primary rounded-3xl p-4 flex items-center gap-4 text-left"
+        >
+          <div className="bg-primary-foreground/20 rounded-2xl p-2.5">
+            <Users className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <div>
+            <h3 className="font-bold text-primary-foreground text-base">Find Your Team 🤝</h3>
+            <p className="text-primary-foreground/70 text-xs">Swipe to match with teammates</p>
+          </div>
+        </motion.button>
+      </div>
 
       {/* Event Feed */}
       <main className="px-5 pt-4 space-y-5">

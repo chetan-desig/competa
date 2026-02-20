@@ -9,6 +9,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import CertificatesPage from "./pages/CertificatesPage";
 import ProfilePage from "./pages/ProfilePage";
 import EventDetailPage from "./pages/EventDetailPage";
+import TeamMatchingPage from "./pages/TeamMatchingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/event/:id" element={<EventDetailPage />} />
+          <Route path="/team-matching" element={<TeamMatchingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
