@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Bell, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,12 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCity, setSelectedCity] = useState("hyd");
+
+  useEffect(() => {
+    if (!localStorage.getItem("eduvibe_onboarded")) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [navigate]);
 
   const currentCity = cities.find((c) => c.id === selectedCity);
 

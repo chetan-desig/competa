@@ -1,0 +1,432 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Camera, ChevronRight, MapPin, Sparkles } from "lucide-react";
+import Confetti from "@/components/Confetti";
+
+const CITIES = [
+  { id: "hyd", name: "Hyderabad", emoji: "🏛️" },
+  { id: "blr", name: "Bangalore", emoji: "🌆" },
+  { id: "mum", name: "Mumbai", emoji: "🌊" },
+  { id: "pun", name: "Pune", emoji: "⛰️" },
+  { id: "che", name: "Chennai", emoji: "🏖️" },
+];
+
+const SKILLS = [
+  { label: "UI/UX", emoji: "🎨" },
+  { label: "Frontend", emoji: "💻" },
+  { label: "Backend", emoji: "⚙️" },
+  { label: "AI/ML", emoji: "🤖" },
+  { label: "Product", emoji: "📦" },
+  { label: "Content", emoji: "✍️" },
+];
+
+const INTERESTS = [
+  { label: "Hackathons", emoji: "🚀" },
+  { label: "Design", emoji: "🎨" },
+  { label: "Live Events", emoji: "🎤" },
+  { label: "Workshops", emoji: "🛠️" },
+];
+
+const slideVariants = {
+  enter: { x: "100%", opacity: 0 },
+  center: { x: 0, opacity: 1 },
+  exit: { x: "-100%", opacity: 0 },
+};
+
+const OnboardingPage = () => {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
+  const [role, setRole] = useState<"student" | "organizer" | null>(null);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Organizer state
+  const [orgName, setOrgName] = useState("");
+  const [orgEventTypes, setOrgEventTypes] = useState<string[]>([]);
+
+  const totalSteps = role === "student" ? 5 : role === "organizer" ? 5 : 2;
+
+  const toggleItem = (list: string[], setList: (v: string[]) => void, item: string, max?: number) => {
+    if (list.includes(item)) {
+      setList(list.filter((i) => i !== item));
+    } else if (!max || list.length < max) {
+      setList([...list, item]);
+    }
+  };
+
+  const next = () => {
+    if (step === totalSteps - 1) {
+      setShowConfetti(true);
+      setTimeout(() => {
+        localStorage.setItem("eduvibe_onboarded", "true");
+        navigate("/");
+      }, 2000);
+    } else {
+      setStep((s) => s + 1);
+    }
+  };
+
+  const skip = () => {
+    localStorage.setItem("eduvibe_onboarded", "true");
+    navigate("/");
+  };
+
+  const canContinue = () => {
+    if (step === 0) return true; // welcome
+    if (step === 1) return !!role; // role selection
+    if (role === "student") {
+      if (step === 2) return selectedCities.length > 0;
+      if (step === 3) return selectedSkills.length > 0;
+      if (step === 4) return true; // interests optional
+    }
+    if (role === "organizer") {
+      if (step === 2) return orgName.trim().length > 0;
+      if (step === 3) return orgEventTypes.length > 0;
+      if (step === 4) return selectedCities.length > 0;
+    }
+    return true;
+  };
+
+  const renderStep = () => {
+    // Step 0 - Welcome
+    if (step === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center text-center px-8 flex-1">
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="text-7xl mb-8"
+          >
+            ✨
+          </motion.div>
+          <h1 className="text-3xl font-extrabold text-foreground mb-3">
+            Let's build something awesome ✨
+          </h1>
+          <p className="text-muted-foreground text-base max-w-xs">
+            Find events. Match teams. Create magic.
+          </p>
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            onClick={next}
+            className="mt-10 gradient-primary text-primary-foreground font-bold text-lg px-10 py-4 rounded-full cta-glow btn-pop"
+          >
+            Get Started 🚀
+          </motion.button>
+          <button onClick={skip} className="mt-4 text-sm text-muted-foreground">
+            Skip for now
+          </button>
+        </div>
+      );
+    }
+
+    // Step 1 - Role selection
+    if (step === 1) {
+      return (
+        <div className="flex flex-col items-center justify-center px-6 flex-1">
+          <h2 className="text-2xl font-extrabold text-foreground mb-2">Who are you? 👋</h2>
+          <p className="text-muted-foreground text-sm mb-8">Pick your vibe</p>
+          <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+            {[
+              { r: "student" as const, emoji: "🎓", desc: "Join events & find teammates" },
+              { r: "organizer" as const, emoji: "🎤", desc: "Host hackathons & workshops" },
+            ].map((opt) => (
+              <motion.button
+                key={opt.r}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setRole(opt.r)}
+                className={`rounded-3xl p-6 flex flex-col items-center gap-3 border-2 transition-all btn-pop ${
+                  role === opt.r
+                    ? "border-primary bg-primary/10 shadow-lg cta-glow"
+                    : "border-border bg-card"
+                }`}
+              >
+                <span className="text-5xl">{opt.emoji}</span>
+                <span className="font-bold text-foreground capitalize">{opt.r}</span>
+                <span className="text-xs text-muted-foreground text-center">{opt.desc}</span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Student flow
+    if (role === "student") {
+      if (step === 2) {
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your cities 🏙️</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              Pick up to 3 cities (
+              <span className="text-primary font-semibold">{selectedCities.length}/3</span>)
+            </p>
+            <div className="space-y-3">
+              {CITIES.map((city) => {
+                const selected = selectedCities.includes(city.id);
+                return (
+                  <motion.button
+                    key={city.id}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => toggleItem(selectedCities, setSelectedCities, city.id, 3)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all btn-pop ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card"
+                    }`}
+                  >
+                    <span className="text-3xl">{city.emoji}</span>
+                    <span className="font-semibold text-foreground flex-1 text-left">{city.name}</span>
+                    {selected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-6 h-6 rounded-full gradient-primary flex items-center justify-center"
+                      >
+                        <span className="text-primary-foreground text-xs">✓</span>
+                      </motion.div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      if (step === 3) {
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your skills 💪</h2>
+            <p className="text-muted-foreground text-sm mb-6">What do you bring to the team?</p>
+            <div className="flex flex-wrap gap-3">
+              {SKILLS.map((skill) => {
+                const selected = selectedSkills.includes(skill.label);
+                return (
+                  <motion.button
+                    key={skill.label}
+                    whileTap={{ scale: 0.93 }}
+                    onClick={() => toggleItem(selectedSkills, setSelectedSkills, skill.label)}
+                    className={`px-5 py-3 rounded-full text-sm font-semibold border-2 transition-all btn-pop flex items-center gap-2 ${
+                      selected
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-foreground"
+                    }`}
+                  >
+                    <span className="text-lg">{skill.emoji}</span>
+                    {skill.label}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      if (step === 4) {
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Interests 🔥</h2>
+            <p className="text-muted-foreground text-sm mb-6">What excites you?</p>
+            <div className="grid grid-cols-2 gap-3">
+              {INTERESTS.map((interest) => {
+                const selected = selectedInterests.includes(interest.label);
+                return (
+                  <motion.button
+                    key={interest.label}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => toggleItem(selectedInterests, setSelectedInterests, interest.label)}
+                    className={`p-5 rounded-3xl border-2 flex flex-col items-center gap-2 transition-all btn-pop ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card"
+                    }`}
+                  >
+                    <span className="text-4xl">{interest.emoji}</span>
+                    <span className="font-semibold text-sm text-foreground">{interest.label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // Organizer flow
+    if (role === "organizer") {
+      if (step === 2) {
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your Org 🏢</h2>
+            <p className="text-muted-foreground text-sm mb-6">What's your organization called?</p>
+            <input
+              value={orgName}
+              onChange={(e) => setOrgName(e.target.value)}
+              placeholder="e.g. TechHive Club"
+              className="w-full bg-card border-2 border-border rounded-2xl px-5 py-4 text-foreground text-lg font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+            />
+          </div>
+        );
+      }
+
+      if (step === 3) {
+        const eventTypes = [
+          { label: "Hackathon", emoji: "🚀" },
+          { label: "Workshop", emoji: "🛠️" },
+          { label: "Design Contest", emoji: "🎨" },
+          { label: "Live Event", emoji: "🎤" },
+        ];
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Event Types 🎯</h2>
+            <p className="text-muted-foreground text-sm mb-6">What do you organize?</p>
+            <div className="grid grid-cols-2 gap-3">
+              {eventTypes.map((et) => {
+                const selected = orgEventTypes.includes(et.label);
+                return (
+                  <motion.button
+                    key={et.label}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => toggleItem(orgEventTypes, setOrgEventTypes, et.label)}
+                    className={`p-5 rounded-3xl border-2 flex flex-col items-center gap-2 transition-all btn-pop ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card"
+                    }`}
+                  >
+                    <span className="text-4xl">{et.emoji}</span>
+                    <span className="font-semibold text-sm text-foreground">{et.label}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      if (step === 4) {
+        return (
+          <div className="flex flex-col px-6 flex-1">
+            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your city 🏙️</h2>
+            <p className="text-muted-foreground text-sm mb-6">Where are you based?</p>
+            <div className="space-y-3">
+              {CITIES.map((city) => {
+                const selected = selectedCities.includes(city.id);
+                return (
+                  <motion.button
+                    key={city.id}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => toggleItem(selectedCities, setSelectedCities, city.id, 3)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all btn-pop ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card"
+                    }`}
+                  >
+                    <span className="text-3xl">{city.emoji}</span>
+                    <span className="font-semibold text-foreground flex-1 text-left">{city.name}</span>
+                    {selected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-6 h-6 rounded-full gradient-primary flex items-center justify-center"
+                      >
+                        <span className="text-primary-foreground text-xs">✓</span>
+                      </motion.div>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    return null;
+  };
+
+  // Completion screen
+  if (showConfetti) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <Confetti />
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          className="text-center"
+        >
+          <div className="text-7xl mb-6">🚀</div>
+          <h1 className="text-3xl font-extrabold text-foreground">You're all set!</h1>
+          <p className="text-muted-foreground mt-2">Let's find your next event</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top bar with skip + progress */}
+      {step > 0 && (
+        <div className="px-6 pt-5 pb-2 flex items-center justify-between">
+          <button onClick={() => setStep((s) => Math.max(0, s - 1))} className="text-muted-foreground text-sm font-medium">
+            ← Back
+          </button>
+          <div className="flex gap-1.5">
+            {Array.from({ length: totalSteps }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i <= step ? "w-6 gradient-primary" : "w-3 bg-border"
+                }`}
+              />
+            ))}
+          </div>
+          <button onClick={skip} className="text-muted-foreground text-sm font-medium">
+            Skip
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="flex-1 flex flex-col pt-8 pb-32"
+        >
+          {renderStep()}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Bottom CTA */}
+      {step > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={next}
+            disabled={!canContinue()}
+            className={`w-full py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 btn-pop transition-all ${
+              canContinue()
+                ? "gradient-primary text-primary-foreground cta-glow"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {step === totalSteps - 1 ? "Let's Go! 🎉" : "Continue"}
+            {step < totalSteps - 1 && <ChevronRight className="w-5 h-5" />}
+          </motion.button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default OnboardingPage;
