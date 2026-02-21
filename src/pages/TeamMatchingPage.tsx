@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Rocket, X, Star, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,8 @@ import BottomNav from "@/components/BottomNav";
 import SwipeCard from "@/components/SwipeCard";
 import MatchOverlay from "@/components/MatchOverlay";
 import TeamLobby from "@/components/TeamLobby";
+import VerificationModal from "@/components/VerificationModal";
+import { useVerification } from "@/hooks/useVerification";
 import { Button } from "@/components/ui/button";
 import {
   mockStudents,
@@ -22,16 +24,26 @@ const TeamMatchingPage = () => {
   const [mode, setMode] = useState<Mode>("entry");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [match, setMatch] = useState<MatchResult | null>(null);
+  const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
-  // join_team → swipe through teams; create_team → swipe through students
   const cards: (StudentCard | TeamCard)[] =
     mode === "join_team" ? mockTeams : mockStudents;
   const cardType = mode === "join_team" ? "team" : "student";
 
+  const handleStartMode = (targetMode: "join_team" | "create_team") => {
+    const verified = requireVerification("student", () => {
+      setCurrentIndex(0);
+      setMode(targetMode);
+    });
+    if (verified) {
+      setCurrentIndex(0);
+      setMode(targetMode);
+    }
+  };
+
   const handleSwipe = useCallback(
     (direction: "left" | "right" | "up") => {
       if (direction === "right" || direction === "up") {
-        // Simulate match on every other right/up swipe
         const card = cards[currentIndex];
         if (currentIndex % 2 === 0) {
           const isStudent = "display_name" in card;
@@ -69,7 +81,13 @@ const TeamMatchingPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Match Overlay */}
+      <VerificationModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        type={verificationType}
+        onVerified={() => setShowModal(false)}
+      />
+
       <MatchOverlay
         match={match}
         onClose={() => setMatch(null)}
@@ -85,7 +103,6 @@ const TeamMatchingPage = () => {
           animate={{ opacity: 1 }}
           className="flex flex-col min-h-screen"
         >
-          {/* Header */}
           <div className="px-4 pt-12 pb-4 flex items-center gap-3">
             <button onClick={() => navigate(-1)}>
               <ArrowLeft className="w-6 h-6 text-foreground" />
@@ -93,7 +110,6 @@ const TeamMatchingPage = () => {
             <h1 className="text-xl font-bold text-foreground">Find Your Team</h1>
           </div>
 
-          {/* Entry Options */}
           <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
             <motion.div
               initial={{ y: 30, opacity: 0 }}
@@ -101,9 +117,7 @@ const TeamMatchingPage = () => {
               className="text-center mb-8"
             >
               <span className="text-6xl mb-4 block">🤝</span>
-              <h2 className="text-2xl font-black text-foreground">
-                Team Matching
-              </h2>
+              <h2 className="text-2xl font-black text-foreground">Team Matching</h2>
               <p className="text-muted-foreground mt-2 text-sm">
                 Swipe to find the perfect teammates for your next event
               </p>
@@ -113,10 +127,7 @@ const TeamMatchingPage = () => {
               initial={{ x: -30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              onClick={() => {
-                setCurrentIndex(0);
-                setMode("join_team");
-              }}
+              onClick={() => handleStartMode("join_team")}
               className="w-full glass-card rounded-3xl p-6 flex items-center gap-4 text-left hover-scale"
             >
               <div className="gradient-primary rounded-2xl p-3">
@@ -134,19 +145,14 @@ const TeamMatchingPage = () => {
               initial={{ x: 30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              onClick={() => {
-                setCurrentIndex(0);
-                setMode("create_team");
-              }}
+              onClick={() => handleStartMode("create_team")}
               className="w-full glass-card rounded-3xl p-6 flex items-center gap-4 text-left hover-scale"
             >
               <div className="gradient-secondary rounded-2xl p-3">
                 <Rocket className="w-6 h-6 text-secondary-foreground" />
               </div>
               <div>
-                <h3 className="font-bold text-foreground text-lg">
-                  Create a Team
-                </h3>
+                <h3 className="font-bold text-foreground text-lg">Create a Team</h3>
                 <p className="text-muted-foreground text-sm">
                   Swipe through students to recruit
                 </p>
@@ -158,7 +164,6 @@ const TeamMatchingPage = () => {
 
       {(mode === "join_team" || mode === "create_team") && (
         <div className="flex flex-col h-screen">
-          {/* Swipe Header */}
           <div className="px-4 pt-12 pb-2 flex items-center gap-3">
             <button onClick={() => setMode("entry")}>
               <ArrowLeft className="w-6 h-6 text-foreground" />
@@ -171,7 +176,6 @@ const TeamMatchingPage = () => {
             </span>
           </div>
 
-          {/* Swipe Area */}
           <div className="flex-1 relative px-4 py-2">
             {currentIndex < cards.length ? (
               <AnimatePresence>
@@ -180,8 +184,7 @@ const TeamMatchingPage = () => {
                   .reverse()
                   .map((card, i, arr) => {
                     const isTop = i === arr.length - 1;
-                    const key =
-                      "user_id" in card ? card.user_id : card.team_id;
+                    const key = "user_id" in card ? card.user_id : card.team_id;
                     return (
                       <SwipeCard
                         key={key}
@@ -200,12 +203,9 @@ const TeamMatchingPage = () => {
                 className="flex flex-col items-center justify-center h-full text-center"
               >
                 <span className="text-5xl mb-4">🎉</span>
-                <h2 className="text-xl font-bold text-foreground">
-                  No more cards!
-                </h2>
+                <h2 className="text-xl font-bold text-foreground">No more cards!</h2>
                 <p className="text-muted-foreground text-sm mt-2">
-                  Check back later for new{" "}
-                  {mode === "join_team" ? "teams" : "students"}
+                  Check back later for new {mode === "join_team" ? "teams" : "students"}
                 </p>
                 <Button
                   onClick={() => setMode("entry")}
@@ -217,7 +217,6 @@ const TeamMatchingPage = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
           {currentIndex < cards.length && (
             <div className="flex items-center justify-center gap-5 pb-6 px-4">
               <motion.button
