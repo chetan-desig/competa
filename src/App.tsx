@@ -10,6 +10,7 @@ import CertificatesPage from "./pages/CertificatesPage";
 import ProfilePage from "./pages/ProfilePage";
 import EventDetailPage from "./pages/EventDetailPage";
 import TeamMatchingPage from "./pages/TeamMatchingPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/create" element={<CreateEventPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
