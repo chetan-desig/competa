@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { useState } from "react";
+import VerificationModal from "@/components/VerificationModal";
+import { useVerification } from "@/hooks/useVerification";
 
 const EventDetailPage = () => {
   const { id } = useParams();
@@ -10,6 +12,7 @@ const EventDetailPage = () => {
   const event = mockEvents.find((e) => e.id === id);
   const [saved, setSaved] = useState(false);
   const [joined, setJoined] = useState(false);
+  const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
   if (!event) {
     return (
@@ -19,8 +22,27 @@ const EventDetailPage = () => {
     );
   }
 
+  const handleJoin = () => {
+    if (joined) {
+      setJoined(false);
+      return;
+    }
+    const verified = requireVerification("student", () => setJoined(true));
+    if (verified) setJoined(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <VerificationModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        type={verificationType}
+        onVerified={() => {
+          setShowModal(false);
+          setJoined(true);
+        }}
+      />
+
       {/* Hero */}
       <div className="relative h-[55vh]">
         <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
@@ -109,7 +131,7 @@ const EventDetailPage = () => {
         <div className="flex gap-3 max-w-lg mx-auto">
           <motion.button
             whileTap={{ scale: 0.97 }}
-            onClick={() => setJoined(!joined)}
+            onClick={handleJoin}
             className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
               joined
                 ? "bg-muted text-muted-foreground"
