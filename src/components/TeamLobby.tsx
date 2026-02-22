@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -6,12 +7,11 @@ import {
   Clock,
   Users,
   MessageCircle,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { mockStudents } from "@/data/teamMatchingData";
-import { useState } from "react";
 
 interface TeamLobbyProps {
   onBack: () => void;
@@ -23,8 +23,20 @@ const skillProgress = [
   { skill: "Frontend", value: 85, emoji: "⚛️" },
   { skill: "Backend", value: 60, emoji: "🟢" },
   { skill: "Design", value: 75, emoji: "🎨" },
-  { skill: "AI/ML", value: 40, emoji: "🧠" },
+  { skill: "AI/ML", value: 25, emoji: "🧠" },
 ];
+
+const getSkillColor = (value: number): string => {
+  if (value < 30) return "bg-destructive";
+  if (value <= 70) return "bg-[hsl(44,100%,50%)]";
+  return "bg-accent";
+};
+
+const getSkillLabel = (value: number): string => {
+  if (value < 30) return "Needs help";
+  if (value <= 70) return "Growing";
+  return "Strong";
+};
 
 const messages = [
   { id: 1, user: "Arjun", text: "Hey team! Excited to build together 🚀", time: "2m ago" },
@@ -34,6 +46,7 @@ const messages = [
 
 const TeamLobby = ({ onBack }: TeamLobbyProps) => {
   const [chatInput, setChatInput] = useState("");
+  const [showInvite, setShowInvite] = useState(false);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -94,18 +107,37 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
                 </span>
               </motion.div>
             ))}
-            {/* Empty slot */}
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center">
-                <span className="text-muted-foreground text-lg">+</span>
+            {/* Actionable open slot */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowInvite(!showInvite)}
+              className="flex flex-col items-center gap-1 group"
+            >
+              <div className="w-14 h-14 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center group-hover:border-primary group-hover:bg-primary/5 transition-all">
+                <UserPlus className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors" />
               </div>
-              <span className="text-xs text-muted-foreground">Open</span>
-              <span className="text-[10px] text-muted-foreground">Slot</span>
-            </div>
+              <span className="text-xs text-primary font-medium">Invite</span>
+              <span className="text-[10px] text-muted-foreground">Open</span>
+            </motion.button>
           </div>
+          {/* Invite options */}
+          {showInvite && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              className="mt-4 flex gap-2"
+            >
+              <Button size="sm" className="flex-1 gradient-primary text-primary-foreground rounded-2xl text-xs">
+                🔗 Invite Friends
+              </Button>
+              <Button size="sm" className="flex-1 gradient-accent text-accent-foreground rounded-2xl text-xs">
+                🚀 Boost Recruitment
+              </Button>
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Skill Progress */}
+        {/* Color-coded Skill Progress */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -122,9 +154,25 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
                   <span className="text-muted-foreground">
                     {s.emoji} {s.skill}
                   </span>
-                  <span className="font-semibold text-foreground">{s.value}%</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      s.value < 30 ? "bg-destructive/10 text-destructive" :
+                      s.value <= 70 ? "bg-yellow-500/10 text-yellow-600" :
+                      "bg-accent/10 text-accent"
+                    }`}>
+                      {getSkillLabel(s.value)}
+                    </span>
+                    <span className="font-semibold text-foreground">{s.value}%</span>
+                  </div>
                 </div>
-                <Progress value={s.value} className="h-2" />
+                <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${s.value}%` }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className={`h-full rounded-full ${getSkillColor(s.value)}`}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -201,17 +249,20 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
           </div>
         </motion.div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons — separated with distinct colors */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="flex gap-3"
+          className="space-y-3"
         >
-          <Button className="flex-1 gradient-primary text-primary-foreground rounded-2xl h-12 font-semibold">
+          <Button className="w-full gradient-primary text-primary-foreground rounded-2xl h-12 font-semibold">
             Share Invite 🔗
           </Button>
-          <Button className="flex-1 gradient-secondary text-secondary-foreground rounded-2xl h-12 font-semibold">
+          <Button
+            variant="outline"
+            className="w-full rounded-2xl h-12 font-semibold border-2 border-accent text-accent hover:bg-accent/10"
+          >
             Submit Project 🚀
           </Button>
         </motion.div>

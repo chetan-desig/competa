@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Linkedin } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
-import { useVerification, getVerificationLevel } from "@/hooks/useVerification";
+import { useVerification } from "@/hooks/useVerification";
 import { useState } from "react";
 
 const ProfilePage = () => {
@@ -11,6 +11,13 @@ const ProfilePage = () => {
     { label: "Events", value: "12" },
     { label: "Teams", value: "4" },
     { label: "Certs", value: "7" },
+  ];
+
+  const githubContributions = [
+    { lang: "TypeScript", pct: 45, color: "bg-[hsl(211,100%,65%)]" },
+    { lang: "Python", pct: 30, color: "bg-accent" },
+    { lang: "CSS", pct: 15, color: "bg-secondary" },
+    { lang: "Other", pct: 10, color: "bg-muted-foreground" },
   ];
 
   const { showModal, setShowModal, verificationType, requireVerification, level } = useVerification();
@@ -65,7 +72,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Verification badge */}
+        {/* Level badge — with glow for verified */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={() => {
@@ -73,7 +80,9 @@ const ProfilePage = () => {
               requireVerification("student");
             }
           }}
-          className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-2xl mb-5 ${current.color}`}
+          className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-2xl mb-5 ${current.color} ${
+            isFullyVerified ? "ring-2 ring-accent/40 shadow-[0_0_16px_2px_hsl(160_76%_53%/0.3)]" : ""
+          }`}
         >
           <Shield className="w-4 h-4" />
           <span className="text-xs font-semibold">{current.label}</span>
@@ -104,6 +113,36 @@ const ProfilePage = () => {
                 {skill}
               </span>
             ))}
+          </div>
+        </div>
+
+        {/* GitHub Contributions Preview */}
+        <div className="mb-6">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
+            Recent Contributions
+          </h2>
+          <div className="bg-card rounded-3xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">🔥</span>
+              <span className="text-sm font-semibold text-card-foreground">142 contributions this month</span>
+            </div>
+            <div className="flex gap-1 h-3 rounded-full overflow-hidden mb-3">
+              {githubContributions.map((c) => (
+                <div
+                  key={c.lang}
+                  className={`${c.color} transition-all`}
+                  style={{ width: `${c.pct}%` }}
+                />
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {githubContributions.map((c) => (
+                <div key={c.lang} className="flex items-center gap-1.5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${c.color}`} />
+                  <span className="text-[11px] text-muted-foreground">{c.lang} {c.pct}%</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

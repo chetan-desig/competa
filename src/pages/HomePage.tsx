@@ -28,9 +28,15 @@ const HomePage = () => {
     });
   }, [selectedCategory, selectedCity]);
 
+  const handleExpandSearch = () => {
+    setSelectedCategory("all");
+    const idx = cities.findIndex((c) => c.id === selectedCity);
+    setSelectedCity(cities[(idx + 1) % cities.length].id);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
+      {/* Header with sticky filter chips */}
       <header className="sticky top-0 z-40 glass-card px-5 pt-3 pb-2">
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -91,15 +97,30 @@ const HomePage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20"
+            className="text-center py-16 px-4"
           >
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="text-muted-foreground font-medium">
-              No events found in {currentCity?.name}
+            <p className="text-5xl mb-4">🔍</p>
+            <p className="text-foreground font-bold text-lg mb-1">
+              No events in {currentCity?.name}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Try switching cities or categories
+            <p className="text-sm text-muted-foreground mb-6">
+              We'll let you know when new events pop up here
             </p>
+            <div className="flex flex-col gap-3 max-w-xs mx-auto">
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                className="gradient-primary text-primary-foreground font-semibold py-3 rounded-2xl text-sm cta-glow btn-pop"
+              >
+                🔔 Notify me when events are added
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleExpandSearch}
+                className="bg-muted text-foreground font-semibold py-3 rounded-2xl text-sm btn-pop"
+              >
+                🌍 Expand to nearby cities
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </main>
