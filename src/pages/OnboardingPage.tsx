@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Camera, ChevronRight, MapPin, Sparkles } from "lucide-react";
+import { ChevronRight, Search, Info } from "lucide-react";
 import Confetti from "@/components/Confetti";
 
 const CITIES = [
@@ -10,6 +10,9 @@ const CITIES = [
   { id: "mum", name: "Mumbai", emoji: "🌊" },
   { id: "pun", name: "Pune", emoji: "⛰️" },
   { id: "che", name: "Chennai", emoji: "🏖️" },
+  { id: "del", name: "Delhi", emoji: "🏰" },
+  { id: "kol", name: "Kolkata", emoji: "🌉" },
+  { id: "ahm", name: "Ahmedabad", emoji: "🏗️" },
 ];
 
 const SKILLS = [
@@ -34,6 +37,11 @@ const slideVariants = {
   exit: { x: "-100%", opacity: 0 },
 };
 
+const ROLE_TOOLTIPS = {
+  student: "Browse events, join hackathons, form teams, earn certificates, and build your portfolio.",
+  organizer: "Create & manage events, recruit participants, track analytics, and issue certificates.",
+};
+
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -42,6 +50,8 @@ const OnboardingPage = () => {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const [showTooltip, setShowTooltip] = useState<string | null>(null);
 
   // Organizer state
   const [orgName, setOrgName] = useState("");
@@ -75,12 +85,12 @@ const OnboardingPage = () => {
   };
 
   const canContinue = () => {
-    if (step === 0) return true; // welcome
-    if (step === 1) return !!role; // role selection
+    if (step === 0) return true;
+    if (step === 1) return !!role;
     if (role === "student") {
       if (step === 2) return selectedCities.length > 0;
       if (step === 3) return selectedSkills.length > 0;
-      if (step === 4) return true; // interests optional
+      if (step === 4) return true;
     }
     if (role === "organizer") {
       if (step === 2) return orgName.trim().length > 0;
@@ -89,6 +99,11 @@ const OnboardingPage = () => {
     }
     return true;
   };
+
+  const filteredCities = useMemo(() => {
+    if (!citySearch.trim()) return CITIES;
+    return CITIES.filter((c) => c.name.toLowerCase().includes(citySearch.toLowerCase()));
+  }, [citySearch]);
 
   const renderStep = () => {
     // Step 0 - Welcome
@@ -137,7 +152,7 @@ const OnboardingPage = () => {
                 key={opt.r}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setRole(opt.r)}
-                className={`rounded-3xl p-6 flex flex-col items-center gap-3 border-2 transition-all btn-pop ${
+                className={`relative rounded-3xl p-6 flex flex-col items-center gap-3 border-2 transition-all btn-pop ${
                   role === opt.r
                     ? "border-primary bg-primary/10 shadow-lg cta-glow"
                     : "border-border bg-card"
@@ -146,6 +161,31 @@ const OnboardingPage = () => {
                 <span className="text-5xl">{opt.emoji}</span>
                 <span className="font-bold text-foreground capitalize">{opt.r}</span>
                 <span className="text-xs text-muted-foreground text-center">{opt.desc}</span>
+                {/* Tooltip trigger */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTooltip(showTooltip === opt.r ? null : opt.r);
+                  }}
+                  className="absolute top-3 right-3 w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+                >
+                  <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+                {/* Tooltip */}
+                <AnimatePresence>
+                  {showTooltip === opt.r && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full z-20 w-52 bg-card border border-border rounded-2xl p-3 shadow-xl"
+                    >
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        {ROLE_TOOLTIPS[opt.r]}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.button>
             ))}
           </div>
@@ -159,12 +199,23 @@ const OnboardingPage = () => {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-extrabold text-foreground mb-1">Your cities 🏙️</h2>
-            <p className="text-muted-foreground text-sm mb-6">
+            <p className="text-muted-foreground text-sm mb-4">
               Pick up to 3 cities (
               <span className="text-primary font-semibold">{selectedCities.length}/3</span>)
             </p>
-            <div className="space-y-3">
-              {CITIES.map((city) => {
+            {/* Search bar */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search cities..."
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 rounded-2xl bg-muted text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div className="space-y-3 overflow-y-auto max-h-[50vh]">
+              {filteredCities.map((city) => {
                 const selected = selectedCities.includes(city.id);
                 return (
                   <motion.button
@@ -173,7 +224,7 @@ const OnboardingPage = () => {
                     onClick={() => toggleItem(selectedCities, setSelectedCities, city.id, 3)}
                     className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all btn-pop ${
                       selected
-                        ? "border-primary bg-primary/10"
+                        ? "border-primary bg-primary/8 shadow-sm"
                         : "border-border bg-card"
                     }`}
                   >
@@ -191,6 +242,9 @@ const OnboardingPage = () => {
                   </motion.button>
                 );
               })}
+              {filteredCities.length === 0 && (
+                <p className="text-center text-muted-foreground text-sm py-8">No cities match "{citySearch}"</p>
+              )}
             </div>
           </div>
         );
@@ -211,7 +265,7 @@ const OnboardingPage = () => {
                     onClick={() => toggleItem(selectedSkills, setSelectedSkills, skill.label)}
                     className={`px-5 py-3 rounded-full text-sm font-semibold border-2 transition-all btn-pop flex items-center gap-2 ${
                       selected
-                        ? "border-primary bg-primary/10 text-primary"
+                        ? "border-primary bg-primary/10 text-primary shadow-sm"
                         : "border-border bg-card text-foreground"
                     }`}
                   >
@@ -240,7 +294,7 @@ const OnboardingPage = () => {
                     onClick={() => toggleItem(selectedInterests, setSelectedInterests, interest.label)}
                     className={`p-5 rounded-3xl border-2 flex flex-col items-center gap-2 transition-all btn-pop ${
                       selected
-                        ? "border-primary bg-primary/10"
+                        ? "border-primary bg-primary/10 shadow-sm"
                         : "border-border bg-card"
                     }`}
                   >
@@ -293,7 +347,7 @@ const OnboardingPage = () => {
                     onClick={() => toggleItem(orgEventTypes, setOrgEventTypes, et.label)}
                     className={`p-5 rounded-3xl border-2 flex flex-col items-center gap-2 transition-all btn-pop ${
                       selected
-                        ? "border-primary bg-primary/10"
+                        ? "border-primary bg-primary/10 shadow-sm"
                         : "border-border bg-card"
                     }`}
                   >
@@ -311,9 +365,19 @@ const OnboardingPage = () => {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-extrabold text-foreground mb-1">Your city 🏙️</h2>
-            <p className="text-muted-foreground text-sm mb-6">Where are you based?</p>
-            <div className="space-y-3">
-              {CITIES.map((city) => {
+            <p className="text-muted-foreground text-sm mb-4">Where are you based?</p>
+            <div className="relative mb-4">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search cities..."
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 rounded-2xl bg-muted text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div className="space-y-3 overflow-y-auto max-h-[50vh]">
+              {filteredCities.map((city) => {
                 const selected = selectedCities.includes(city.id);
                 return (
                   <motion.button
@@ -322,7 +386,7 @@ const OnboardingPage = () => {
                     onClick={() => toggleItem(selectedCities, setSelectedCities, city.id, 3)}
                     className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all btn-pop ${
                       selected
-                        ? "border-primary bg-primary/10"
+                        ? "border-primary bg-primary/8 shadow-sm"
                         : "border-border bg-card"
                     }`}
                   >
@@ -376,15 +440,20 @@ const OnboardingPage = () => {
           <button onClick={() => setStep((s) => Math.max(0, s - 1))} className="text-muted-foreground text-sm font-medium">
             ← Back
           </button>
-          <div className="flex gap-1.5">
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${
-                  i <= step ? "w-6 gradient-primary" : "w-3 bg-border"
-                }`}
-              />
-            ))}
+          <div className="flex flex-col items-center gap-1.5">
+            <div className="flex gap-1.5">
+              {Array.from({ length: totalSteps }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-2 rounded-full transition-all ${
+                    i <= step ? "w-7 gradient-primary" : "w-4 bg-border"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] font-semibold text-muted-foreground">
+              Step {step} of {totalSteps - 1}
+            </span>
           </div>
           <button onClick={skip} className="text-muted-foreground text-sm font-medium">
             Skip

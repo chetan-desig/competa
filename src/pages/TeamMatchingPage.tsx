@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Users, Rocket, X, Star, Heart } from "lucide-react";
+import { ArrowLeft, Users, Rocket, X, Star, Heart, Undo2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import SwipeCard from "@/components/SwipeCard";
@@ -24,6 +24,8 @@ const TeamMatchingPage = () => {
   const [mode, setMode] = useState<Mode>("entry");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [match, setMatch] = useState<MatchResult | null>(null);
+  const [undoAvailable, setUndoAvailable] = useState(false);
+  const lastIndexRef = useRef<number | null>(null);
   const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
   const cards: (StudentCard | TeamCard)[] =
@@ -37,12 +39,14 @@ const TeamMatchingPage = () => {
     });
     if (verified) {
       setCurrentIndex(0);
+      setUndoAvailable(false);
       setMode(targetMode);
     }
   };
 
   const handleSwipe = useCallback(
     (direction: "left" | "right" | "up") => {
+      lastIndexRef.current = currentIndex;
       if (direction === "right" || direction === "up") {
         const card = cards[currentIndex];
         if (currentIndex % 2 === 0) {
@@ -65,9 +69,18 @@ const TeamMatchingPage = () => {
         }
       }
       setCurrentIndex((prev) => prev + 1);
+      setUndoAvailable(true);
     },
     [cards, currentIndex]
   );
+
+  const handleUndo = () => {
+    if (lastIndexRef.current !== null && undoAvailable) {
+      setCurrentIndex(lastIndexRef.current);
+      setUndoAvailable(false);
+      lastIndexRef.current = null;
+    }
+  };
 
   const handleButtonSwipe = (direction: "left" | "right" | "up") => {
     if (currentIndex < cards.length) {
@@ -218,7 +231,19 @@ const TeamMatchingPage = () => {
           </div>
 
           {currentIndex < cards.length && (
-            <div className="flex items-center justify-center gap-5 pb-6 px-4">
+            <div className="flex items-center justify-center gap-4 pb-6 px-4">
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={handleUndo}
+                disabled={!undoAvailable}
+                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-md transition-opacity ${
+                  undoAvailable
+                    ? "bg-card border-2 border-primary/30"
+                    : "bg-muted opacity-40"
+                }`}
+              >
+                <Undo2 className={`w-5 h-5 ${undoAvailable ? "text-primary" : "text-muted-foreground"}`} />
+              </motion.button>
               <motion.button
                 whileTap={{ scale: 0.85 }}
                 onClick={() => handleButtonSwipe("left")}

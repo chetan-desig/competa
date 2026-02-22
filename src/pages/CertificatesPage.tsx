@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Share2, Download } from "lucide-react";
+import { Share2, Download, Linkedin } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { mockCertificates } from "@/data/mockData";
 
@@ -51,6 +51,9 @@ const CertificatesPage = () => {
               </h3>
               <p className="text-[10px] text-muted-foreground mb-3">{cert.date}</p>
               <div className="flex gap-2">
+                <button className="w-7 h-7 rounded-xl bg-[hsl(211,100%,65%)]/10 flex items-center justify-center hover:bg-[hsl(211,100%,65%)]/20 transition-colors" title="Share to LinkedIn">
+                  <Linkedin className="w-3.5 h-3.5 text-[hsl(211,100%,65%)]" />
+                </button>
                 <button className="w-7 h-7 rounded-xl bg-muted flex items-center justify-center">
                   <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>

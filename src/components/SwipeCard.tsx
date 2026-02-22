@@ -10,13 +10,26 @@ interface SwipeCardProps {
   isTop: boolean;
 }
 
+/** Compute a fake compatibility % based on skill coverage */
+const getCompatibility = (card: StudentCard | TeamCard, type: string): number => {
+  if (type === "team") {
+    const team = card as TeamCard;
+    const vals = Object.values(team.skill_coverage);
+    if (vals.length === 0) return 70;
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    return Math.min(99, Math.round(avg + 15));
+  }
+  const student = card as StudentCard;
+  return Math.min(99, 60 + student.skills.length * 8);
+};
+
 const SwipeCard = ({ card, type, onSwipe, isTop }: SwipeCardProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-25, 25]);
-  const matchOpacity = useTransform(x, [0, 100], [0, 1]);
-  const skipOpacity = useTransform(x, [-100, 0], [1, 0]);
-  const superOpacity = useTransform(y, [-100, 0], [1, 0]);
+  const matchOpacity = useTransform(x, [0, 60], [0, 1]);
+  const skipOpacity = useTransform(x, [-60, 0], [1, 0]);
+  const superOpacity = useTransform(y, [-60, 0], [1, 0]);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.y < -100) {
@@ -37,6 +50,7 @@ const SwipeCard = ({ card, type, onSwipe, isTop }: SwipeCardProps) => {
 
   const photo = isStudent ? student.profile_photo : team.team_image;
   const name = isStudent ? student.display_name : team.team_name;
+  const compatibility = getCompatibility(card, type);
 
   return (
     <motion.div
@@ -61,27 +75,27 @@ const SwipeCard = ({ card, type, onSwipe, isTop }: SwipeCardProps) => {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        {/* Swipe Labels */}
+        {/* Swipe Labels — stronger opacity */}
         {isTop && (
           <>
             <motion.div
               style={{ opacity: matchOpacity }}
-              className="absolute top-8 left-6 z-20 border-4 border-green-400 rounded-xl px-4 py-2 -rotate-12"
+              className="absolute top-8 left-6 z-20 border-[5px] border-green-400 rounded-xl px-5 py-2.5 -rotate-12 bg-green-400/20"
             >
-              <span className="text-green-400 font-black text-2xl">MATCH</span>
+              <span className="text-green-400 font-black text-3xl drop-shadow-lg">MATCH</span>
             </motion.div>
             <motion.div
               style={{ opacity: skipOpacity }}
-              className="absolute top-8 right-6 z-20 border-4 border-red-400 rounded-xl px-4 py-2 rotate-12"
+              className="absolute top-8 right-6 z-20 border-[5px] border-red-400 rounded-xl px-5 py-2.5 rotate-12 bg-red-400/20"
             >
-              <span className="text-red-400 font-black text-2xl">SKIP</span>
+              <span className="text-red-400 font-black text-3xl drop-shadow-lg">SKIP</span>
             </motion.div>
             <motion.div
               style={{ opacity: superOpacity }}
-              className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-4 border-accent rounded-xl px-4 py-2"
+              className="absolute top-8 left-1/2 -translate-x-1/2 z-20 border-[5px] border-accent rounded-xl px-5 py-2.5 bg-accent/20"
             >
-              <span className="text-accent font-black text-2xl flex items-center gap-1">
-                <Zap className="w-5 h-5" /> SUPER
+              <span className="text-accent font-black text-3xl flex items-center gap-1 drop-shadow-lg">
+                <Zap className="w-6 h-6" /> SUPER
               </span>
             </motion.div>
           </>
@@ -92,6 +106,14 @@ const SwipeCard = ({ card, type, onSwipe, isTop }: SwipeCardProps) => {
           <MapPin className="w-3 h-3 text-primary-foreground" />
           <span className="text-xs font-semibold text-primary-foreground">
             {cityName}
+          </span>
+        </div>
+
+        {/* Compatibility Badge */}
+        <div className="absolute top-4 left-4 z-10 gradient-accent rounded-full px-3 py-1 flex items-center gap-1.5 shadow-lg">
+          <Zap className="w-3 h-3 text-accent-foreground" />
+          <span className="text-xs font-bold text-accent-foreground">
+            {compatibility}% Match
           </span>
         </div>
 
