@@ -1,9 +1,21 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Camera, FileText, Tag, MapPin, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { categories, cities } from "@/data/mockData";
+import { useRole } from "@/hooks/useRole";
 
 const CreateEventPage = () => {
+  const navigate = useNavigate();
+  const { isOrganizer } = useRole();
+
+  useEffect(() => {
+    if (!isOrganizer) {
+      navigate("/", { replace: true });
+    }
+  }, [isOrganizer, navigate]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="px-5 pt-5 pb-3">

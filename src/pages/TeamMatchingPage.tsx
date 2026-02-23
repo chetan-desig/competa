@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Users, Rocket, X, Star, Heart, Undo2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import TeamLobby from "@/components/TeamLobby";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
 import { Button } from "@/components/ui/button";
+import { useRole } from "@/hooks/useRole";
 import {
   mockStudents,
   mockTeams,
@@ -21,12 +22,19 @@ type Mode = "entry" | "join_team" | "create_team" | "lobby";
 
 const TeamMatchingPage = () => {
   const navigate = useNavigate();
+  const { isStudent } = useRole();
   const [mode, setMode] = useState<Mode>("entry");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [match, setMatch] = useState<MatchResult | null>(null);
   const [undoAvailable, setUndoAvailable] = useState(false);
   const lastIndexRef = useRef<number | null>(null);
   const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
+
+  useEffect(() => {
+    if (!isStudent) {
+      navigate("/", { replace: true });
+    }
+  }, [isStudent, navigate]);
 
   const cards: (StudentCard | TeamCard)[] =
     mode === "join_team" ? mockTeams : mockStudents;
