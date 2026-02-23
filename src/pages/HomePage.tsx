@@ -1,17 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Bell, Users } from "lucide-react";
+import { MapPin, Bell, Users, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EventCard from "@/components/EventCard";
 import CategoryChips from "@/components/CategoryChips";
 import BottomNav from "@/components/BottomNav";
 import { mockEvents, categories, cities } from "@/data/mockData";
+import { useRole } from "@/hooks/useRole";
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { isStudent, isOrganizer } = useRole();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCity, setSelectedCity] = useState("hyd");
-
   useEffect(() => {
     if (!localStorage.getItem("eduvibe_onboarded")) {
       navigate("/onboarding", { replace: true });
@@ -68,23 +69,42 @@ const HomePage = () => {
         />
       </header>
 
-      {/* Team Matching CTA */}
+      {/* Role-specific CTA */}
       <div className="px-5 pt-4">
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => navigate("/team-matching")}
-          className="w-full gradient-primary rounded-3xl p-4 flex items-center gap-4 text-left"
-        >
-          <div className="bg-primary-foreground/20 rounded-2xl p-2.5">
-            <Users className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h3 className="font-bold text-primary-foreground text-base">Find Your Team 🤝</h3>
-            <p className="text-primary-foreground/70 text-xs">Swipe to match with teammates</p>
-          </div>
-        </motion.button>
+        {isStudent && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/team-matching")}
+            className="w-full gradient-primary rounded-3xl p-4 flex items-center gap-4 text-left"
+          >
+            <div className="bg-primary-foreground/20 rounded-2xl p-2.5">
+              <Users className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h3 className="font-bold text-primary-foreground text-base">Find Your Team 🤝</h3>
+              <p className="text-primary-foreground/70 text-xs">Swipe to match with teammates</p>
+            </div>
+          </motion.button>
+        )}
+        {isOrganizer && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/create")}
+            className="w-full gradient-secondary rounded-3xl p-4 flex items-center gap-4 text-left"
+          >
+            <div className="bg-primary-foreground/20 rounded-2xl p-2.5">
+              <PlusCircle className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h3 className="font-bold text-primary-foreground text-base">Create an Event 🎤</h3>
+              <p className="text-primary-foreground/70 text-xs">Host your next hackathon or workshop</p>
+            </div>
+          </motion.button>
+        )}
       </div>
 
       {/* Event Feed */}

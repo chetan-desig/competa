@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Search, Info } from "lucide-react";
 import Confetti from "@/components/Confetti";
+import { setUserRole } from "@/hooks/useRole";
 
 const CITIES = [
   { id: "hyd", name: "Hyderabad", emoji: "🏛️" },
@@ -67,21 +68,25 @@ const OnboardingPage = () => {
     }
   };
 
+  const finishOnboarding = () => {
+    localStorage.setItem("eduvibe_onboarded", "true");
+    if (role) setUserRole(role);
+    const dest = role === "organizer" ? "/create" : "/";
+    navigate(dest, { replace: true });
+  };
+
   const next = () => {
     if (step === totalSteps - 1) {
       setShowConfetti(true);
-      setTimeout(() => {
-        localStorage.setItem("eduvibe_onboarded", "true");
-        navigate("/");
-      }, 2000);
+      setTimeout(finishOnboarding, 2000);
     } else {
       setStep((s) => s + 1);
     }
   };
 
   const skip = () => {
-    localStorage.setItem("eduvibe_onboarded", "true");
-    navigate("/");
+    if (role) setUserRole(role);
+    finishOnboarding();
   };
 
   const canContinue = () => {
@@ -426,7 +431,9 @@ const OnboardingPage = () => {
         >
           <div className="text-7xl mb-6">🚀</div>
           <h1 className="text-3xl font-extrabold text-foreground">You're all set!</h1>
-          <p className="text-muted-foreground mt-2">Let's find your next event</p>
+          <p className="text-muted-foreground mt-2">
+            {role === "organizer" ? "Let's create your first event 🎤" : "Let's find your next event"}
+          </p>
         </motion.div>
       </div>
     );
