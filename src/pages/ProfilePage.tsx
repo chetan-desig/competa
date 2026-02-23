@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Linkedin } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Linkedin, Trophy } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
+import { mockCertificates } from "@/data/mockData";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const skills = ["React", "Figma", "Python", "UI/UX", "AI/ML"];
   const stats = [
     { label: "Events", value: "12" },
@@ -143,6 +146,41 @@ const ProfilePage = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Certificate Preview Gallery */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+              Certificates
+            </h2>
+            <button
+              onClick={() => navigate("/certificates")}
+              className="text-xs font-semibold text-primary flex items-center gap-1"
+            >
+              View All <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+            {mockCertificates.slice(0, 4).map((cert, i) => (
+              <motion.div
+                key={cert.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.1 }}
+                onClick={() => navigate("/certificates")}
+                className="flex-shrink-0 w-28 cursor-pointer"
+              >
+                <div
+                  className="w-28 h-20 rounded-2xl flex items-center justify-center text-3xl mb-2 shadow-sm"
+                  style={{ background: i % 2 === 0 ? "var(--gradient-primary)" : "var(--gradient-accent)" }}
+                >
+                  {cert.badge}
+                </div>
+                <p className="text-[10px] font-semibold text-card-foreground leading-tight line-clamp-2">{cert.title}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
 
