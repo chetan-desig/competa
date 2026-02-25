@@ -1,107 +1,106 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Users, Rocket, X, Star, Heart, Undo2 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Users, Plus, Check, ChevronRight, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
-import SwipeCard from "@/components/SwipeCard";
-import MatchOverlay from "@/components/MatchOverlay";
 import TeamLobby from "@/components/TeamLobby";
 import VerificationModal from "@/components/VerificationModal";
+import Confetti from "@/components/Confetti";
 import { useVerification } from "@/hooks/useVerification";
-import { Button } from "@/components/ui/button";
 import { useRole } from "@/hooks/useRole";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import {
-  mockStudents,
   mockTeams,
-  MatchResult,
-  StudentCard,
+  ROLES_CATALOG,
+  RoleId,
   TeamCard,
 } from "@/data/teamMatchingData";
 
-type Mode = "entry" | "join_team" | "create_team" | "lobby";
+type Mode = "entry" | "browse_teams" | "create_team" | "lobby";
+
+const cardColors = [
+  "bg-olive", "bg-purple text-primary-foreground", "bg-gold", "bg-red-card text-primary-foreground",
+];
 
 const TeamMatchingPage = () => {
   const navigate = useNavigate();
   const { isStudent } = useRole();
   const [mode, setMode] = useState<Mode>("entry");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [match, setMatch] = useState<MatchResult | null>(null);
-  const [undoAvailable, setUndoAvailable] = useState(false);
-  const lastIndexRef = useRef<number | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
+  const [secondaryRole, setSecondaryRole] = useState<RoleId | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
-  useEffect(() => {
-    if (!isStudent) {
-      navigate("/", { replace: true });
-    }
-  }, [isStudent, navigate]);
+  // Create team state
+  const [newTeamName, setNewTeamName] = useState("");
+  const [newTeamSize, setNewTeamSize] = useState(4);
+  const [newTeamRoles, setNewTeamRoles] = useState<RoleId[]>([]);
 
-  const cards: (StudentCard | TeamCard)[] =
-    mode === "join_team" ? mockTeams : mockStudents;
-  const cardType = mode === "join_team" ? "team" : "student";
+  // Get user's stored role
+  const storedPrimary = localStorage.getItem("eduvibe_primary_role") as RoleId | null;
+  const storedSecondary = localStorage.getItem("eduvibe_secondary_role") as RoleId | null;
 
-  const handleStartMode = (targetMode: "join_team" | "create_team") => {
+  const userRole = selectedRole || storedPrimary;
+
+  const handleStartMode = (targetMode: "browse_teams" | "create_team") => {
     const verified = requireVerification("student", () => {
-      setCurrentIndex(0);
       setMode(targetMode);
     });
     if (verified) {
-      setCurrentIndex(0);
-      setUndoAvailable(false);
       setMode(targetMode);
     }
   };
 
-  const handleSwipe = useCallback(
-    (direction: "left" | "right" | "up") => {
-      lastIndexRef.current = currentIndex;
-      if (direction === "right" || direction === "up") {
-        const card = cards[currentIndex];
-        if (currentIndex % 2 === 0) {
-          const isStudent = "display_name" in card;
-          setMatch({
-            id: isStudent
-              ? (card as StudentCard).user_id
-              : (card as TeamCard).team_id,
-            name: isStudent
-              ? (card as StudentCard).display_name
-              : (card as TeamCard).team_name,
-            photo: isStudent
-              ? (card as StudentCard).profile_photo
-              : (card as TeamCard).team_image,
-            role: isStudent
-              ? (card as StudentCard).primary_role
-              : (card as TeamCard).open_roles[0],
-            type: isStudent ? "student" : "team",
-          });
-        }
-      }
-      setCurrentIndex((prev) => prev + 1);
-      setUndoAvailable(true);
-    },
-    [cards, currentIndex]
-  );
-
-  const handleUndo = () => {
-    if (lastIndexRef.current !== null && undoAvailable) {
-      setCurrentIndex(lastIndexRef.current);
-      setUndoAvailable(false);
-      lastIndexRef.current = null;
+  // Filter & sort teams
+  const sortedTeams = useMemo(() => {
+    let teams = [...mockTeams];
+    if (userRole) {
+      teams.sort((a, b) => {
+        const aMatch = a.open_roles.includes(userRole) ? 1 : 0;
+        const bMatch = b.open_roles.includes(userRole) ? 1 : 0;
+        if (bMatch !== aMatch) return bMatch - aMatch;
+        return b.completion - a.completion;
+      });
     }
+    return teams;
+  }, [userRole]);
+
+  const handleJoinTeam = (team: TeamCard, role: RoleId) => {
+    toast({
+      title: "Request Sent! 🎉",
+      description: `You requested to join ${team.team_name} as ${ROLES_CATALOG.find(r => r.id === role)?.label}`,
+    });
   };
 
-  const handleButtonSwipe = (direction: "left" | "right" | "up") => {
-    if (currentIndex < cards.length) {
-      handleSwipe(direction);
+  const handleCreateTeam = () => {
+    if (!newTeamName.trim()) {
+      toast({ title: "Enter a team name", variant: "destructive" });
+      return;
     }
+    if (newTeamRoles.length === 0) {
+      toast({ title: "Select at least one required role", variant: "destructive" });
+      return;
+    }
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 3000);
+    toast({
+      title: "Team Created! 🚀",
+      description: `${newTeamName} is now open for members`,
+    });
+    setMode("lobby");
   };
+
+  const getRoleInfo = (id: RoleId) => ROLES_CATALOG.find(r => r.id === id)!;
 
   if (mode === "lobby") {
     return <TeamLobby onBack={() => setMode("entry")} />;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
+      <Confetti active={showConfetti} />
       <VerificationModal
         open={showModal}
         onClose={() => setShowModal(false)}
@@ -109,173 +108,281 @@ const TeamMatchingPage = () => {
         onVerified={() => setShowModal(false)}
       />
 
-      <MatchOverlay
-        match={match}
-        onClose={() => setMatch(null)}
-        onViewLobby={() => {
-          setMatch(null);
-          setMode("lobby");
-        }}
-      />
-
+      {/* ENTRY */}
       {mode === "entry" && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col min-h-screen"
-        >
-          <div className="px-4 pt-12 pb-4 flex items-center gap-3">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col min-h-screen pb-20">
+          <header className="px-5 pt-12 pb-2 flex items-center gap-3">
             <button onClick={() => navigate(-1)}>
               <ArrowLeft className="w-6 h-6 text-foreground" />
             </button>
-            <h1 className="text-xl font-bold text-foreground">Find Your Team</h1>
+          </header>
+
+          <div className="px-5 pt-2">
+            <h1 className="text-4xl font-display font-bold text-foreground leading-tight">
+              Find Your<br />Team
+            </h1>
+            <p className="text-muted-foreground mt-2 text-sm font-medium">
+              Join a team or create your own 🤝
+            </p>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="text-center mb-8"
-            >
-              <span className="text-6xl mb-4 block">🤝</span>
-              <h2 className="text-2xl font-black text-foreground">Team Matching</h2>
-              <p className="text-muted-foreground mt-2 text-sm">
-                Swipe to find the perfect teammates for your next event
-              </p>
-            </motion.div>
-
-            <motion.button
-              initial={{ x: -30, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              onClick={() => handleStartMode("join_team")}
-              className="w-full glass-card rounded-3xl p-6 flex items-center gap-4 text-left hover-scale"
-            >
-              <div className="gradient-primary rounded-2xl p-3">
-                <Users className="w-6 h-6 text-primary-foreground" />
+          {/* Role selection */}
+          {!storedPrimary && (
+            <div className="px-5 mt-6">
+              <p className="text-sm font-bold text-foreground mb-3">Select your role first</p>
+              <div className="flex flex-wrap gap-2">
+                {ROLES_CATALOG.map((role) => (
+                  <motion.button
+                    key={role.id}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setSelectedRole(role.id);
+                      localStorage.setItem("eduvibe_primary_role", role.id);
+                    }}
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                      selectedRole === role.id
+                        ? "bg-foreground text-background"
+                        : "bg-card text-foreground border border-border"
+                    }`}
+                  >
+                    <span>{role.emoji}</span>
+                    {role.label}
+                    {selectedRole === role.id && <Check className="w-4 h-4" />}
+                  </motion.button>
+                ))}
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-lg">Join a Team</h3>
-                <p className="text-muted-foreground text-sm">
-                  Swipe through teams looking for members
-                </p>
+            </div>
+          )}
+
+          <div className="px-5 mt-8 space-y-4">
+            <motion.button
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => handleStartMode("browse_teams")}
+              className="w-full bg-olive rounded-3xl p-6 flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-4">
+                <Users className="w-7 h-7 text-foreground" />
+                <div>
+                  <h3 className="font-display text-xl font-bold text-foreground">Join a Team</h3>
+                  <p className="text-foreground/70 text-sm font-medium">Browse teams needing members</p>
+                </div>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
 
             <motion.button
-              initial={{ x: 30, opacity: 0 }}
+              initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.1 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => handleStartMode("create_team")}
-              className="w-full glass-card rounded-3xl p-6 flex items-center gap-4 text-left hover-scale"
+              className="w-full bg-gold rounded-3xl p-6 flex items-center justify-between text-left"
             >
-              <div className="gradient-secondary rounded-2xl p-3">
-                <Rocket className="w-6 h-6 text-secondary-foreground" />
+              <div className="flex items-center gap-4">
+                <Plus className="w-7 h-7 text-foreground" />
+                <div>
+                  <h3 className="font-display text-xl font-bold text-foreground">Create Team</h3>
+                  <p className="text-foreground/70 text-sm font-medium">Build your dream squad</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-foreground text-lg">Create a Team</h3>
-                <p className="text-muted-foreground text-sm">
-                  Swipe through students to recruit
-                </p>
+              <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
+          </div>
+
+          <BottomNav />
+        </motion.div>
+      )}
+
+      {/* BROWSE TEAMS */}
+      {mode === "browse_teams" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <header className="sticky top-0 z-40 bg-background px-5 pt-12 pb-4">
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={() => setMode("entry")}>
+                <ArrowLeft className="w-6 h-6 text-foreground" />
+              </button>
+              <h1 className="text-2xl font-display font-bold text-foreground">Browse Teams</h1>
+            </div>
+
+            {userRole && (
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-muted-foreground font-medium">Your role:</span>
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-foreground text-background">
+                  {getRoleInfo(userRole).emoji} {getRoleInfo(userRole).label}
+                </span>
+              </div>
+            )}
+          </header>
+
+          <div className="px-5 space-y-4 pb-24">
+            {sortedTeams.map((team, i) => {
+              const colorClass = cardColors[i % cardColors.length];
+              const matchesRole = userRole && team.open_roles.includes(userRole);
+
+              return (
+                <motion.div
+                  key={team.team_id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`${colorClass} rounded-3xl p-5 relative overflow-hidden`}
+                >
+                  {matchesRole && (
+                    <div className="absolute top-3 right-3 bg-foreground/20 rounded-full px-3 py-1">
+                      <span className="text-[10px] font-bold text-primary-foreground">🎯 Match</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex -space-x-2">
+                      {team.member_avatars.map((av, j) => (
+                        <img key={j} src={av} alt="" className="w-9 h-9 rounded-full border-2 border-background object-cover" />
+                      ))}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display text-lg font-bold truncate">{team.team_name}</h3>
+                      <p className="text-xs opacity-70 font-medium">{team.event_name}</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
+                      <ArrowUpRight className="w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* Completion bar */}
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between text-[11px] font-semibold mb-1 opacity-80">
+                      <span>{team.members.length}/{team.max_size} members</span>
+                      <span>{team.completion}% complete</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-foreground/10 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${team.completion}%` }}
+                        className="h-full rounded-full bg-foreground/30"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Open roles */}
+                  <div className="mb-3">
+                    <p className="text-[11px] font-bold mb-2 opacity-70 uppercase tracking-wider">Open Roles</p>
+                    <div className="flex flex-wrap gap-2">
+                      {team.open_roles.map((roleId) => {
+                        const role = getRoleInfo(roleId);
+                        const isUserRole = roleId === userRole;
+                        return (
+                          <button
+                            key={roleId}
+                            onClick={() => handleJoinTeam(team, roleId)}
+                            className={`text-xs font-semibold px-3 py-2 rounded-2xl flex items-center gap-1.5 transition-all ${
+                              isUserRole
+                                ? "bg-foreground text-background ring-2 ring-foreground/30"
+                                : "bg-background/40 text-foreground"
+                            }`}
+                          >
+                            {role.emoji} {role.label}
+                            {isUserRole && <span className="text-[10px]">→ Join</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       )}
 
-      {(mode === "join_team" || mode === "create_team") && (
-        <div className="flex flex-col h-screen">
-          <div className="px-4 pt-12 pb-2 flex items-center gap-3">
+      {/* CREATE TEAM */}
+      {mode === "create_team" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <header className="px-5 pt-12 pb-4 flex items-center gap-3">
             <button onClick={() => setMode("entry")}>
               <ArrowLeft className="w-6 h-6 text-foreground" />
             </button>
-            <h1 className="text-lg font-bold text-foreground flex-1">
-              {mode === "join_team" ? "Teams for You" : "Find Teammates"}
-            </h1>
-            <span className="text-xs text-muted-foreground">
-              {currentIndex + 1}/{cards.length}
-            </span>
-          </div>
+            <h1 className="text-2xl font-display font-bold text-foreground">Create Team</h1>
+          </header>
 
-          <div className="flex-1 relative px-4 py-2">
-            {currentIndex < cards.length ? (
-              <AnimatePresence>
-                {cards
-                  .slice(currentIndex, currentIndex + 2)
-                  .reverse()
-                  .map((card, i, arr) => {
-                    const isTop = i === arr.length - 1;
-                    const key = "user_id" in card ? card.user_id : card.team_id;
-                    return (
-                      <SwipeCard
-                        key={key}
-                        card={card}
-                        type={cardType as "student" | "team"}
-                        onSwipe={handleSwipe}
-                        isTop={isTop}
-                      />
-                    );
-                  })}
-              </AnimatePresence>
-            ) : (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="flex flex-col items-center justify-center h-full text-center"
-              >
-                <span className="text-5xl mb-4">🎉</span>
-                <h2 className="text-xl font-bold text-foreground">No more cards!</h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  Check back later for new {mode === "join_team" ? "teams" : "students"}
-                </p>
-                <Button
-                  onClick={() => setMode("entry")}
-                  className="mt-6 gradient-primary text-primary-foreground rounded-2xl"
-                >
-                  Go Back
-                </Button>
-              </motion.div>
-            )}
-          </div>
-
-          {currentIndex < cards.length && (
-            <div className="flex items-center justify-center gap-4 pb-6 px-4">
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={handleUndo}
-                disabled={!undoAvailable}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shadow-md transition-opacity ${
-                  undoAvailable
-                    ? "bg-card border-2 border-primary/30"
-                    : "bg-muted opacity-40"
-                }`}
-              >
-                <Undo2 className={`w-5 h-5 ${undoAvailable ? "text-primary" : "text-muted-foreground"}`} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => handleButtonSwipe("left")}
-                className="w-14 h-14 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center shadow-lg"
-              >
-                <X className="w-7 h-7 text-destructive" />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => handleButtonSwipe("up")}
-                className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center shadow-lg"
-              >
-                <Star className="w-6 h-6 text-primary-foreground" />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={() => handleButtonSwipe("right")}
-                className="w-14 h-14 rounded-full bg-card border-2 border-green-400/30 flex items-center justify-center shadow-lg"
-              >
-                <Heart className="w-7 h-7 text-green-500" />
-              </motion.button>
+          <div className="px-5 space-y-6 pb-24">
+            {/* Team Name */}
+            <div>
+              <label className="text-sm font-bold text-foreground mb-2 block">Team Name</label>
+              <Input
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                placeholder="e.g. Code Crushers"
+                className="rounded-2xl bg-card border-border h-14 text-lg font-semibold"
+              />
             </div>
-          )}
-        </div>
+
+            {/* Team Size */}
+            <div>
+              <label className="text-sm font-bold text-foreground mb-3 block">Team Size</label>
+              <div className="flex items-center gap-4">
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setNewTeamSize(Math.max(2, newTeamSize - 1))}
+                  className="w-12 h-12 rounded-2xl bg-card border border-border flex items-center justify-center"
+                >
+                  <Minus className="w-5 h-5 text-foreground" />
+                </motion.button>
+                <span className="text-4xl font-display font-bold text-foreground w-12 text-center">{newTeamSize}</span>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setNewTeamSize(Math.min(8, newTeamSize + 1))}
+                  className="w-12 h-12 rounded-2xl bg-card border border-border flex items-center justify-center"
+                >
+                  <Plus className="w-5 h-5 text-foreground" />
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Required Roles */}
+            <div>
+              <label className="text-sm font-bold text-foreground mb-3 block">Required Roles</label>
+              <div className="flex flex-wrap gap-2">
+                {ROLES_CATALOG.map((role) => {
+                  const isSelected = newTeamRoles.includes(role.id);
+                  return (
+                    <motion.button
+                      key={role.id}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setNewTeamRoles(
+                          isSelected
+                            ? newTeamRoles.filter((r) => r !== role.id)
+                            : [...newTeamRoles, role.id]
+                        );
+                      }}
+                      className={`px-4 py-3 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                        isSelected
+                          ? "bg-foreground text-background"
+                          : "bg-card text-foreground border border-border"
+                      }`}
+                    >
+                      {role.emoji} {role.label}
+                      {isSelected && <Check className="w-4 h-4" />}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <Button
+              onClick={handleCreateTeam}
+              className="w-full h-14 rounded-3xl bg-foreground text-background font-bold text-base"
+            >
+              Create Team 🚀
+            </Button>
+          </div>
+        </motion.div>
       )}
 
       {mode === "entry" && <BottomNav />}

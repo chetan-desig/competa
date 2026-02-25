@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-const COLORS = ["#7C5CFF", "#4D9CFF", "#FF7A7A", "#FFD36E", "#2DE2A6", "#FF4FD8"];
+const COLORS = ["#7C5CFF", "#FFD36E", "#FF7A7A", "#B8C97E", "#4D9CFF", "#FF4FD8"];
 
-const Confetti = ({ duration = 2500 }: { duration?: number }) => {
+const Confetti = ({ active = true, duration = 2500 }: { active?: boolean; duration?: number }) => {
   const [pieces] = useState(() =>
     Array.from({ length: 40 }, (_, i) => ({
       id: i,
@@ -16,11 +16,14 @@ const Confetti = ({ duration = 2500 }: { duration?: number }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(false), duration);
-    return () => clearTimeout(t);
-  }, [duration]);
+    if (active) {
+      setVisible(true);
+      const t = setTimeout(() => setVisible(false), duration);
+      return () => clearTimeout(t);
+    }
+  }, [active, duration]);
 
-  if (!visible) return null;
+  if (!visible || !active) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
