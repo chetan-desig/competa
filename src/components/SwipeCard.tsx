@@ -14,10 +14,7 @@ interface SwipeCardProps {
 const getCompatibility = (card: StudentCard | TeamCard, type: string): number => {
   if (type === "team") {
     const team = card as TeamCard;
-    const vals = Object.values(team.skill_coverage);
-    if (vals.length === 0) return 70;
-    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-    return Math.min(99, Math.round(avg + 15));
+    return Math.min(99, team.completion + 30);
   }
   const student = card as StudentCard;
   return Math.min(99, 60 + student.skills.length * 8);

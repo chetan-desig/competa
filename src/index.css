@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,43 +6,51 @@
 
 @layer base {
   :root {
-    --background: 240 20% 99%;
-    --foreground: 230 40% 10%;
+    --background: 36 33% 95%;
+    --foreground: 0 0% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 230 40% 10%;
+    --card: 40 30% 97%;
+    --card-foreground: 0 0% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 230 40% 10%;
+    --popover: 40 30% 97%;
+    --popover-foreground: 0 0% 8%;
 
-    --primary: 252 100% 68%;
+    --primary: 263 65% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 100% 73%;
+    --secondary: 0 65% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 230 20% 95%;
-    --muted-foreground: 230 10% 44%;
+    --muted: 36 20% 90%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 160 76% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 44 95% 58%;
+    --accent-foreground: 0 0% 8%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 230 18% 92%;
-    --input: 230 18% 92%;
-    --ring: 252 100% 68%;
+    --border: 36 20% 88%;
+    --input: 36 20% 88%;
+    --ring: 263 65% 52%;
 
-    --radius: 1.75rem;
+    --radius: 1.25rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(252 100% 68%), hsl(211 100% 65%));
-    --gradient-secondary: linear-gradient(135deg, hsl(0 100% 73%), hsl(44 100% 71%));
-    --gradient-accent: linear-gradient(135deg, hsl(160 76% 53%), hsl(211 100% 65%));
-    --gradient-dark: linear-gradient(180deg, hsl(230 60% 9%), hsl(228 40% 14%));
+    /* Named palette colors */
+    --color-olive: 72 40% 65%;
+    --color-purple: 263 55% 58%;
+    --color-gold: 44 95% 58%;
+    --color-red: 0 65% 55%;
+    --color-cream: 36 33% 95%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(263 65% 52%), hsl(263 55% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 65% 55%), hsl(0 55% 65%));
+    --gradient-accent: linear-gradient(135deg, hsl(44 95% 58%), hsl(44 90% 68%));
+    --gradient-olive: linear-gradient(135deg, hsl(72 40% 65%), hsl(72 35% 72%));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 15%));
 
     --accent-pink: 316 100% 65%;
-    --accent-green: 160 76% 53%;
+    --accent-green: 72 40% 65%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -50,50 +58,56 @@
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 230 18% 92%;
-    --sidebar-ring: 252 100% 68%;
+    --sidebar-border: 36 20% 88%;
+    --sidebar-ring: 263 65% 52%;
   }
 
   .dark {
-    --background: 230 60% 9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 8%;
+    --foreground: 36 33% 95%;
 
-    --card: 228 40% 14%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 13%;
+    --card-foreground: 36 33% 95%;
 
-    --popover: 228 40% 14%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 36 33% 95%;
 
-    --primary: 252 100% 68%;
+    --primary: 263 65% 62%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 100% 73%;
+    --secondary: 0 65% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 228 40% 14%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 36 15% 65%;
 
-    --accent: 160 76% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 44 90% 55%;
+    --accent-foreground: 0 0% 8%;
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 228 40% 18%;
-    --input: 228 40% 18%;
-    --ring: 252 100% 68%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 263 65% 62%;
+
+    --color-olive: 72 35% 55%;
+    --color-purple: 263 55% 62%;
+    --color-gold: 44 90% 55%;
+    --color-red: 0 60% 55%;
+    --color-cream: 0 0% 13%;
 
     --accent-pink: 316 100% 65%;
-    --accent-green: 160 76% 53%;
+    --accent-green: 72 35% 55%;
 
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 252 100% 68%;
+    --sidebar-primary: 263 65% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 252 100% 68%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 263 65% 62%;
   }
 }
 
@@ -103,7 +117,12 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'DM Serif Display', serif;
   }
 }
 
@@ -113,7 +132,7 @@
   }
 
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-lg;
+    @apply bg-card/90 backdrop-blur-xl border border-border shadow-sm;
   }
 
   .gradient-primary {
@@ -122,6 +141,14 @@
 
   .gradient-secondary {
     background: var(--gradient-secondary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .gradient-olive {
+    background: var(--gradient-olive);
   }
 
   .gradient-text {
@@ -143,12 +170,8 @@
     display: none;
   }
 
-  .gradient-accent {
-    background: var(--gradient-accent);
-  }
-
   .cta-glow {
-    box-shadow: 0 0 24px 4px hsl(252 100% 68% / 0.4);
+    box-shadow: 0 0 24px 4px hsl(263 65% 52% / 0.3);
   }
 
   .btn-pop {
@@ -156,5 +179,21 @@
   }
   .btn-pop:active {
     transform: scale(0.93);
+  }
+
+  .bg-olive {
+    background-color: hsl(var(--color-olive));
+  }
+  .bg-purple {
+    background-color: hsl(var(--color-purple));
+  }
+  .bg-gold {
+    background-color: hsl(var(--color-gold));
+  }
+  .bg-red-card {
+    background-color: hsl(var(--color-red));
+  }
+  .bg-cream {
+    background-color: hsl(var(--color-cream));
   }
 }
