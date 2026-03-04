@@ -19,7 +19,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border/50 safe-bottom">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path;
@@ -33,27 +33,27 @@ const BottomNav = () => {
               className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-1"
             >
               {isCenter ? (
-                <div className="bg-foreground rounded-2xl p-2.5 -mt-4 shadow-lg">
-                  <Icon className="w-5 h-5 text-background" />
+                <div className="gradient-primary rounded-2xl p-2.5 -mt-4 shadow-lg cta-glow">
+                  <Icon className="w-5 h-5 text-primary-foreground" />
                 </div>
               ) : (
                 <>
                   <div className="relative">
                     <Icon
                       className={`w-5 h-5 transition-colors ${
-                        isActive ? "text-foreground" : "text-muted-foreground"
+                        isActive ? "text-primary" : "text-muted-foreground"
                       }`}
                     />
                     {isActive && (
                       <motion.div
                         layoutId="nav-dot"
-                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-foreground"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"
                       />
                     )}
                   </div>
                   <span
                     className={`text-[10px] font-semibold ${
-                      isActive ? "text-foreground" : "text-muted-foreground"
+                      isActive ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
                     {tab.label}

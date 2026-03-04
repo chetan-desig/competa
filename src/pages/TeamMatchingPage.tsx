@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Users, Plus, Check, ChevronRight, Minus } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Users, Plus, Check, ChevronRight, Minus, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import TeamLobby from "@/components/TeamLobby";
@@ -20,10 +20,6 @@ import {
 
 type Mode = "entry" | "browse_teams" | "create_team" | "lobby";
 
-const cardColors = [
-  "bg-olive", "bg-purple text-primary-foreground", "bg-gold", "bg-red-card text-primary-foreground",
-];
-
 const TeamMatchingPage = () => {
   const navigate = useNavigate();
   const { isStudent } = useRole();
@@ -38,10 +34,10 @@ const TeamMatchingPage = () => {
   const [newTeamSize, setNewTeamSize] = useState(4);
   const [newTeamRoles, setNewTeamRoles] = useState<RoleId[]>([]);
 
-  // Get user's stored role
-  const storedPrimary = localStorage.getItem("eduvibe_primary_role") as RoleId | null;
-  const storedSecondary = localStorage.getItem("eduvibe_secondary_role") as RoleId | null;
+  // Join request states
+  const [joinedTeams, setJoinedTeams] = useState<Record<string, "pending" | "approved" | "rejected">>({});
 
+  const storedPrimary = localStorage.getItem("eduvibe_primary_role") as RoleId | null;
   const userRole = selectedRole || storedPrimary;
 
   const handleStartMode = (targetMode: "browse_teams" | "create_team") => {
@@ -53,7 +49,6 @@ const TeamMatchingPage = () => {
     }
   };
 
-  // Filter & sort teams
   const sortedTeams = useMemo(() => {
     let teams = [...mockTeams];
     if (userRole) {
@@ -68,6 +63,8 @@ const TeamMatchingPage = () => {
   }, [userRole]);
 
   const handleJoinTeam = (team: TeamCard, role: RoleId) => {
+    if (joinedTeams[team.team_id]) return;
+    setJoinedTeams((prev) => ({ ...prev, [team.team_id]: "pending" }));
     toast({
       title: "Request Sent! 🎉",
       description: `You requested to join ${team.team_name} as ${ROLES_CATALOG.find(r => r.id === role)?.label}`,
@@ -129,7 +126,7 @@ const TeamMatchingPage = () => {
           {/* Role selection */}
           {!storedPrimary && (
             <div className="px-5 mt-6">
-              <p className="text-sm font-bold text-foreground mb-3">Select your role first</p>
+              <p className="text-sm font-display font-bold text-foreground mb-3">Select your role first</p>
               <div className="flex flex-wrap gap-2">
                 {ROLES_CATALOG.map((role) => (
                   <motion.button
@@ -141,7 +138,7 @@ const TeamMatchingPage = () => {
                     }}
                     className={`px-4 py-2.5 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
                       selectedRole === role.id
-                        ? "bg-foreground text-background"
+                        ? "gradient-primary text-primary-foreground"
                         : "bg-card text-foreground border border-border"
                     }`}
                   >
@@ -160,17 +157,17 @@ const TeamMatchingPage = () => {
               animate={{ x: 0, opacity: 1 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => handleStartMode("browse_teams")}
-              className="w-full bg-olive rounded-3xl p-6 flex items-center justify-between text-left"
+              className="w-full gradient-primary rounded-3xl p-6 flex items-center justify-between text-left shadow-lg"
             >
               <div className="flex items-center gap-4">
-                <Users className="w-7 h-7 text-foreground" />
+                <Users className="w-7 h-7 text-primary-foreground" />
                 <div>
-                  <h3 className="font-display text-xl font-bold text-foreground">Join a Team</h3>
-                  <p className="text-foreground/70 text-sm font-medium">Browse teams needing members</p>
+                  <h3 className="font-display text-xl font-bold text-primary-foreground">Join a Team</h3>
+                  <p className="text-primary-foreground/70 text-sm font-medium">Browse teams needing members</p>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5 text-foreground" />
+              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
               </div>
             </motion.button>
 
@@ -180,16 +177,16 @@ const TeamMatchingPage = () => {
               transition={{ delay: 0.1 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => handleStartMode("create_team")}
-              className="w-full bg-gold rounded-3xl p-6 flex items-center justify-between text-left"
+              className="w-full bg-card border border-border rounded-3xl p-6 flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-4">
                 <Plus className="w-7 h-7 text-foreground" />
                 <div>
                   <h3 className="font-display text-xl font-bold text-foreground">Create Team</h3>
-                  <p className="text-foreground/70 text-sm font-medium">Build your dream squad</p>
+                  <p className="text-muted-foreground text-sm font-medium">Build your dream squad</p>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                 <ArrowUpRight className="w-5 h-5 text-foreground" />
               </div>
             </motion.button>
@@ -202,7 +199,7 @@ const TeamMatchingPage = () => {
       {/* BROWSE TEAMS */}
       {mode === "browse_teams" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <header className="sticky top-0 z-40 bg-background px-5 pt-12 pb-4">
+          <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-12 pb-4">
             <div className="flex items-center gap-3 mb-4">
               <button onClick={() => setMode("entry")}>
                 <ArrowLeft className="w-6 h-6 text-foreground" />
@@ -213,7 +210,7 @@ const TeamMatchingPage = () => {
             {userRole && (
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs text-muted-foreground font-medium">Your role:</span>
-                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-foreground text-background">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl gradient-primary text-primary-foreground">
                   {getRoleInfo(userRole).emoji} {getRoleInfo(userRole).label}
                 </span>
               </div>
@@ -221,81 +218,99 @@ const TeamMatchingPage = () => {
           </header>
 
           <div className="px-5 space-y-4 pb-24">
-            {sortedTeams.map((team, i) => {
-              const colorClass = cardColors[i % cardColors.length];
-              const matchesRole = userRole && team.open_roles.includes(userRole);
-
-              return (
-                <motion.div
-                  key={team.team_id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className={`${colorClass} rounded-3xl p-5 relative overflow-hidden`}
+            {sortedTeams.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-5xl mb-4">🔍</p>
+                <p className="font-display font-bold text-lg text-foreground">No teams available</p>
+                <p className="text-sm text-muted-foreground mb-6">Be the first to create one!</p>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setMode("create_team")}
+                  className="gradient-primary text-primary-foreground font-bold py-3 px-8 rounded-2xl text-sm"
                 >
-                  {matchesRole && (
-                    <div className="absolute top-3 right-3 bg-foreground/20 rounded-full px-3 py-1">
-                      <span className="text-[10px] font-bold text-primary-foreground">🎯 Match</span>
-                    </div>
-                  )}
+                  Create Team 🚀
+                </motion.button>
+              </div>
+            ) : (
+              sortedTeams.map((team, i) => {
+                const matchesRole = userRole && team.open_roles.includes(userRole);
+                const joinStatus = joinedTeams[team.team_id];
 
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex -space-x-2">
-                      {team.member_avatars.map((av, j) => (
-                        <img key={j} src={av} alt="" className="w-9 h-9 rounded-full border-2 border-background object-cover" />
-                      ))}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-lg font-bold truncate">{team.team_name}</h3>
-                      <p className="text-xs opacity-70 font-medium">{team.event_name}</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
-                      <ArrowUpRight className="w-5 h-5" />
-                    </div>
-                  </div>
+                return (
+                  <motion.div
+                    key={team.team_id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    className={`bg-card rounded-3xl p-5 border relative overflow-hidden ${
+                      matchesRole ? "border-primary/30 shadow-md" : "border-border"
+                    }`}
+                  >
+                    {matchesRole && (
+                      <div className="absolute top-3 right-3 gradient-primary rounded-full px-3 py-1">
+                        <span className="text-[10px] font-bold text-primary-foreground">🎯 Match</span>
+                      </div>
+                    )}
 
-                  {/* Completion bar */}
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between text-[11px] font-semibold mb-1 opacity-80">
-                      <span>{team.members.length}/{team.max_size} members</span>
-                      <span>{team.completion}% complete</span>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex -space-x-2">
+                        {team.member_avatars.map((av, j) => (
+                          <img key={j} src={av} alt="" className="w-9 h-9 rounded-full border-2 border-card object-cover" />
+                        ))}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display text-lg font-bold text-card-foreground truncate">{team.team_name}</h3>
+                        <p className="text-xs text-muted-foreground font-medium">{team.event_name}</p>
+                      </div>
                     </div>
-                    <div className="h-2 rounded-full bg-foreground/10 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${team.completion}%` }}
-                        className="h-full rounded-full bg-foreground/30"
-                      />
-                    </div>
-                  </div>
 
-                  {/* Open roles */}
-                  <div className="mb-3">
-                    <p className="text-[11px] font-bold mb-2 opacity-70 uppercase tracking-wider">Open Roles</p>
-                    <div className="flex flex-wrap gap-2">
-                      {team.open_roles.map((roleId) => {
-                        const role = getRoleInfo(roleId);
-                        const isUserRole = roleId === userRole;
-                        return (
-                          <button
-                            key={roleId}
-                            onClick={() => handleJoinTeam(team, roleId)}
-                            className={`text-xs font-semibold px-3 py-2 rounded-2xl flex items-center gap-1.5 transition-all ${
-                              isUserRole
-                                ? "bg-foreground text-background ring-2 ring-foreground/30"
-                                : "bg-background/40 text-foreground"
-                            }`}
-                          >
-                            {role.emoji} {role.label}
-                            {isUserRole && <span className="text-[10px]">→ Join</span>}
-                          </button>
-                        );
-                      })}
+                    {/* Completion bar */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-[11px] font-semibold mb-1 text-muted-foreground">
+                        <span>{team.members.length}/{team.max_size} members</span>
+                        <span>{team.completion}% complete</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${team.completion}%` }}
+                          className="h-full rounded-full gradient-primary"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+
+                    {/* Open roles */}
+                    <div className="mb-3">
+                      <p className="text-[11px] font-display font-bold mb-2 text-muted-foreground uppercase tracking-wider">Open Roles</p>
+                      <div className="flex flex-wrap gap-2">
+                        {team.open_roles.map((roleId) => {
+                          const role = getRoleInfo(roleId);
+                          const isUserRole = roleId === userRole;
+                          return (
+                            <button
+                              key={roleId}
+                              onClick={() => handleJoinTeam(team, roleId)}
+                              disabled={!!joinStatus}
+                              className={`text-xs font-semibold px-3 py-2 rounded-2xl flex items-center gap-1.5 transition-all ${
+                                joinStatus === "pending"
+                                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                                  : isUserRole
+                                  ? "gradient-primary text-primary-foreground shadow-sm"
+                                  : "bg-muted text-foreground hover:bg-primary/10"
+                              }`}
+                            >
+                              {role.emoji} {role.label}
+                              {isUserRole && !joinStatus && <span className="text-[10px]">→ Join</span>}
+                              {joinStatus === "pending" && isUserRole && <Loader2 className="w-3 h-3 animate-spin" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
           </div>
         </motion.div>
       )}
@@ -311,9 +326,8 @@ const TeamMatchingPage = () => {
           </header>
 
           <div className="px-5 space-y-6 pb-24">
-            {/* Team Name */}
             <div>
-              <label className="text-sm font-bold text-foreground mb-2 block">Team Name</label>
+              <label className="text-sm font-display font-bold text-foreground mb-2 block">Team Name</label>
               <Input
                 value={newTeamName}
                 onChange={(e) => setNewTeamName(e.target.value)}
@@ -322,9 +336,8 @@ const TeamMatchingPage = () => {
               />
             </div>
 
-            {/* Team Size */}
             <div>
-              <label className="text-sm font-bold text-foreground mb-3 block">Team Size</label>
+              <label className="text-sm font-display font-bold text-foreground mb-3 block">Team Size</label>
               <div className="flex items-center gap-4">
                 <motion.button
                   whileTap={{ scale: 0.9 }}
@@ -344,9 +357,8 @@ const TeamMatchingPage = () => {
               </div>
             </div>
 
-            {/* Required Roles */}
             <div>
-              <label className="text-sm font-bold text-foreground mb-3 block">Required Roles</label>
+              <label className="text-sm font-display font-bold text-foreground mb-3 block">Required Roles</label>
               <div className="flex flex-wrap gap-2">
                 {ROLES_CATALOG.map((role) => {
                   const isSelected = newTeamRoles.includes(role.id);
@@ -363,7 +375,7 @@ const TeamMatchingPage = () => {
                       }}
                       className={`px-4 py-3 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
                         isSelected
-                          ? "bg-foreground text-background"
+                          ? "gradient-primary text-primary-foreground"
                           : "bg-card text-foreground border border-border"
                       }`}
                     >
@@ -377,7 +389,7 @@ const TeamMatchingPage = () => {
 
             <Button
               onClick={handleCreateTeam}
-              className="w-full h-14 rounded-3xl bg-foreground text-background font-bold text-base"
+              className="w-full h-14 rounded-3xl gradient-primary text-primary-foreground font-bold text-base shadow-lg"
             >
               Create Team 🚀
             </Button>
