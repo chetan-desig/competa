@@ -18,6 +18,8 @@ export interface Event {
   organizer: string;
   description: string;
   tags: string[];
+  requiresTeam?: boolean;
+  maxTeamSize?: number;
 }
 
 export const categories = [
@@ -51,6 +53,8 @@ export const mockEvents: Event[] = [
     organizer: "IIIT Coding Club",
     description: "48-hour hackathon with prizes worth ₹5L. Build solutions for real-world problems.",
     tags: ["AI/ML", "Web3", "FinTech"],
+    requiresTeam: true,
+    maxTeamSize: 4,
   },
   {
     id: "2",
@@ -65,6 +69,8 @@ export const mockEvents: Event[] = [
     organizer: "Design Collective",
     description: "24-hour design sprint. Create impactful UI/UX solutions for social good.",
     tags: ["UI/UX", "Figma", "Product"],
+    requiresTeam: true,
+    maxTeamSize: 4,
   },
   {
     id: "3",
@@ -107,6 +113,8 @@ export const mockEvents: Event[] = [
     organizer: "AI Research Lab",
     description: "Hands-on workshop on building autonomous robots with computer vision.",
     tags: ["AI", "Robotics", "IoT"],
+    requiresTeam: true,
+    maxTeamSize: 4,
   },
   {
     id: "6",
@@ -121,6 +129,8 @@ export const mockEvents: Event[] = [
     organizer: "T-Hub & Google",
     description: "54-hour startup building experience. Pitch to real investors.",
     tags: ["Pitch", "MVP", "Business"],
+    requiresTeam: true,
+    maxTeamSize: 4,
   },
 ];
 
