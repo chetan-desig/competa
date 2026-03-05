@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
+import { mockTeams } from "@/data/teamMatchingData";
 import { useState } from "react";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
@@ -21,6 +22,9 @@ const EventDetailPage = () => {
       </div>
     );
   }
+
+  const teamsForEvent = mockTeams.filter((t) => t.event_id === event.id);
+  const openTeams = teamsForEvent.filter((t) => t.open_roles.length > 0);
 
   const handleJoin = () => {
     if (joined) {
@@ -84,10 +88,17 @@ const EventDetailPage = () => {
         >
           <div className="flex items-start justify-between mb-4">
             <div>
-              <span className="gradient-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-xl">
-                {event.category.toUpperCase()}
-              </span>
-              <h1 className="text-2xl font-extrabold text-card-foreground mt-3">{event.title}</h1>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="gradient-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-xl">
+                  {event.category.toUpperCase()}
+                </span>
+                {event.requiresTeam && (
+                  <span className="bg-accent/10 text-accent text-xs font-bold px-3 py-1 rounded-xl flex items-center gap-1">
+                    <Users className="w-3 h-3" /> Team Event
+                  </span>
+                )}
+              </div>
+              <h1 className="text-2xl font-extrabold text-card-foreground">{event.title}</h1>
               <p className="text-sm text-muted-foreground mt-1">by {event.organizer}</p>
             </div>
           </div>
@@ -113,7 +124,7 @@ const EventDetailPage = () => {
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-4">
             {event.tags.map((tag) => (
               <span
                 key={tag}
@@ -123,29 +134,97 @@ const EventDetailPage = () => {
               </span>
             ))}
           </div>
+
+          {/* Team section for team events */}
+          {event.requiresTeam && (
+            <div className="border-t border-border pt-4 mt-2">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-display text-sm font-bold text-foreground">Teams</h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    {openTeams.length} team{openTeams.length !== 1 ? "s" : ""} looking for members
+                  </p>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate(`/team-matching?eventId=${event.id}`)}
+                  className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5"
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  Find / Create Team
+                </motion.button>
+              </div>
+
+              {/* Preview of teams */}
+              {teamsForEvent.slice(0, 2).map((team) => (
+                <div
+                  key={team.team_id}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-muted mb-2 cursor-pointer"
+                  onClick={() => navigate(`/team-matching?eventId=${event.id}`)}
+                >
+                  <div className="flex -space-x-2">
+                    {team.member_avatars.slice(0, 3).map((av, j) => (
+                      <img key={j} src={av} alt="" className="w-7 h-7 rounded-full border-2 border-muted object-cover" />
+                    ))}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-foreground truncate">{team.team_name}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {team.members.length}/{team.max_size} · {team.open_roles.length} role{team.open_roles.length !== 1 ? "s" : ""} open
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
 
       {/* Sticky CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-5 glass-card safe-bottom">
         <div className="flex gap-3 max-w-lg mx-auto">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={handleJoin}
-            className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
-              joined
-                ? "bg-muted text-muted-foreground"
-                : "gradient-primary text-primary-foreground shadow-lg"
-            }`}
-          >
-            {joined ? "✅ Joined!" : "Join Event"}
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            className="px-6 py-4 rounded-2xl bg-muted font-bold text-sm text-foreground"
-          >
-            💬 Chat
-          </motion.button>
+          {event.requiresTeam ? (
+            <>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleJoin}
+                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
+                  joined
+                    ? "bg-muted text-muted-foreground"
+                    : "gradient-primary text-primary-foreground shadow-lg"
+                }`}
+              >
+                {joined ? "✅ Registered" : "Join Solo"}
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigate(`/team-matching?eventId=${event.id}`)}
+                className="flex-1 py-4 rounded-2xl bg-card border border-border font-bold text-sm text-foreground flex items-center justify-center gap-2"
+              >
+                <Users className="w-4 h-4" /> Find Team
+              </motion.button>
+            </>
+          ) : (
+            <>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={handleJoin}
+                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
+                  joined
+                    ? "bg-muted text-muted-foreground"
+                    : "gradient-primary text-primary-foreground shadow-lg"
+                }`}
+              >
+                {joined ? "✅ Joined!" : "Join Event"}
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                className="px-6 py-4 rounded-2xl bg-muted font-bold text-sm text-foreground"
+              >
+                💬 Chat
+              </motion.button>
+            </>
+          )}
         </div>
       </div>
     </div>
