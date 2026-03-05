@@ -14,6 +14,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import BuddiesPage from "./pages/BuddiesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import MessagesPage from "./pages/MessagesPage";
+import MessagesListPage from "./pages/MessagesListPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/team-matching" element={<TeamMatchingPage />} />
           <Route path="/buddies" element={<BuddiesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/messages" element={<MessagesListPage />} />
           <Route path="/messages/:userId" element={<MessagesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

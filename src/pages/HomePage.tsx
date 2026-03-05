@@ -6,6 +6,7 @@ import EventCard from "@/components/EventCard";
 import CategoryChips from "@/components/CategoryChips";
 import BottomNav from "@/components/BottomNav";
 import { mockEvents, categories, cities } from "@/data/mockData";
+import { mockStudents } from "@/data/teamMatchingData";
 import { useRole } from "@/hooks/useRole";
 
 type LoadState = "loading" | "loaded" | "empty" | "error";
@@ -130,18 +131,30 @@ const HomePage = () => {
               transition={{ delay: 0.05 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/buddies")}
-              className="w-full bg-card border border-border rounded-3xl p-4 flex items-center justify-between text-left"
+              className="w-full bg-card border-2 border-accent/20 rounded-3xl p-4 flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-secondary" />
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center">
+                    <span className="text-lg">👋</span>
+                  </div>
+                  <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-success rounded-full border-2 border-card" />
                 </div>
                 <div>
-                  <h3 className="font-display text-sm font-bold text-foreground">Find Buddies 👋</h3>
-                  <p className="text-muted-foreground text-xs">Connect with fellow students</p>
+                  <h3 className="font-display text-sm font-bold text-foreground">Browse Students</h3>
+                  <p className="text-muted-foreground text-xs">View profiles & add buddies</p>
                 </div>
               </div>
-              <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+              <div className="flex -space-x-2">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="w-7 h-7 rounded-full bg-muted border-2 border-card overflow-hidden">
+                    <img src={mockStudents[i]?.profile_photo} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+                <div className="w-7 h-7 rounded-full bg-primary/10 border-2 border-card flex items-center justify-center text-[9px] font-bold text-primary">
+                  +{mockStudents.length - 3}
+                </div>
+              </div>
             </motion.button>
           </div>
         )}
