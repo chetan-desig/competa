@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Poppins", "sans-serif"],
+        sans: ["DM Sans", "sans-serif"],
+        display: ["DM Serif Display", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,10 +55,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "ev-olive": "hsl(var(--color-olive))",
         "ev-purple": "hsl(var(--color-purple))",
-        "ev-blue": "hsl(var(--color-blue))",
+        "ev-gold": "hsl(var(--color-gold))",
         "ev-coral": "hsl(var(--color-coral))",
-        "ev-mint": "hsl(var(--color-mint))",
+        "ev-cream": "hsl(var(--color-cream))",
+        "ev-red-card": "hsl(var(--color-red-card))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
