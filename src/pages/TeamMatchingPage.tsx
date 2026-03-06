@@ -40,7 +40,7 @@ const TeamMatchingPage = () => {
   const [joinedTeams, setJoinedTeams] = useState<Record<string, "pending" | "approved" | "rejected">>({});
   const [myTeamId, setMyTeamId] = useState<string | null>(null);
 
-  const storedPrimary = localStorage.getItem("eduvibe_primary_role") as RoleId | null;
+  const storedPrimary = localStorage.getItem("competa_primary_role") as RoleId | null;
   const userRole = selectedRole || storedPrimary;
 
   // Events that require teams
@@ -157,7 +157,7 @@ const TeamMatchingPage = () => {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
                         setSelectedRole(role.id);
-                        localStorage.setItem("eduvibe_primary_role", role.id);
+                        localStorage.setItem("competa_primary_role", role.id);
                       }}
                       className={`px-3 py-2 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
                         selectedRole === role.id

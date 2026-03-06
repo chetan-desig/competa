@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, ArrowUpRight, Lock, Globe, UserCheck } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
@@ -27,10 +27,10 @@ const ProfilePage = () => {
   const [privacy, setPrivacy] = useState<PrivacyOption>("public_inside_app");
 
   const [primaryRole, setPrimaryRole] = useState<RoleId | null>(
-    (localStorage.getItem("eduvibe_primary_role") as RoleId) || null
+    (localStorage.getItem("competa_primary_role") as RoleId) || null
   );
   const [secondaryRole, setSecondaryRole] = useState<RoleId | null>(
-    (localStorage.getItem("eduvibe_secondary_role") as RoleId) || null
+    (localStorage.getItem("competa_secondary_role") as RoleId) || null
   );
 
   const levelConfig = {
@@ -44,10 +44,10 @@ const ProfilePage = () => {
   const isFullyVerified = level === "verified_student" || level === "verified_organizer";
 
   const handleSaveRoles = () => {
-    if (primaryRole) localStorage.setItem("eduvibe_primary_role", primaryRole);
-    else localStorage.removeItem("eduvibe_primary_role");
-    if (secondaryRole) localStorage.setItem("eduvibe_secondary_role", secondaryRole);
-    else localStorage.removeItem("eduvibe_secondary_role");
+    if (primaryRole) localStorage.setItem("competa_primary_role", primaryRole);
+    else localStorage.removeItem("competa_primary_role");
+    if (secondaryRole) localStorage.setItem("competa_secondary_role", secondaryRole);
+    else localStorage.removeItem("competa_secondary_role");
     setShowRoleEditor(false);
     toast({ title: "Roles updated ✨", description: "Your role has been updated 🚀" });
   };
@@ -180,7 +180,6 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background pb-20">
       <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
-      {/* Header */}
       <div className="relative h-36 gradient-primary rounded-b-[2rem]">
         <button className="absolute top-5 right-5 w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
           <Settings className="w-5 h-5 text-primary-foreground" />
@@ -206,7 +205,6 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Level badge */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={() => { if (!isFullyVerified) requireVerification("student"); }}
@@ -250,10 +248,41 @@ const ProfilePage = () => {
           ))}
         </div>
 
+        {/* XP & Achievements */}
+        <div className="mb-6">
+          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Achievements</h2>
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl gradient-gold flex items-center justify-center">
+                  <Trophy className="w-4 h-4 text-foreground" />
+                </div>
+                <span className="text-sm font-display font-bold text-card-foreground">Level 3</span>
+              </div>
+              <span className="text-xs text-muted-foreground font-medium">1,250 / 2,000 XP</span>
+            </div>
+            <div className="h-2.5 bg-muted rounded-full overflow-hidden mb-3">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "62.5%" }}
+                transition={{ duration: 1 }}
+                className="h-full gradient-primary rounded-full"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar">
+              {["🏆 Winner", "🥈 Top 10", "🎯 3x Streak", "🔥 Active"].map((badge) => (
+                <span key={badge} className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-muted text-foreground whitespace-nowrap">
+                  {badge}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Buddy link */}
         <motion.button
           whileTap={{ scale: 0.98 }}
-          onClick={() => navigate("/buddies")}
+          onClick={() => navigate("/people")}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-card border border-border mb-6"
         >
           <div className="flex items-center gap-3">
@@ -402,7 +431,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Links */}
+        {/* Portfolio Links */}
         <div className="space-y-2 mb-6">
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Portfolio</h2>
           {[
@@ -418,6 +447,26 @@ const ProfilePage = () => {
               <ExternalLink className="w-4 h-4 text-muted-foreground" />
             </motion.div>
           ))}
+        </div>
+
+        {/* Past Events */}
+        <div className="mb-6">
+          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Past Events</h2>
+          <div className="space-y-2">
+            {[
+              { name: "HackVerse 2.0", result: "🏆 Winner", date: "Jan 2026" },
+              { name: "DesignJam 2025", result: "🎨 Top 5", date: "Nov 2025" },
+              { name: "React Workshop", result: "📜 Completed", date: "Oct 2025" },
+            ].map((ev) => (
+              <div key={ev.name} className="flex items-center justify-between bg-card rounded-2xl px-4 py-3 border border-border">
+                <div>
+                  <p className="text-sm font-display font-bold text-card-foreground">{ev.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{ev.date}</p>
+                </div>
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary">{ev.result}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <BottomNav />

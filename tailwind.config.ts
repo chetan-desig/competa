@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["DM Sans", "sans-serif"],
-        display: ["DM Serif Display", "serif"],
+        display: ["Space Grotesk", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,12 +55,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "ev-olive": "hsl(var(--color-olive))",
-        "ev-purple": "hsl(var(--color-purple))",
-        "ev-gold": "hsl(var(--color-gold))",
-        "ev-coral": "hsl(var(--color-coral))",
-        "ev-cream": "hsl(var(--color-cream))",
-        "ev-red-card": "hsl(var(--color-red-card))",
+        "cp-indigo": "hsl(var(--color-indigo))",
+        "cp-violet": "hsl(var(--color-violet))",
+        "cp-lime": "hsl(var(--color-lime))",
+        "cp-coral": "hsl(var(--color-coral))",
+        "cp-slate": "hsl(var(--color-slate))",
+        "cp-gold": "hsl(var(--color-gold))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

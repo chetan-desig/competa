@@ -29,16 +29,16 @@ const ORGANIZER_CAN = [
 export type Permission = (typeof STUDENT_CAN)[number] | (typeof ORGANIZER_CAN)[number];
 
 export const getUserRole = (): UserRole => {
-  const role = localStorage.getItem("eduvibe_role");
+  const role = localStorage.getItem("competa_role");
   if (role === "student" || role === "organizer") return role;
   return null;
 };
 
 export const setUserRole = (role: UserRole) => {
   if (role) {
-    localStorage.setItem("eduvibe_role", role);
+    localStorage.setItem("competa_role", role);
   } else {
-    localStorage.removeItem("eduvibe_role");
+    localStorage.removeItem("competa_role");
   }
 };
 

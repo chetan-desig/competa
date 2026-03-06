@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Bell, Users, PlusCircle, BarChart3, Eye, TrendingUp, Calendar, ArrowUpRight, Search, Wifi, WifiOff, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { MapPin, Bell, Users, PlusCircle, BarChart3, Eye, TrendingUp, Calendar, ArrowUpRight, Search, WifiOff, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EventCard from "@/components/EventCard";
 import CategoryChips from "@/components/CategoryChips";
@@ -19,12 +19,11 @@ const HomePage = () => {
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
   useEffect(() => {
-    if (!localStorage.getItem("eduvibe_onboarded")) {
+    if (!localStorage.getItem("competa_onboarded")) {
       navigate("/onboarding", { replace: true });
     }
   }, [navigate]);
 
-  // Simulate loading
   useEffect(() => {
     const t = setTimeout(() => setLoadState("loaded"), 800);
     return () => clearTimeout(t);
@@ -57,7 +56,6 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-6 pb-3 border-b border-border/50">
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -65,7 +63,7 @@ const HomePage = () => {
               {isOrganizer ? "🎤 Organizer Dashboard" : `📍 ${currentCity?.name}`}
             </p>
             <h1 className="text-2xl font-display font-bold text-foreground leading-tight">
-              {isOrganizer ? "Dashboard" : "Explore Events"}
+              {isOrganizer ? "Dashboard" : "Explore"}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -85,7 +83,7 @@ const HomePage = () => {
             >
               <Bell className="w-5 h-5 text-foreground" />
               {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full border-2 border-background flex items-center justify-center text-[9px] font-bold text-accent-foreground">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full border-2 border-background flex items-center justify-center text-[9px] font-bold text-destructive-foreground">
                   {unreadNotifications}
                 </span>
               )}
@@ -102,7 +100,7 @@ const HomePage = () => {
         )}
       </header>
 
-      {/* Role-specific CTA */}
+      {/* Role-specific CTAs */}
       <div className="px-5 pt-5">
         {isStudent && (
           <div className="space-y-3">
@@ -130,12 +128,12 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/buddies")}
-              className="w-full bg-card border-2 border-accent/20 rounded-3xl p-4 flex items-center justify-between text-left"
+              onClick={() => navigate("/people")}
+              className="w-full bg-card border-2 border-secondary/20 rounded-3xl p-4 flex items-center justify-between text-left"
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-accent/15 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-secondary/15 flex items-center justify-center">
                     <span className="text-lg">👋</span>
                   </div>
                   <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-success rounded-full border-2 border-card" />
@@ -242,7 +240,6 @@ const HomePage = () => {
       {/* Student Event Feed */}
       {!isOrganizer && (
         <main className="px-5 pt-5 space-y-5">
-          {/* Loading State */}
           {loadState === "loading" && (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
@@ -250,7 +247,6 @@ const HomePage = () => {
             </div>
           )}
 
-          {/* Error State */}
           {loadState === "error" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-4">
               <WifiOff className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -266,14 +262,12 @@ const HomePage = () => {
             </motion.div>
           )}
 
-          {/* Loaded State */}
           {loadState === "loaded" && filteredEvents.length > 0 && (
             filteredEvents.map((event, i) => (
               <EventCard key={event.id} event={event} index={i} />
             ))
           )}
 
-          {/* Empty State */}
           {loadState === "loaded" && filteredEvents.length === 0 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 px-4">
               <p className="text-5xl mb-4">🔍</p>

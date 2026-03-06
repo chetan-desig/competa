@@ -121,12 +121,12 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
       if (type === "student") {
         setStudentStep("success");
         setShowConfetti(true);
-        localStorage.setItem("eduvibe_verified", "student");
+        localStorage.setItem("competa_verified", "student");
         setTimeout(() => onVerified(), 2000);
       } else {
         setOrgStep("success");
         setShowConfetti(true);
-        localStorage.setItem("eduvibe_verified", "organizer");
+        localStorage.setItem("competa_verified", "organizer");
         setTimeout(() => onVerified(), 2000);
       }
     }, 1500);
@@ -140,7 +140,7 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
       setTimeout(() => {
         setStudentStep("success");
         setShowConfetti(true);
-        localStorage.setItem("eduvibe_verified", "student");
+        localStorage.setItem("competa_verified", "student");
         setTimeout(() => onVerified(), 2000);
       }, 800);
     }, 2000);
