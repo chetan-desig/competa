@@ -3,10 +3,10 @@ import { useState, useCallback } from "react";
 export type VerificationLevel = "none" | "basic" | "verified_student" | "verified_organizer";
 
 export const getVerificationLevel = (): VerificationLevel => {
-  const stored = localStorage.getItem("eduvibe_verified");
+  const stored = localStorage.getItem("competa_verified");
   if (stored === "student") return "verified_student";
   if (stored === "organizer") return "verified_organizer";
-  const onboarded = localStorage.getItem("eduvibe_onboarded");
+  const onboarded = localStorage.getItem("competa_onboarded");
   if (onboarded) return "basic";
   return "none";
 };

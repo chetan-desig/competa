@@ -69,7 +69,7 @@ const OnboardingPage = () => {
   };
 
   const finishOnboarding = () => {
-    localStorage.setItem("eduvibe_onboarded", "true");
+    localStorage.setItem("competa_onboarded", "true");
     if (role) setUserRole(role);
     const dest = role === "organizer" ? "/create" : "/";
     navigate(dest, { replace: true });
@@ -111,7 +111,6 @@ const OnboardingPage = () => {
   }, [citySearch]);
 
   const renderStep = () => {
-    // Step 0 - Welcome
     if (step === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-center px-8 flex-1">
@@ -120,13 +119,13 @@ const OnboardingPage = () => {
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="text-7xl mb-8"
           >
-            ✨
+            ⚡
           </motion.div>
-          <h1 className="text-3xl font-extrabold text-foreground mb-3">
-            Let's build something awesome ✨
+          <h1 className="text-3xl font-display font-bold text-foreground mb-3">
+            Welcome to Competa
           </h1>
           <p className="text-muted-foreground text-base max-w-xs">
-            Find events. Match teams. Create magic.
+            Compete. Connect. Conquer.
           </p>
           <motion.button
             whileTap={{ scale: 0.93 }}
@@ -142,12 +141,11 @@ const OnboardingPage = () => {
       );
     }
 
-    // Step 1 - Role selection
     if (step === 1) {
       return (
         <div className="flex flex-col items-center justify-center px-6 flex-1">
-          <h2 className="text-2xl font-extrabold text-foreground mb-2">Who are you? 👋</h2>
-          <p className="text-muted-foreground text-sm mb-8">Pick your vibe</p>
+          <h2 className="text-2xl font-display font-bold text-foreground mb-2">Who are you? 👋</h2>
+          <p className="text-muted-foreground text-sm mb-8">Pick your role</p>
           <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
             {[
               { r: "student" as const, emoji: "🎓", desc: "Join events & find teammates" },
@@ -164,9 +162,8 @@ const OnboardingPage = () => {
                 }`}
               >
                 <span className="text-5xl">{opt.emoji}</span>
-                <span className="font-bold text-foreground capitalize">{opt.r}</span>
+                <span className="font-display font-bold text-foreground capitalize">{opt.r}</span>
                 <span className="text-xs text-muted-foreground text-center">{opt.desc}</span>
-                {/* Tooltip trigger */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -176,7 +173,6 @@ const OnboardingPage = () => {
                 >
                   <Info className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
-                {/* Tooltip */}
                 <AnimatePresence>
                   {showTooltip === opt.r && (
                     <motion.div
@@ -198,17 +194,15 @@ const OnboardingPage = () => {
       );
     }
 
-    // Student flow
     if (role === "student") {
       if (step === 2) {
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your cities 🏙️</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your cities 🏙️</h2>
             <p className="text-muted-foreground text-sm mb-4">
               Pick up to 3 cities (
               <span className="text-primary font-semibold">{selectedCities.length}/3</span>)
             </p>
-            {/* Search bar */}
             <div className="relative mb-4">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -258,7 +252,7 @@ const OnboardingPage = () => {
       if (step === 3) {
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your skills 💪</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your skills 💪</h2>
             <p className="text-muted-foreground text-sm mb-6">What do you bring to the team?</p>
             <div className="flex flex-wrap gap-3">
               {SKILLS.map((skill) => {
@@ -287,7 +281,7 @@ const OnboardingPage = () => {
       if (step === 4) {
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Interests 🔥</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Interests 🔥</h2>
             <p className="text-muted-foreground text-sm mb-6">What excites you?</p>
             <div className="grid grid-cols-2 gap-3">
               {INTERESTS.map((interest) => {
@@ -314,12 +308,11 @@ const OnboardingPage = () => {
       }
     }
 
-    // Organizer flow
     if (role === "organizer") {
       if (step === 2) {
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your Org 🏢</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your Org 🏢</h2>
             <p className="text-muted-foreground text-sm mb-6">What's your organization called?</p>
             <input
               value={orgName}
@@ -340,7 +333,7 @@ const OnboardingPage = () => {
         ];
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Event Types 🎯</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Event Types 🎯</h2>
             <p className="text-muted-foreground text-sm mb-6">What do you organize?</p>
             <div className="grid grid-cols-2 gap-3">
               {eventTypes.map((et) => {
@@ -369,7 +362,7 @@ const OnboardingPage = () => {
       if (step === 4) {
         return (
           <div className="flex flex-col px-6 flex-1">
-            <h2 className="text-2xl font-extrabold text-foreground mb-1">Your city 🏙️</h2>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your city 🏙️</h2>
             <p className="text-muted-foreground text-sm mb-4">Where are you based?</p>
             <div className="relative mb-4">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -418,7 +411,6 @@ const OnboardingPage = () => {
     return null;
   };
 
-  // Completion screen
   if (showConfetti) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -429,10 +421,10 @@ const OnboardingPage = () => {
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
           className="text-center"
         >
-          <div className="text-7xl mb-6">🚀</div>
-          <h1 className="text-3xl font-extrabold text-foreground">You're all set!</h1>
+          <div className="text-7xl mb-6">⚡</div>
+          <h1 className="text-3xl font-display font-bold text-foreground">You're all set!</h1>
           <p className="text-muted-foreground mt-2">
-            {role === "organizer" ? "Let's create your first event 🎤" : "Let's find your next event"}
+            {role === "organizer" ? "Let's create your first event 🎤" : "Time to compete 🏆"}
           </p>
         </motion.div>
       </div>
@@ -441,7 +433,6 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top bar with skip + progress */}
       {step > 0 && (
         <div className="px-6 pt-5 pb-2 flex items-center justify-between">
           <button onClick={() => setStep((s) => Math.max(0, s - 1))} className="text-muted-foreground text-sm font-medium">
@@ -468,7 +459,6 @@ const OnboardingPage = () => {
         </div>
       )}
 
-      {/* Content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
@@ -483,14 +473,13 @@ const OnboardingPage = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Bottom CTA */}
       {step > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background via-background to-transparent">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={next}
             disabled={!canContinue()}
-            className={`w-full py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 btn-pop transition-all ${
+            className={`w-full py-4 rounded-full font-display font-bold text-lg flex items-center justify-center gap-2 btn-pop transition-all ${
               canContinue()
                 ? "gradient-primary text-primary-foreground cta-glow"
                 : "bg-muted text-muted-foreground"

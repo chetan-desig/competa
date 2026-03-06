@@ -5,13 +5,13 @@ import student4 from "@/assets/student-4.jpg";
 import student5 from "@/assets/student-5.jpg";
 
 export const ROLES_CATALOG = [
-  { id: "ui_ux_designer", label: "UI/UX Designer", emoji: "🎨", color: "bg-ev-purple" },
-  { id: "frontend_developer", label: "Frontend Dev", emoji: "⚛️", color: "bg-ev-blue" },
-  { id: "backend_developer", label: "Backend Dev", emoji: "🟢", color: "bg-ev-mint" },
-  { id: "fullstack_developer", label: "Full-Stack Dev", emoji: "🔥", color: "bg-ev-coral" },
-  { id: "ai_ml_engineer", label: "AI/ML Engineer", emoji: "🧠", color: "bg-ev-purple" },
-  { id: "product_manager", label: "Product Manager", emoji: "📋", color: "bg-ev-blue" },
-  { id: "content_creator", label: "Content Creator", emoji: "✍️", color: "bg-ev-mint" },
+  { id: "ui_ux_designer", label: "UI/UX Designer", emoji: "🎨", color: "bg-cp-violet" },
+  { id: "frontend_developer", label: "Frontend Dev", emoji: "⚛️", color: "bg-cp-indigo" },
+  { id: "backend_developer", label: "Backend Dev", emoji: "🟢", color: "bg-cp-lime" },
+  { id: "fullstack_developer", label: "Full-Stack Dev", emoji: "🔥", color: "bg-cp-coral" },
+  { id: "ai_ml_engineer", label: "AI/ML Engineer", emoji: "🧠", color: "bg-cp-violet" },
+  { id: "product_manager", label: "Product Manager", emoji: "📋", color: "bg-cp-indigo" },
+  { id: "content_creator", label: "Content Creator", emoji: "✍️", color: "bg-cp-lime" },
 ] as const;
 
 export type RoleId = typeof ROLES_CATALOG[number]["id"];
