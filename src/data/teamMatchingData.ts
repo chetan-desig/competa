@@ -34,15 +34,24 @@ export interface TeamCard {
   team_name: string;
   team_image: string;
   member_avatars: string[];
-  members: { name: string; role: RoleId; avatar: string }[];
+  members: { name: string; role: RoleId; avatar: string; user_id: string }[];
   open_roles: RoleId[];
   required_roles: RoleId[];
   max_size: number;
-  event_name: string;
-  event_id: string;
+  registered_events: string[]; // event IDs the team is registered for
   city: string;
   creator_id: string;
   completion: number;
+}
+
+export interface TeamInvite {
+  invite_id: string;
+  team_id: string;
+  team_name: string;
+  invited_by: string;
+  invited_user_id: string;
+  role: RoleId;
+  status: "pending" | "accepted" | "declined";
 }
 
 export interface MatchResult {
@@ -120,14 +129,13 @@ export const mockTeams: TeamCard[] = [
     team_image: student1,
     member_avatars: [student1, student3],
     members: [
-      { name: "Arjun", role: "fullstack_developer", avatar: student1 },
-      { name: "Karthik", role: "ai_ml_engineer", avatar: student3 },
+      { name: "Arjun", role: "fullstack_developer", avatar: student1, user_id: "s1" },
+      { name: "Karthik", role: "ai_ml_engineer", avatar: student3, user_id: "s3" },
     ],
     open_roles: ["ui_ux_designer", "backend_developer"],
     required_roles: ["fullstack_developer", "ai_ml_engineer", "ui_ux_designer", "backend_developer"],
     max_size: 4,
-    event_name: "HackVerse 3.0",
-    event_id: "1",
+    registered_events: ["1"],
     city: "hyd",
     creator_id: "s1",
     completion: 50,
@@ -138,13 +146,12 @@ export const mockTeams: TeamCard[] = [
     team_image: student2,
     member_avatars: [student2],
     members: [
-      { name: "Priya", role: "ui_ux_designer", avatar: student2 },
+      { name: "Priya", role: "ui_ux_designer", avatar: student2, user_id: "s2" },
     ],
     open_roles: ["fullstack_developer", "ai_ml_engineer", "content_creator"],
     required_roles: ["ui_ux_designer", "fullstack_developer", "ai_ml_engineer", "content_creator"],
     max_size: 4,
-    event_name: "DesignJam 2026",
-    event_id: "2",
+    registered_events: ["2"],
     city: "blr",
     creator_id: "s2",
     completion: 25,
@@ -155,14 +162,13 @@ export const mockTeams: TeamCard[] = [
     team_image: student3,
     member_avatars: [student3, student4],
     members: [
-      { name: "Karthik", role: "ai_ml_engineer", avatar: student3 },
-      { name: "Ananya", role: "backend_developer", avatar: student4 },
+      { name: "Karthik", role: "ai_ml_engineer", avatar: student3, user_id: "s3" },
+      { name: "Ananya", role: "backend_developer", avatar: student4, user_id: "s4" },
     ],
     open_roles: ["frontend_developer", "product_manager"],
     required_roles: ["ai_ml_engineer", "backend_developer", "frontend_developer", "product_manager"],
     max_size: 4,
-    event_name: "AI & Robotics Lab",
-    event_id: "5",
+    registered_events: ["5"],
     city: "che",
     creator_id: "s3",
     completion: 50,
@@ -173,16 +179,27 @@ export const mockTeams: TeamCard[] = [
     team_image: student5,
     member_avatars: [student5],
     members: [
-      { name: "Rahul", role: "product_manager", avatar: student5 },
+      { name: "Rahul", role: "product_manager", avatar: student5, user_id: "s5" },
     ],
     open_roles: ["frontend_developer", "backend_developer", "ui_ux_designer"],
     required_roles: ["product_manager", "frontend_developer", "backend_developer", "ui_ux_designer"],
     max_size: 4,
-    event_name: "Startup Weekend",
-    event_id: "6",
+    registered_events: ["6"],
     city: "mum",
     creator_id: "s5",
     completion: 25,
+  },
+];
+
+export const mockTeamInvites: TeamInvite[] = [
+  {
+    invite_id: "inv1",
+    team_id: "t1",
+    team_name: "Code Crushers",
+    invited_by: "Arjun Reddy",
+    invited_user_id: "s2",
+    role: "ui_ux_designer",
+    status: "pending",
   },
 ];
 
