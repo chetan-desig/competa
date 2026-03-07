@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock } from "lucide-react";
+import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock, Edit3, BarChart3, Megaphone, UserCheck, Eye, ChevronRight, AlertTriangle, Trash2 } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { mockTeams } from "@/data/teamMatchingData";
 import { useState } from "react";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
+import { useRole } from "@/hooks/useRole";
+import { toast } from "sonner";
 
 const EventDetailPage = () => {
   const { id } = useParams();
@@ -13,6 +15,7 @@ const EventDetailPage = () => {
   const event = mockEvents.find((e) => e.id === id);
   const [saved, setSaved] = useState(false);
   const [joined, setJoined] = useState(false);
+  const { isOrganizer, isStudent } = useRole();
   const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
   if (!event) {
@@ -34,6 +37,14 @@ const EventDetailPage = () => {
     const verified = requireVerification("student", () => setJoined(true));
     if (verified) setJoined(true);
   };
+
+  // Mock organizer stats for this event
+  const eventStats = [
+    { label: "Views", value: "1.2K", icon: Eye, color: "bg-primary/10 text-primary" },
+    { label: "Registered", value: `${event.attendees}`, icon: UserCheck, color: "bg-secondary/10 text-secondary" },
+    { label: "Teams", value: `${teamsForEvent.length}`, icon: Users, color: "bg-accent/10 text-accent" },
+    { label: "Fill Rate", value: "78%", icon: BarChart3, color: "bg-success/10 text-success" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,15 +79,35 @@ const EventDetailPage = () => {
             >
               <Share2 className="w-5 h-5 text-primary-foreground" />
             </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setSaved(!saved)}
-              className="w-10 h-10 rounded-2xl glass flex items-center justify-center"
-            >
-              <Bookmark className={`w-5 h-5 ${saved ? "fill-primary text-primary" : "text-primary-foreground"}`} />
-            </motion.button>
+            {isStudent && (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSaved(!saved)}
+                className="w-10 h-10 rounded-2xl glass flex items-center justify-center"
+              >
+                <Bookmark className={`w-5 h-5 ${saved ? "fill-primary text-primary" : "text-primary-foreground"}`} />
+              </motion.button>
+            )}
+            {isOrganizer && (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => toast.info("Edit mode coming soon!")}
+                className="w-10 h-10 rounded-2xl glass flex items-center justify-center"
+              >
+                <Edit3 className="w-5 h-5 text-primary-foreground" />
+              </motion.button>
+            )}
           </div>
         </div>
+
+        {/* Organizer badge */}
+        {isOrganizer && (
+          <div className="absolute bottom-16 left-5">
+            <span className="bg-accent text-accent-foreground text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider">
+              ⚙️ Managing
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -135,8 +166,144 @@ const EventDetailPage = () => {
             ))}
           </div>
 
-          {/* Team section for team events */}
-          {event.requiresTeam && (
+          {/* ─── ORGANIZER: Event Management Section ─── */}
+          {isOrganizer && (
+            <div className="space-y-5 border-t border-border pt-5 mt-2">
+              {/* Quick Stats */}
+              <div>
+                <h3 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+                  📊 Event Analytics
+                </h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {eventStats.map((stat) => {
+                    const Icon = stat.icon;
+                    return (
+                      <div key={stat.label} className="bg-muted rounded-2xl p-3 text-center">
+                        <div className={`w-7 h-7 rounded-xl ${stat.color} flex items-center justify-center mx-auto mb-1.5`}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <p className="text-sm font-display font-bold text-card-foreground">{stat.value}</p>
+                        <p className="text-[9px] text-muted-foreground font-medium">{stat.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Registered Participants */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    👥 Participants ({event.attendees})
+                  </h3>
+                  <button
+                    onClick={() => toast.info("Full participant list coming soon!")}
+                    className="text-[11px] font-semibold text-primary flex items-center gap-0.5"
+                  >
+                    View All <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-2xl bg-muted">
+                  <div className="flex -space-x-2">
+                    {teamsForEvent.flatMap(t => t.member_avatars).slice(0, 5).map((av, j) => (
+                      <img key={j} src={av} alt="" className="w-8 h-8 rounded-full border-2 border-muted object-cover" />
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium ml-1">
+                    +{Math.max(0, event.attendees - 5)} more registered
+                  </p>
+                </div>
+              </div>
+
+              {/* Teams Monitor */}
+              {event.requiresTeam && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                      🏆 Teams Formed ({teamsForEvent.length})
+                    </h3>
+                    <button
+                      onClick={() => toast.info("Teams monitor coming soon!")}
+                      className="text-[11px] font-semibold text-primary flex items-center gap-0.5"
+                    >
+                      Manage <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {teamsForEvent.map((team) => (
+                      <div
+                        key={team.team_id}
+                        className="flex items-center gap-3 p-3 rounded-2xl bg-muted"
+                      >
+                        <div className="flex -space-x-2">
+                          {team.member_avatars.slice(0, 3).map((av, j) => (
+                            <img key={j} src={av} alt="" className="w-7 h-7 rounded-full border-2 border-muted object-cover" />
+                          ))}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-foreground truncate">{team.team_name}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {team.members.length}/{team.max_size} members · {team.open_roles.length} roles open
+                          </p>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
+                          team.members.length >= team.max_size 
+                            ? "bg-success/10 text-success" 
+                            : "bg-accent/10 text-accent"
+                        }`}>
+                          {team.members.length >= team.max_size ? "Full" : "Open"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Actions */}
+              <div>
+                <h3 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+                  ⚡ Quick Actions
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Send Announcement", icon: Megaphone, action: () => toast.info("Announcements coming soon!"), color: "bg-primary/10 text-primary" },
+                    { label: "Invite Students", icon: UserCheck, action: () => navigate("/search"), color: "bg-secondary/10 text-secondary" },
+                    { label: "Edit Event", icon: Edit3, action: () => toast.info("Edit mode coming soon!"), color: "bg-accent/10 text-accent" },
+                    { label: "View Analytics", icon: BarChart3, action: () => toast.info("Analytics dashboard coming soon!"), color: "bg-success/10 text-success" },
+                  ].map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <motion.button
+                        key={action.label}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={action.action}
+                        className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted text-left"
+                      >
+                        <div className={`w-8 h-8 rounded-xl ${action.color} flex items-center justify-center shrink-0`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-semibold text-foreground">{action.label}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Danger zone */}
+              <div className="pt-2">
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => toast.error("Event deletion coming soon", { description: "This action cannot be undone." })}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-destructive/30 text-destructive text-xs font-semibold"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete Event
+                </motion.button>
+              </div>
+            </div>
+          )}
+
+          {/* ─── STUDENT: Team Section ─── */}
+          {isStudent && event.requiresTeam && (
             <div className="border-t border-border pt-4 mt-2">
               <div className="flex items-center justify-between mb-3">
                 <div>
@@ -155,7 +322,6 @@ const EventDetailPage = () => {
                 </motion.button>
               </div>
 
-              {/* Preview of teams */}
               {teamsForEvent.slice(0, 2).map((team) => (
                 <div
                   key={team.team_id}
@@ -180,10 +346,27 @@ const EventDetailPage = () => {
         </motion.div>
       </div>
 
-      {/* Sticky CTA */}
+      {/* Sticky CTA - Role aware */}
       <div className="fixed bottom-0 left-0 right-0 p-5 glass-card safe-bottom">
         <div className="flex gap-3 max-w-lg mx-auto">
-          {event.requiresTeam ? (
+          {isOrganizer ? (
+            <>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => toast.info("Edit mode coming soon!")}
+                className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-lg flex items-center justify-center gap-2"
+              >
+                <Edit3 className="w-4 h-4" /> Edit Event
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => toast.info("Announcements coming soon!")}
+                className="flex-1 py-4 rounded-2xl bg-card border border-border font-bold text-sm text-foreground flex items-center justify-center gap-2"
+              >
+                <Megaphone className="w-4 h-4" /> Announce
+              </motion.button>
+            </>
+          ) : event.requiresTeam ? (
             <>
               <motion.button
                 whileTap={{ scale: 0.97 }}

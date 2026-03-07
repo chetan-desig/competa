@@ -9,8 +9,8 @@ const BottomNav = () => {
   const { isOrganizer, isStudent } = useRole();
 
   const tabs = [
-    { path: "/", icon: Home, label: "Home", show: true },
-    { path: "/search", icon: Search, label: "Search", show: true },
+    { path: "/", icon: Home, label: isOrganizer ? "Dashboard" : "Home", show: true },
+    { path: "/search", icon: Search, label: isOrganizer ? "Students" : "Search", show: true },
     ...(isOrganizer
       ? [{ path: "/create", icon: PlusCircle, label: "Create", show: true, isCenter: true }]
       : [{ path: "/team-matching", icon: Users, label: "Teams", show: true, isCenter: true }]),
