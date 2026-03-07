@@ -26,7 +26,7 @@ const EventDetailPage = () => {
     );
   }
 
-  const teamsForEvent = mockTeams.filter((t) => t.event_id === event.id);
+  const teamsForEvent = mockTeams.filter((t) => t.registered_events.includes(event.id));
   const openTeams = teamsForEvent.filter((t) => t.open_roles.length > 0);
 
   const handleJoin = () => {
