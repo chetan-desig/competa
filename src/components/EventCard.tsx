@@ -85,7 +85,7 @@ const EventCard = ({ event, index }: EventCardProps) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
-                className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-amber-500/20 backdrop-blur-md text-amber-200 border border-amber-400/20 flex items-center gap-1"
+                className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur-md text-white border border-white/10 flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {prize}
               </motion.span>
