@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserPlus, Check, X, MapPin, ExternalLink, Sparkles } from "lucide-react";
+import { ArrowLeft, UserPlus, Check, X, MapPin, ExternalLink, Sparkles, Clock, Send, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { mockStudents, ROLES_CATALOG, skillEmojis } from "@/data/teamMatchingData";
 
-type BuddyStatus = "not_connected" | "pending" | "connected";
+type BuddyStatus = "not_connected" | "request_sent" | "request_received" | "connected";
 
 interface Buddy {
   id: string;
@@ -18,6 +18,7 @@ interface Buddy {
   skills: string[];
   portfolio: string;
   status: BuddyStatus;
+  requestTime?: string;
 }
 
 const initialBuddies: Buddy[] = mockStudents.map((s) => {
@@ -36,8 +37,12 @@ const initialBuddies: Buddy[] = mockStudents.map((s) => {
       s.user_id === "s1"
         ? "connected"
         : s.user_id === "s3"
-        ? "pending"
+        ? "request_received"
+        : s.user_id === "s4"
+        ? "request_sent"
         : ("not_connected" as BuddyStatus),
+    requestTime:
+      s.user_id === "s3" ? "15m ago" : s.user_id === "s4" ? "1h ago" : undefined,
   };
 });
 
@@ -49,26 +54,30 @@ const cityNames: Record<string, string> = {
   mum: "Mumbai",
 };
 
+type Tab = "discover" | "buddies" | "received" | "sent";
+
 const BuddiesPage = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"discover" | "buddies" | "requests">("discover");
+  const [tab, setTab] = useState<Tab>("discover");
   const [buddies, setBuddies] = useState<Buddy[]>(initialBuddies);
   const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
 
   const connected = buddies.filter((b) => b.status === "connected");
-  const pending = buddies.filter((b) => b.status === "pending");
+  const received = buddies.filter((b) => b.status === "request_received");
+  const sent = buddies.filter((b) => b.status === "request_sent");
   const discover = buddies.filter((b) => b.status === "not_connected");
 
   const handleAction = (id: string, newStatus: BuddyStatus) => {
     setBuddies((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
+      prev.map((b) => (b.id === id ? { ...b, status: newStatus, requestTime: newStatus === "request_sent" ? "Just now" : b.requestTime } : b))
     );
   };
 
-  const tabs = [
-    { id: "discover" as const, label: "Discover", count: discover.length },
-    { id: "buddies" as const, label: "My Buddies", count: connected.length },
-    { id: "requests" as const, label: "Requests", count: pending.length },
+  const tabs: { id: Tab; label: string; count: number; icon: React.ReactNode }[] = [
+    { id: "discover", label: "Discover", count: discover.length, icon: <Sparkles className="w-3.5 h-3.5" /> },
+    { id: "buddies", label: "Buddies", count: connected.length, icon: <Check className="w-3.5 h-3.5" /> },
+    { id: "received", label: "Received", count: received.length, icon: <Inbox className="w-3.5 h-3.5" /> },
+    { id: "sent", label: "Sent", count: sent.length, icon: <Send className="w-3.5 h-3.5" /> },
   ];
 
   const renderProfileCard = (buddy: Buddy) => {
@@ -113,51 +122,70 @@ const BuddiesPage = () => {
             </div>
           </div>
 
-          {/* Action Button */}
-          {buddy.status === "not_connected" && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAction(buddy.id, "pending");
-              }}
-              className="shrink-0 px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Add
-            </motion.button>
-          )}
-          {buddy.status === "pending" && (
-            <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+          {/* Action Buttons based on status */}
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            {buddy.status === "not_connected" && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                onClick={() => handleAction(buddy.id, "connected")}
-                className="w-9 h-9 rounded-xl bg-success/10 flex items-center justify-center"
+                onClick={() => handleAction(buddy.id, "request_sent")}
+                className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5"
               >
-                <Check className="w-4 h-4 text-success" />
+                <UserPlus className="w-3.5 h-3.5" />
+                Add
               </motion.button>
+            )}
+
+            {buddy.status === "request_received" && (
+              <div className="flex gap-1.5">
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAction(buddy.id, "connected")}
+                  className="px-3 py-2 rounded-xl bg-success/10 text-success text-xs font-bold flex items-center gap-1"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Accept
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleAction(buddy.id, "not_connected")}
+                  className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center"
+                >
+                  <X className="w-4 h-4 text-destructive" />
+                </motion.button>
+              </div>
+            )}
+
+            {buddy.status === "request_sent" && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => handleAction(buddy.id, "not_connected")}
-                className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center"
+                className="px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-bold flex items-center gap-1.5"
               >
-                <X className="w-4 h-4 text-destructive" />
+                <Clock className="w-3.5 h-3.5" />
+                Cancel
               </motion.button>
-            </div>
-          )}
-          {buddy.status === "connected" && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/messages/${buddy.id}`);
-              }}
-              className="shrink-0 px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-bold"
-            >
-              Message
-            </motion.button>
-          )}
+            )}
+
+            {buddy.status === "connected" && (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => navigate(`/messages/${buddy.id}`)}
+                className="px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-bold"
+              >
+                Message
+              </motion.button>
+            )}
+          </div>
         </button>
+
+        {/* Timestamp for requests */}
+        {(buddy.status === "request_received" || buddy.status === "request_sent") && buddy.requestTime && (
+          <div className="px-4 -mt-2 pb-2">
+            <p className="text-[10px] text-muted-foreground/60">
+              {buddy.status === "request_received" ? "Received" : "Sent"} {buddy.requestTime}
+            </p>
+          </div>
+        )}
 
         {/* Expanded Profile Details */}
         <AnimatePresence>
@@ -203,6 +231,23 @@ const BuddiesPage = () => {
     );
   };
 
+  const renderEmptyState = (emoji: string, title: string, subtitle: string, action?: { label: string; onClick: () => void }) => (
+    <div className="text-center py-16">
+      <p className="text-4xl mb-3">{emoji}</p>
+      <p className="font-display font-bold text-foreground">{title}</p>
+      <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
+      {action && (
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={action.onClick}
+          className="gradient-primary text-primary-foreground font-bold py-3 px-6 rounded-2xl text-sm"
+        >
+          {action.label}
+        </motion.button>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-6 pb-4 border-b border-border/50">
@@ -216,12 +261,12 @@ const BuddiesPage = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 py-2.5 rounded-2xl text-sm font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-2xl text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                 tab === t.id
                   ? "gradient-primary text-primary-foreground shadow-md"
                   : "bg-muted text-muted-foreground"
@@ -230,8 +275,8 @@ const BuddiesPage = () => {
               {t.label}
               {t.count > 0 && (
                 <span
-                  className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-                    tab === t.id ? "bg-primary-foreground/20" : "bg-border"
+                  className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                    tab === t.id ? "bg-primary-foreground/20" : t.id === "received" ? "bg-destructive text-destructive-foreground" : "bg-border"
                   }`}
                 >
                   {t.count}
@@ -245,83 +290,46 @@ const BuddiesPage = () => {
       <main className="px-5 pt-4 space-y-3">
         <AnimatePresence mode="wait">
           {tab === "discover" && (
-            <motion.div
-              key="discover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-3"
-            >
+            <motion.div key="discover" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
               <div className="flex items-center gap-2 mb-1">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <p className="text-xs font-bold text-muted-foreground">
-                  Tap a profile to see skills & portfolio
-                </p>
+                <p className="text-xs font-bold text-muted-foreground">Tap a profile to see skills & portfolio</p>
               </div>
-              {discover.length === 0 ? (
-                <div className="text-center py-16">
-                  <p className="text-4xl mb-3">🎉</p>
-                  <p className="font-display font-bold text-foreground">
-                    You've discovered everyone!
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Check back later for new students
-                  </p>
-                </div>
-              ) : (
-                discover.map(renderProfileCard)
-              )}
+              {discover.length === 0
+                ? renderEmptyState("🎉", "You've discovered everyone!", "Check back later for new students")
+                : discover.map(renderProfileCard)}
             </motion.div>
           )}
 
           {tab === "buddies" && (
-            <motion.div
-              key="buddies"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-3"
-            >
-              {connected.length === 0 ? (
-                <div className="text-center py-16">
-                  <p className="text-4xl mb-3">👋</p>
-                  <p className="font-display font-bold text-foreground">No buddies yet</p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Discover students and send requests!
-                  </p>
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => setTab("discover")}
-                    className="gradient-primary text-primary-foreground font-bold py-3 px-6 rounded-2xl text-sm"
-                  >
-                    Browse Students
-                  </motion.button>
-                </div>
-              ) : (
-                connected.map(renderProfileCard)
-              )}
+            <motion.div key="buddies" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+              {connected.length === 0
+                ? renderEmptyState("👋", "No buddies yet", "Discover students and send requests!", { label: "Browse Students", onClick: () => setTab("discover") })
+                : connected.map(renderProfileCard)}
             </motion.div>
           )}
 
-          {tab === "requests" && (
-            <motion.div
-              key="requests"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-3"
-            >
-              {pending.length === 0 ? (
-                <div className="text-center py-16">
-                  <p className="text-4xl mb-3">📭</p>
-                  <p className="font-display font-bold text-foreground">
-                    No pending requests
-                  </p>
-                  <p className="text-sm text-muted-foreground">You're all caught up!</p>
-                </div>
-              ) : (
-                pending.map(renderProfileCard)
-              )}
+          {tab === "received" && (
+            <motion.div key="received" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Inbox className="w-4 h-4 text-primary" />
+                <p className="text-xs font-bold text-muted-foreground">People who want to connect with you</p>
+              </div>
+              {received.length === 0
+                ? renderEmptyState("📭", "No pending requests", "You're all caught up!")
+                : received.map(renderProfileCard)}
+            </motion.div>
+          )}
+
+          {tab === "sent" && (
+            <motion.div key="sent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Send className="w-4 h-4 text-primary" />
+                <p className="text-xs font-bold text-muted-foreground">Waiting for them to accept</p>
+              </div>
+              {sent.length === 0
+                ? renderEmptyState("✨", "No pending sent requests", "Discover people and send requests!", { label: "Discover People", onClick: () => setTab("discover") })
+                : sent.map(renderProfileCard)}
             </motion.div>
           )}
         </AnimatePresence>

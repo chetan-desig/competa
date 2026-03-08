@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { useRole } from "@/hooks/useRole";
@@ -15,13 +15,33 @@ interface Notification {
   time: string;
   read: boolean;
   icon: string;
+  actionable?: "buddy_request" | "team_invite";
+  actionStatus?: "pending" | "accepted" | "declined";
+  senderId?: string;
+  senderAvatar?: string;
 }
 
 const studentNotifications: Notification[] = [
   { id: "1", type: "teams", title: "Team Complete! 🎉", message: "Code Crushers is ready for HackVerse 3.0", time: "2m ago", read: false, icon: "🎉" },
-  { id: "2", type: "messages", title: "Buddy Request", message: "Priya Sharma wants to connect", time: "15m ago", read: false, icon: "👋" },
+  {
+    id: "2", type: "messages", title: "Buddy Request", message: "Priya Sharma wants to connect with you",
+    time: "15m ago", read: false, icon: "👋",
+    actionable: "buddy_request", actionStatus: "pending", senderId: "s3",
+    senderAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
+  },
+  {
+    id: "2b", type: "messages", title: "Buddy Request", message: "Ravi Kumar sent you a buddy request",
+    time: "30m ago", read: false, icon: "👋",
+    actionable: "buddy_request", actionStatus: "pending", senderId: "s5",
+    senderAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100"
+  },
   { id: "3", type: "teams", title: "Request Approved ✅", message: "You're in! Neural Nexus accepted you", time: "1h ago", read: true, icon: "✅" },
   { id: "4", type: "events", title: "Event Tomorrow", message: "HackVerse 3.0 starts in 24 hours", time: "3h ago", read: true, icon: "⏰" },
+  {
+    id: "5b", type: "messages", title: "Request Accepted ✅", message: "Arjun Patel accepted your buddy request",
+    time: "4h ago", read: true, icon: "🤝",
+    actionable: "buddy_request", actionStatus: "accepted", senderId: "s1"
+  },
   { id: "5", type: "teams", title: "New Teammate", message: "Karthik joined Code Crushers as AI/ML Engineer", time: "5h ago", read: true, icon: "🤝" },
   { id: "6", type: "events", title: "Registration Closing", message: "DesignJam 2026 closes in 2 days", time: "6h ago", read: true, icon: "🔔" },
   { id: "7", type: "events", title: "Certificate Ready 🏆", message: "Your HackVerse 2.0 certificate is available", time: "1d ago", read: true, icon: "🏆" },
@@ -61,6 +81,16 @@ const NotificationsPage = () => {
   const markRead = (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  const handleBuddyAction = (id: string, action: "accepted" | "declined") => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id
+          ? { ...n, actionStatus: action, read: true, icon: action === "accepted" ? "✅" : "❌" }
+          : n
+      )
     );
   };
 
@@ -136,24 +166,87 @@ const NotificationsPage = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04 }}
-                  onClick={() => markRead(notif.id)}
-                  className={`flex items-start gap-3 p-4 rounded-2xl cursor-pointer transition-colors ${
+                  onClick={() => {
+                    markRead(notif.id);
+                    // Navigate to buddies page for buddy requests
+                    if (notif.actionable === "buddy_request" && !notif.actionStatus?.match(/accepted|declined/)) {
+                      // stay on page for actionable items
+                    } else if (notif.actionable === "buddy_request") {
+                      navigate("/buddies");
+                    }
+                  }}
+                  className={`rounded-2xl cursor-pointer transition-colors overflow-hidden ${
                     notif.read ? "bg-card" : "bg-primary/5 border border-primary/10"
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0">
-                    {notif.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-display font-bold text-card-foreground truncate">{notif.title}</p>
-                      {!notif.read && (
-                        <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                      )}
+                  <div className="flex items-start gap-3 p-4">
+                    {/* Avatar or icon */}
+                    {notif.senderAvatar ? (
+                      <img
+                        src={notif.senderAvatar}
+                        alt=""
+                        className="w-10 h-10 rounded-xl object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0">
+                        {notif.icon}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-display font-bold text-card-foreground truncate">{notif.title}</p>
+                        {!notif.read && (
+                          <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">{notif.time}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">{notif.time}</p>
                   </div>
+
+                  {/* Actionable buddy request buttons */}
+                  {notif.actionable === "buddy_request" && notif.actionStatus === "pending" && (
+                    <div className="px-4 pb-4 flex gap-2">
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBuddyAction(notif.id, "accepted");
+                        }}
+                        className="flex-1 py-2.5 rounded-xl bg-success/10 text-success text-xs font-bold flex items-center justify-center gap-1.5"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        Accept Request
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBuddyAction(notif.id, "declined");
+                        }}
+                        className="flex-1 py-2.5 rounded-xl bg-destructive/10 text-destructive text-xs font-bold flex items-center justify-center gap-1.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Decline
+                      </motion.button>
+                    </div>
+                  )}
+
+                  {/* Resolved status */}
+                  {notif.actionable === "buddy_request" && notif.actionStatus === "accepted" && (
+                    <div className="px-4 pb-3">
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-success/10 text-success text-[11px] font-bold">
+                        <Check className="w-3 h-3" /> Accepted
+                      </span>
+                    </div>
+                  )}
+                  {notif.actionable === "buddy_request" && notif.actionStatus === "declined" && (
+                    <div className="px-4 pb-3">
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[11px] font-bold">
+                        <X className="w-3 h-3" /> Declined
+                      </span>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </motion.div>
