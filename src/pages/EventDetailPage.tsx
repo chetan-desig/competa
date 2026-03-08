@@ -197,7 +197,7 @@ const EventDetailPage = () => {
                     👥 Participants ({event.attendees})
                   </h3>
                   <button
-                    onClick={() => toast.info("Full participant list coming soon!")}
+                    onClick={() => navigate("/participants")}
                     className="text-[11px] font-semibold text-primary flex items-center gap-0.5"
                   >
                     View All <ChevronRight className="w-3 h-3" />
@@ -223,7 +223,7 @@ const EventDetailPage = () => {
                       🏆 Teams Formed ({teamsForEvent.length})
                     </h3>
                     <button
-                      onClick={() => toast.info("Teams monitor coming soon!")}
+                      onClick={() => navigate("/teams-management")}
                       className="text-[11px] font-semibold text-primary flex items-center gap-0.5"
                     >
                       Manage <ChevronRight className="w-3 h-3" />
