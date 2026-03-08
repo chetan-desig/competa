@@ -330,40 +330,6 @@ const HomePage = () => {
       {/* ─── STUDENT CTAs ─── */}
       {isStudent && (
         <div className="px-5 pt-5">
-          {/* Live students strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="mb-4"
-          >
-            <div className="flex items-center gap-2 mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
-              <p className="text-[11px] font-bold text-muted-foreground">Active students near you</p>
-            </div>
-            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
-              {mockStudents.slice(0, 5).map((s, i) => (
-                <motion.button
-                  key={s.user_id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.15 + i * 0.06 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => navigate("/people")}
-                  className="flex flex-col items-center gap-1 min-w-[52px]"
-                >
-                  <div className="relative">
-                    <img src={s.profile_photo} alt={s.display_name} className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" />
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-background" />
-                  </div>
-                  <p className="text-[9px] font-semibold text-muted-foreground truncate max-w-[52px]">
-                    {s.display_name.split(" ")[0]}
-                  </p>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-
           <div className="space-y-3">
             <motion.button
               initial={{ opacity: 0, y: 20 }}
