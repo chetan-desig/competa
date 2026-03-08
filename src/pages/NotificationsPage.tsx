@@ -61,6 +61,25 @@ const notifTabs: { id: NotifTab; label: string }[] = [
   { id: "messages", label: "Messages" },
 ];
 
+// Group notifications by time
+const groupByTime = (notifs: Notification[]) => {
+  const groups: { label: string; items: Notification[] }[] = [];
+  const today: Notification[] = [];
+  const earlier: Notification[] = [];
+
+  notifs.forEach((n) => {
+    if (n.time.includes("d ago") || n.time.includes("w ago")) {
+      earlier.push(n);
+    } else {
+      today.push(n);
+    }
+  });
+
+  if (today.length) groups.push({ label: "Today", items: today });
+  if (earlier.length) groups.push({ label: "Earlier", items: earlier });
+  return groups;
+};
+
 const NotificationsPage = () => {
   const navigate = useNavigate();
   const { isOrganizer } = useRole();
@@ -72,6 +91,7 @@ const NotificationsPage = () => {
     ? notifications
     : notifications.filter((n) => n.type === activeTab);
 
+  const groups = groupByTime(filtered);
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAllRead = () => {
@@ -100,23 +120,27 @@ const NotificationsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="px-5 pt-6 pb-3">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-2xl px-5 pt-6 pb-3 border-b border-border/30">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)}>
+            <motion.button whileTap={{ scale: 0.85 }} onClick={() => navigate(-1)}>
               <ArrowLeft className="w-6 h-6 text-foreground" />
-            </button>
-            <h1 className="text-2xl font-display font-bold text-foreground">Notifications</h1>
+            </motion.button>
+            <div>
+              <h1 className="text-2xl font-display font-bold text-foreground">Notifications</h1>
+              {unreadCount > 0 && (
+                <p className="text-[11px] text-muted-foreground">{unreadCount} unread</p>
+              )}
+            </div>
           </div>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} className="text-xs font-bold text-primary">
+            <motion.button whileTap={{ scale: 0.95 }} onClick={markAllRead} className="text-xs font-bold text-primary px-3 py-1.5 rounded-xl bg-primary/8">
               Mark all read
-            </button>
+            </motion.button>
           )}
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-1 bg-muted rounded-2xl p-1">
           {notifTabs.map((tab) => {
             const unread = tabUnread(tab.id);
@@ -144,7 +168,7 @@ const NotificationsPage = () => {
         </div>
       </header>
 
-      <main className="px-5 space-y-2 pt-2">
+      <main className="px-5 pt-2">
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-5xl mb-4">🔔</p>
@@ -158,96 +182,104 @@ const NotificationsPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-2"
             >
-              {filtered.map((notif, i) => (
-                <motion.div
-                  key={notif.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  onClick={() => {
-                    markRead(notif.id);
-                    // Navigate to buddies page for buddy requests
-                    if (notif.actionable === "buddy_request" && !notif.actionStatus?.match(/accepted|declined/)) {
-                      // stay on page for actionable items
-                    } else if (notif.actionable === "buddy_request") {
-                      navigate("/buddies");
-                    }
-                  }}
-                  className={`rounded-2xl cursor-pointer transition-colors overflow-hidden ${
-                    notif.read ? "bg-card" : "bg-primary/5 border border-primary/10"
-                  }`}
-                >
-                  <div className="flex items-start gap-3 p-4">
-                    {/* Avatar or icon */}
-                    {notif.senderAvatar ? (
-                      <img
-                        src={notif.senderAvatar}
-                        alt=""
-                        className="w-10 h-10 rounded-xl object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0">
-                        {notif.icon}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-display font-bold text-card-foreground truncate">{notif.title}</p>
-                        {!notif.read && (
-                          <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+              {groups.map((group) => (
+                <div key={group.label} className="mb-4">
+                  <p className="text-[10px] font-display font-bold text-muted-foreground uppercase tracking-widest px-1 mb-2 mt-3">
+                    {group.label}
+                  </p>
+                  <div className="space-y-2">
+                    {group.items.map((notif, i) => (
+                      <motion.div
+                        key={notif.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.04 }}
+                        onClick={() => {
+                          markRead(notif.id);
+                          if (notif.actionable === "buddy_request" && !notif.actionStatus?.match(/accepted|declined/)) {
+                            // stay for actionable
+                          } else if (notif.actionable === "buddy_request") {
+                            navigate("/buddies");
+                          }
+                        }}
+                        className={`rounded-2xl cursor-pointer transition-all overflow-hidden shadow-sm ${
+                          notif.read ? "bg-card" : "bg-primary/5 border border-primary/10"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3 p-4">
+                          {notif.senderAvatar ? (
+                            <img
+                              src={notif.senderAvatar}
+                              alt=""
+                              className="w-10 h-10 rounded-xl object-cover shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0">
+                              {notif.icon}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-display font-bold text-card-foreground truncate">{notif.title}</p>
+                              {!notif.read && (
+                                <motion.span
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-2 h-2 rounded-full bg-primary shrink-0"
+                                />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                            <p className="text-[10px] text-muted-foreground/60 mt-1">{notif.time}</p>
+                          </div>
+                        </div>
+
+                        {notif.actionable === "buddy_request" && notif.actionStatus === "pending" && (
+                          <div className="px-4 pb-4 flex gap-2">
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBuddyAction(notif.id, "accepted");
+                              }}
+                              className="flex-1 py-2.5 rounded-xl bg-success/10 text-success text-xs font-bold flex items-center justify-center gap-1.5"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              Accept
+                            </motion.button>
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBuddyAction(notif.id, "declined");
+                              }}
+                              className="flex-1 py-2.5 rounded-xl bg-destructive/10 text-destructive text-xs font-bold flex items-center justify-center gap-1.5"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              Decline
+                            </motion.button>
+                          </div>
                         )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
-                      <p className="text-[10px] text-muted-foreground/60 mt-1">{notif.time}</p>
-                    </div>
+
+                        {notif.actionable === "buddy_request" && notif.actionStatus === "accepted" && (
+                          <div className="px-4 pb-3">
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-success/10 text-success text-[11px] font-bold">
+                              <Check className="w-3 h-3" /> Accepted
+                            </span>
+                          </div>
+                        )}
+                        {notif.actionable === "buddy_request" && notif.actionStatus === "declined" && (
+                          <div className="px-4 pb-3">
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[11px] font-bold">
+                              <X className="w-3 h-3" /> Declined
+                            </span>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
                   </div>
-
-                  {/* Actionable buddy request buttons */}
-                  {notif.actionable === "buddy_request" && notif.actionStatus === "pending" && (
-                    <div className="px-4 pb-4 flex gap-2">
-                      <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBuddyAction(notif.id, "accepted");
-                        }}
-                        className="flex-1 py-2.5 rounded-xl bg-success/10 text-success text-xs font-bold flex items-center justify-center gap-1.5"
-                      >
-                        <Check className="w-3.5 h-3.5" />
-                        Accept Request
-                      </motion.button>
-                      <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBuddyAction(notif.id, "declined");
-                        }}
-                        className="flex-1 py-2.5 rounded-xl bg-destructive/10 text-destructive text-xs font-bold flex items-center justify-center gap-1.5"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                        Decline
-                      </motion.button>
-                    </div>
-                  )}
-
-                  {/* Resolved status */}
-                  {notif.actionable === "buddy_request" && notif.actionStatus === "accepted" && (
-                    <div className="px-4 pb-3">
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-success/10 text-success text-[11px] font-bold">
-                        <Check className="w-3 h-3" /> Accepted
-                      </span>
-                    </div>
-                  )}
-                  {notif.actionable === "buddy_request" && notif.actionStatus === "declined" && (
-                    <div className="px-4 pb-3">
-                      <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[11px] font-bold">
-                        <X className="w-3 h-3" /> Declined
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           </AnimatePresence>

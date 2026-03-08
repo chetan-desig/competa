@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserPlus, Check, X, MapPin, ExternalLink, Sparkles, Clock, Send, Inbox } from "lucide-react";
+import { ArrowLeft, UserPlus, Check, X, MapPin, ExternalLink, Sparkles, Clock, Send, Inbox, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { mockStudents, ROLES_CATALOG, skillEmojis } from "@/data/teamMatchingData";
@@ -61,11 +61,21 @@ const BuddiesPage = () => {
   const [tab, setTab] = useState<Tab>("discover");
   const [buddies, setBuddies] = useState<Buddy[]>(initialBuddies);
   const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const connected = buddies.filter((b) => b.status === "connected");
   const received = buddies.filter((b) => b.status === "request_received");
   const sent = buddies.filter((b) => b.status === "request_sent");
   const discover = buddies.filter((b) => b.status === "not_connected");
+
+  const currentList = useMemo(() => {
+    const list = tab === "discover" ? discover : tab === "buddies" ? connected : tab === "received" ? received : sent;
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase();
+    return list.filter(
+      (b) => b.name.toLowerCase().includes(q) || b.role.toLowerCase().includes(q) || b.skills.some((s) => s.toLowerCase().includes(q))
+    );
+  }, [tab, buddies, searchQuery]);
 
   const handleAction = (id: string, newStatus: BuddyStatus) => {
     setBuddies((prev) =>
@@ -90,9 +100,8 @@ const BuddiesPage = () => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-card rounded-3xl border border-border overflow-hidden"
+        className="bg-card rounded-[1.5rem] border border-border overflow-hidden shadow-sm"
       >
-        {/* Profile Header - tappable */}
         <button
           onClick={() => setExpandedProfile(isExpanded ? null : buddy.id)}
           className="w-full p-4 flex items-center gap-3.5 text-left"
@@ -122,13 +131,12 @@ const BuddiesPage = () => {
             </div>
           </div>
 
-          {/* Action Buttons based on status */}
           <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
             {buddy.status === "not_connected" && (
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.85 }}
                 onClick={() => handleAction(buddy.id, "request_sent")}
-                className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5 shadow-sm"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Add
@@ -138,7 +146,7 @@ const BuddiesPage = () => {
             {buddy.status === "request_received" && (
               <div className="flex gap-1.5">
                 <motion.button
-                  whileTap={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.85 }}
                   onClick={() => handleAction(buddy.id, "connected")}
                   className="px-3 py-2 rounded-xl bg-success/10 text-success text-xs font-bold flex items-center gap-1"
                 >
@@ -146,7 +154,7 @@ const BuddiesPage = () => {
                   Accept
                 </motion.button>
                 <motion.button
-                  whileTap={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.85 }}
                   onClick={() => handleAction(buddy.id, "not_connected")}
                   className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center"
                 >
@@ -157,7 +165,7 @@ const BuddiesPage = () => {
 
             {buddy.status === "request_sent" && (
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.85 }}
                 onClick={() => handleAction(buddy.id, "not_connected")}
                 className="px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-bold flex items-center gap-1.5"
               >
@@ -168,7 +176,7 @@ const BuddiesPage = () => {
 
             {buddy.status === "connected" && (
               <motion.button
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.85 }}
                 onClick={() => navigate(`/messages/${buddy.id}`)}
                 className="px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-bold"
               >
@@ -178,7 +186,6 @@ const BuddiesPage = () => {
           </div>
         </button>
 
-        {/* Timestamp for requests */}
         {(buddy.status === "request_received" || buddy.status === "request_sent") && buddy.requestTime && (
           <div className="px-4 -mt-2 pb-2">
             <p className="text-[10px] text-muted-foreground/60">
@@ -187,7 +194,6 @@ const BuddiesPage = () => {
           </div>
         )}
 
-        {/* Expanded Profile Details */}
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -198,7 +204,6 @@ const BuddiesPage = () => {
               className="overflow-hidden"
             >
               <div className="px-4 pb-4 pt-0 space-y-3 border-t border-border/50">
-                {/* Skills */}
                 <div className="pt-3">
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
                     Skills
@@ -214,8 +219,6 @@ const BuddiesPage = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* Portfolio */}
                 <button
                   className="flex items-center gap-2 text-primary text-[12px] font-bold"
                   onClick={(e) => e.stopPropagation()}
@@ -249,16 +252,27 @@ const BuddiesPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-6 pb-4 border-b border-border/50">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate(-1)}>
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-2xl px-5 pt-6 pb-4 border-b border-border/30">
+        <div className="flex items-center gap-3 mb-3">
+          <motion.button whileTap={{ scale: 0.85 }} onClick={() => navigate(-1)}>
             <ArrowLeft className="w-6 h-6 text-foreground" />
-          </button>
+          </motion.button>
           <div>
             <h1 className="text-2xl font-display font-bold text-foreground">People</h1>
             <p className="text-xs text-muted-foreground">Browse profiles & connect</p>
           </div>
+        </div>
+
+        {/* Search bar */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name, role, or skill..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-muted text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
         </div>
 
         <div className="flex gap-1.5">
@@ -291,45 +305,51 @@ const BuddiesPage = () => {
         <AnimatePresence mode="wait">
           {tab === "discover" && (
             <motion.div key="discover" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <p className="text-xs font-bold text-muted-foreground">Tap a profile to see skills & portfolio</p>
-              </div>
-              {discover.length === 0
-                ? renderEmptyState("🎉", "You've discovered everyone!", "Check back later for new students")
-                : discover.map(renderProfileCard)}
+              {!searchQuery && (
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <p className="text-xs font-bold text-muted-foreground">Tap a profile to see skills & portfolio</p>
+                </div>
+              )}
+              {currentList.length === 0
+                ? renderEmptyState("🎉", searchQuery ? "No results found" : "You've discovered everyone!", searchQuery ? "Try a different search term" : "Check back later for new students")
+                : currentList.map(renderProfileCard)}
             </motion.div>
           )}
 
           {tab === "buddies" && (
             <motion.div key="buddies" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-              {connected.length === 0
+              {currentList.length === 0
                 ? renderEmptyState("👋", "No buddies yet", "Discover students and send requests!", { label: "Browse Students", onClick: () => setTab("discover") })
-                : connected.map(renderProfileCard)}
+                : currentList.map(renderProfileCard)}
             </motion.div>
           )}
 
           {tab === "received" && (
             <motion.div key="received" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Inbox className="w-4 h-4 text-primary" />
-                <p className="text-xs font-bold text-muted-foreground">People who want to connect with you</p>
-              </div>
-              {received.length === 0
+              {!searchQuery && currentList.length > 0 && (
+                <div className="flex items-center gap-2 mb-1">
+                  <Inbox className="w-4 h-4 text-primary" />
+                  <p className="text-xs font-bold text-muted-foreground">People who want to connect with you</p>
+                </div>
+              )}
+              {currentList.length === 0
                 ? renderEmptyState("📭", "No pending requests", "You're all caught up!")
-                : received.map(renderProfileCard)}
+                : currentList.map(renderProfileCard)}
             </motion.div>
           )}
 
           {tab === "sent" && (
             <motion.div key="sent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Send className="w-4 h-4 text-primary" />
-                <p className="text-xs font-bold text-muted-foreground">Waiting for them to accept</p>
-              </div>
-              {sent.length === 0
+              {!searchQuery && currentList.length > 0 && (
+                <div className="flex items-center gap-2 mb-1">
+                  <Send className="w-4 h-4 text-primary" />
+                  <p className="text-xs font-bold text-muted-foreground">Waiting for them to accept</p>
+                </div>
+              )}
+              {currentList.length === 0
                 ? renderEmptyState("✨", "No pending sent requests", "Discover people and send requests!", { label: "Discover People", onClick: () => setTab("discover") })
-                : sent.map(renderProfileCard)}
+                : currentList.map(renderProfileCard)}
             </motion.div>
           )}
         </AnimatePresence>
