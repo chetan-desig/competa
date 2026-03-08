@@ -15,6 +15,10 @@ import BuddiesPage from "./pages/BuddiesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import MessagesPage from "./pages/MessagesPage";
 import MessagesListPage from "./pages/MessagesListPage";
+import ParticipantsPage from "./pages/ParticipantsPage";
+import TeamsManagementPage from "./pages/TeamsManagementPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage";
+import EventAnalyticsPage from "./pages/EventAnalyticsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +43,10 @@ const App = () => (
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/messages" element={<MessagesListPage />} />
           <Route path="/messages/:userId" element={<MessagesPage />} />
+          <Route path="/participants" element={<ParticipantsPage />} />
+          <Route path="/teams-management" element={<TeamsManagementPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
+          <Route path="/analytics/:id" element={<EventAnalyticsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
