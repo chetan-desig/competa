@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock, Edit3, BarChart3, Megaphone, UserCheck, Eye, ChevronRight, AlertTriangle, Trash2 } from "lucide-react";
+import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock, Edit3, BarChart3, Megaphone, UserCheck, Eye, ChevronRight, AlertTriangle, Trash2, MessageCircle, CalendarCheck, Send, Trophy, Ticket } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { mockTeams } from "@/data/teamMatchingData";
 import { useState } from "react";
@@ -165,6 +165,47 @@ const EventDetailPage = () => {
               </span>
             ))}
           </div>
+
+          {/* ─── STUDENT: Post-Join Actions ─── */}
+          {isStudent && joined && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="border-t border-border pt-5 mt-2 mb-4"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <h3 className="font-display text-xs font-bold text-success uppercase tracking-wider">
+                  You're In! Here's what's next
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  ...(event.requiresTeam ? [{ label: "Find a Team", icon: Users, action: () => navigate(`/team-matching?eventId=${event.id}`), color: "bg-accent/10 text-accent" }] : []),
+                  { label: "Chat with Attendees", icon: MessageCircle, action: () => navigate("/messages"), color: "bg-primary/10 text-primary" },
+                  { label: "Share with Buddies", icon: Send, action: () => { toast.success("Share link copied!"); }, color: "bg-secondary/10 text-secondary" },
+                  { label: "View Schedule", icon: CalendarCheck, action: () => toast.info("Full schedule coming soon!"), color: "bg-success/10 text-success" },
+                  { label: "View Prizes", icon: Trophy, action: () => toast.info("Prize details coming soon!"), color: "bg-accent/10 text-accent" },
+                  { label: "My Ticket", icon: Ticket, action: () => toast.info("E-ticket coming soon!"), color: "bg-primary/10 text-primary" },
+                ].slice(0, 4).map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.button
+                      key={item.label}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={item.action}
+                      className="flex items-center gap-2.5 p-3 rounded-2xl bg-muted text-left"
+                    >
+                      <div className={`w-8 h-8 rounded-xl ${item.color} flex items-center justify-center shrink-0`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-semibold text-foreground">{item.label}</span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
 
           {/* ─── ORGANIZER: Event Management Section ─── */}
           {isOrganizer && (

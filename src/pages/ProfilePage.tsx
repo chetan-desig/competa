@@ -4,7 +4,7 @@ import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trop
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
-import { mockCertificates } from "@/data/mockData";
+import { mockCertificates, mockEvents } from "@/data/mockData";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
 import { ROLES_CATALOG, RoleId } from "@/data/teamMatchingData";
@@ -447,6 +447,35 @@ const ProfilePage = () => {
               <ExternalLink className="w-4 h-4 text-muted-foreground" />
             </motion.div>
           ))}
+        </div>
+
+        {/* Joined / Upcoming Events */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">My Events</h2>
+            <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary flex items-center gap-1">
+              Browse More <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {mockEvents.slice(0, 3).map((ev) => (
+              <motion.div
+                key={ev.id}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate(`/event/${ev.id}`)}
+                className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border cursor-pointer"
+              >
+                <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-display font-bold text-card-foreground truncate">{ev.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{ev.date} · {ev.location}</p>
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-success/10 text-success whitespace-nowrap">
+                  Joined
+                </span>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Past Events */}
