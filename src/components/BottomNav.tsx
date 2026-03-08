@@ -1,4 +1,4 @@
-import { Home, Search, PlusCircle, MessageCircle, User, Users } from "lucide-react";
+import { Home, Search, PlusCircle, MessageCircle, User, Users, LayoutGrid, Megaphone } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useRole } from "@/hooks/useRole";
@@ -8,22 +8,29 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const { isOrganizer, isStudent } = useRole();
 
-  const tabs = [
-    { path: "/", icon: Home, label: isOrganizer ? "Dashboard" : "Home", show: true },
-    { path: "/search", icon: Search, label: isOrganizer ? "Students" : "Search", show: true },
-    ...(isOrganizer
-      ? [{ path: "/create", icon: PlusCircle, label: "Create", show: true, isCenter: true }]
-      : [{ path: "/team-matching", icon: Users, label: "Teams", show: true, isCenter: true }]),
-    { path: "/messages", icon: MessageCircle, label: "Chats", show: true, badge: 4 },
-    { path: "/profile", icon: User, label: "Profile", show: true },
-  ];
+  const tabs = isOrganizer
+    ? [
+        { path: "/", icon: Home, label: "Dashboard", show: true },
+        { path: "/participants", icon: Users, label: "Participants", show: true },
+        { path: "/create", icon: PlusCircle, label: "Create", show: true, isCenter: true },
+        { path: "/messages", icon: MessageCircle, label: "Messages", show: true, badge: 4 },
+        { path: "/profile", icon: User, label: "Profile", show: true },
+      ]
+    : [
+        { path: "/", icon: Home, label: "Home", show: true },
+        { path: "/search", icon: Search, label: "Search", show: true },
+        { path: "/team-matching", icon: Users, label: "Teams", show: true, isCenter: true },
+        { path: "/messages", icon: MessageCircle, label: "Chats", show: true, badge: 4 },
+        { path: "/profile", icon: User, label: "Profile", show: true },
+      ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-xl border-t border-border/50 safe-bottom">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path || 
-            (tab.path === "/messages" && location.pathname.startsWith("/messages"));
+            (tab.path === "/messages" && location.pathname.startsWith("/messages")) ||
+            (tab.path === "/participants" && location.pathname.startsWith("/participants"));
           const Icon = tab.icon;
           const isCenter = (tab as any).isCenter;
           const badge = (tab as any).badge;
