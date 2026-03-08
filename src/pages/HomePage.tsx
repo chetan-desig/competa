@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Bell, Users, PlusCircle, BarChart3, Eye, TrendingUp, Calendar, ArrowUpRight, Search, WifiOff, Loader2 } from "lucide-react";
+import { MapPin, Bell, Users, PlusCircle, BarChart3, Eye, TrendingUp, Calendar, ArrowUpRight, Search, WifiOff, Loader2, Megaphone, Shield, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import EventCard from "@/components/EventCard";
 import CategoryChips from "@/components/CategoryChips";
 import BottomNav from "@/components/BottomNav";
 import { mockEvents, categories, cities } from "@/data/mockData";
-import { mockStudents } from "@/data/teamMatchingData";
+import { mockStudents, mockTeams } from "@/data/teamMatchingData";
 import { useRole } from "@/hooks/useRole";
 
 type LoadState = "loading" | "loaded" | "empty" | "error";
@@ -52,7 +52,15 @@ const HomePage = () => {
     { label: "Engagement", value: "72%", icon: BarChart3, trend: "+5%", color: "bg-accent/10 text-accent" },
   ];
 
+  const pendingTeams = mockTeams.filter((_, i) => i !== 0 && i !== 3).length; // mock: 2 pending
   const unreadNotifications = 3;
+
+  const recentActivity = [
+    { text: "Code Crushers registered for HackVerse 3.0", time: "2h ago", emoji: "🏆" },
+    { text: "New participant joined DesignJam 2026", time: "4h ago", emoji: "👤" },
+    { text: "Pixel Pirates team created", time: "1d ago", emoji: "🎨" },
+    { text: "React Masterclass got 50 new views", time: "1d ago", emoji: "👀" },
+  ];
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -100,9 +108,150 @@ const HomePage = () => {
         )}
       </header>
 
-      {/* Role-specific CTAs */}
-      <div className="px-5 pt-5">
-        {isStudent && (
+      {/* Organizer Dashboard */}
+      {isOrganizer && (
+        <div className="px-5 pt-5 space-y-5">
+          {/* Create Event CTA */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/create")}
+            className="w-full gradient-primary rounded-3xl p-5 flex items-center justify-between text-left shadow-lg"
+          >
+            <div className="flex items-center gap-4">
+              <PlusCircle className="w-6 h-6 text-primary-foreground" />
+              <div>
+                <h3 className="font-display text-lg font-bold text-primary-foreground">Create Event 🎤</h3>
+                <p className="text-primary-foreground/70 text-xs font-medium">Host your next hackathon or workshop</p>
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+              <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
+            </div>
+          </motion.button>
+
+          {/* Quick Stats */}
+          <div>
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">
+              Quick Stats
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {organizerStats.map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="bg-card rounded-3xl p-4 border border-border"
+                  >
+                    <div className={`w-8 h-8 rounded-xl ${stat.color} flex items-center justify-center mb-2`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <p className="text-2xl font-display font-bold text-card-foreground">{stat.value}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">{stat.label}</p>
+                    <p className="text-[10px] text-success font-semibold mt-0.5">{stat.trend}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div>
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "Participants", icon: Users, path: "/participants", color: "bg-primary/10 text-primary", desc: `${mockStudents.length} registered` },
+                { label: "Teams Review", icon: Shield, path: "/teams-management", color: "bg-secondary/10 text-secondary", desc: `${pendingTeams} pending` },
+                { label: "Announcements", icon: Megaphone, path: "/announcements", color: "bg-accent/10 text-accent", desc: "Broadcast updates" },
+                { label: "Analytics", icon: BarChart3, path: "/analytics/1", color: "bg-success/10 text-success", desc: "View insights" },
+              ].map((action, i) => {
+                const Icon = action.icon;
+                return (
+                  <motion.button
+                    key={action.label}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + i * 0.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => navigate(action.path)}
+                    className="bg-card rounded-2xl p-4 border border-border text-left"
+                  >
+                    <div className={`w-9 h-9 rounded-xl ${action.color} flex items-center justify-center mb-2`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <p className="text-sm font-display font-bold text-card-foreground">{action.label}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">{action.desc}</p>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Upcoming Events */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">
+                My Events
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {mockEvents.slice(0, 3).map((event, i) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.08 }}
+                  onClick={() => navigate(`/event/${event.id}`)}
+                  className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border cursor-pointer"
+                >
+                  <img src={event.image} alt={event.title} className="w-14 h-14 rounded-2xl object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-display font-bold text-card-foreground truncate">{event.title}</p>
+                    <p className="text-[11px] text-muted-foreground">{event.date} · {event.attendees} registered</p>
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+                    <ArrowUpRight className="w-4 h-4 text-foreground" />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div>
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">
+              Recent Activity
+            </h2>
+            <div className="bg-card rounded-2xl border border-border divide-y divide-border">
+              {recentActivity.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 + i * 0.05 }}
+                  className="flex items-center gap-3 px-4 py-3"
+                >
+                  <span className="text-lg">{item.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-card-foreground font-medium truncate">{item.text}</p>
+                    <p className="text-[10px] text-muted-foreground">{item.time}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Student CTAs */}
+      {isStudent && (
+        <div className="px-5 pt-5">
           <div className="space-y-3">
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -154,85 +303,6 @@ const HomePage = () => {
                 </div>
               </div>
             </motion.button>
-          </div>
-        )}
-        {isOrganizer && (
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate("/create")}
-            className="w-full gradient-primary rounded-3xl p-5 flex items-center justify-between text-left shadow-lg"
-          >
-            <div className="flex items-center gap-4">
-              <PlusCircle className="w-6 h-6 text-primary-foreground" />
-              <div>
-                <h3 className="font-display text-lg font-bold text-primary-foreground">Create Event 🎤</h3>
-                <p className="text-primary-foreground/70 text-xs font-medium">Host your next hackathon or workshop</p>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
-            </div>
-          </motion.button>
-        )}
-      </div>
-
-      {/* Organizer Dashboard */}
-      {isOrganizer && (
-        <div className="px-5 pt-5 space-y-5">
-          <div>
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">
-              Quick Stats
-            </h2>
-            <div className="grid grid-cols-2 gap-3">
-              {organizerStats.map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="bg-card rounded-3xl p-4 border border-border"
-                  >
-                    <div className={`w-8 h-8 rounded-xl ${stat.color} flex items-center justify-center mb-2`}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <p className="text-2xl font-display font-bold text-card-foreground">{stat.value}</p>
-                    <p className="text-[10px] text-muted-foreground font-medium">{stat.label}</p>
-                    <p className="text-[10px] text-success font-semibold mt-0.5">{stat.trend}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">
-              My Events
-            </h2>
-            <div className="space-y-3">
-              {mockEvents.slice(0, 3).map((event, i) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  onClick={() => navigate(`/event/${event.id}`)}
-                  className="flex items-center gap-3 bg-card rounded-2xl p-4 border border-border cursor-pointer"
-                >
-                  <img src={event.image} alt={event.title} className="w-14 h-14 rounded-2xl object-cover" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-display font-bold text-card-foreground truncate">{event.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{event.date}</p>
-                  </div>
-                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <ArrowUpRight className="w-4 h-4 text-foreground" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
       )}

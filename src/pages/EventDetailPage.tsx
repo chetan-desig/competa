@@ -266,10 +266,10 @@ const EventDetailPage = () => {
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: "Send Announcement", icon: Megaphone, action: () => toast.info("Announcements coming soon!"), color: "bg-primary/10 text-primary" },
-                    { label: "Invite Students", icon: UserCheck, action: () => navigate("/search"), color: "bg-secondary/10 text-secondary" },
-                    { label: "Edit Event", icon: Edit3, action: () => toast.info("Edit mode coming soon!"), color: "bg-accent/10 text-accent" },
-                    { label: "View Analytics", icon: BarChart3, action: () => toast.info("Analytics dashboard coming soon!"), color: "bg-success/10 text-success" },
+                    { label: "Send Announcement", icon: Megaphone, action: () => navigate("/announcements"), color: "bg-primary/10 text-primary" },
+                    { label: "Invite Students", icon: UserCheck, action: () => navigate("/participants"), color: "bg-secondary/10 text-secondary" },
+                    { label: "Manage Teams", icon: Edit3, action: () => navigate("/teams-management"), color: "bg-accent/10 text-accent" },
+                    { label: "View Analytics", icon: BarChart3, action: () => navigate(`/analytics/${event.id}`), color: "bg-success/10 text-success" },
                   ].map((action) => {
                     const Icon = action.icon;
                     return (
