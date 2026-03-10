@@ -61,6 +61,10 @@ const ProfilePage = () => {
   const [, setForceRender] = useState(0);
   const [showRoleEditor, setShowRoleEditor] = useState(false);
   const [privacy, setPrivacy] = useState<PrivacyOption>("public_inside_app");
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [profile, setProfile] = useState<ProfileData>(loadProfile);
+  const [editDraft, setEditDraft] = useState<ProfileData>(profile);
+  const [newSkill, setNewSkill] = useState("");
 
   const [primaryRole, setPrimaryRole] = useState<RoleId | null>(
     (localStorage.getItem("competa_primary_role") as RoleId) || null
@@ -68,6 +72,31 @@ const ProfilePage = () => {
   const [secondaryRole, setSecondaryRole] = useState<RoleId | null>(
     (localStorage.getItem("competa_secondary_role") as RoleId) || null
   );
+
+  const openEditProfile = () => {
+    setEditDraft({ ...profile });
+    setNewSkill("");
+    setShowEditProfile(true);
+  };
+
+  const handleSaveProfile = () => {
+    setProfile(editDraft);
+    saveProfile(editDraft);
+    setShowEditProfile(false);
+    toast({ title: "Profile updated ✨", description: "Your changes have been saved" });
+  };
+
+  const addSkill = () => {
+    const trimmed = newSkill.trim();
+    if (trimmed && !editDraft.skills.includes(trimmed)) {
+      setEditDraft({ ...editDraft, skills: [...editDraft.skills, trimmed] });
+      setNewSkill("");
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    setEditDraft({ ...editDraft, skills: editDraft.skills.filter(s => s !== skill) });
+  };
 
   const levelConfig = {
     none: { label: "Not Verified", color: "bg-muted text-muted-foreground", icon: "🔒" },
