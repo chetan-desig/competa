@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck, Pencil, X, Plus, Camera } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
@@ -9,8 +9,44 @@ import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
 import { ROLES_CATALOG, RoleId } from "@/data/teamMatchingData";
 import { toast } from "@/hooks/use-toast";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 type PrivacyOption = "public_inside_app" | "buddies_only" | "private";
+
+interface ProfileData {
+  name: string;
+  bio: string;
+  location: string;
+  avatar: string;
+  skills: string[];
+  github: string;
+  linkedin: string;
+  portfolio: string;
+}
+
+const defaultProfile: ProfileData = {
+  name: "Alex Student",
+  bio: "",
+  location: "Hyderabad, India",
+  avatar: "🧑‍💻",
+  skills: ["React", "Figma", "Python", "UI/UX", "AI/ML"],
+  github: "github.com/alexstudent",
+  linkedin: "linkedin.com/in/alexstudent",
+  portfolio: "alexstudent.dev",
+};
+
+const loadProfile = (): ProfileData => {
+  const stored = localStorage.getItem("competa_profile");
+  if (stored) return { ...defaultProfile, ...JSON.parse(stored) };
+  return defaultProfile;
+};
+
+const saveProfile = (data: ProfileData) => {
+  localStorage.setItem("competa_profile", JSON.stringify(data));
+};
 
 const privacyOptions = [
   { id: "public_inside_app" as const, label: "Public", icon: Globe, desc: "Anyone in app can see" },
@@ -25,6 +61,10 @@ const ProfilePage = () => {
   const [, setForceRender] = useState(0);
   const [showRoleEditor, setShowRoleEditor] = useState(false);
   const [privacy, setPrivacy] = useState<PrivacyOption>("public_inside_app");
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [profile, setProfile] = useState<ProfileData>(loadProfile);
+  const [editDraft, setEditDraft] = useState<ProfileData>(profile);
+  const [newSkill, setNewSkill] = useState("");
 
   const [primaryRole, setPrimaryRole] = useState<RoleId | null>(
     (localStorage.getItem("competa_primary_role") as RoleId) || null
@@ -32,6 +72,31 @@ const ProfilePage = () => {
   const [secondaryRole, setSecondaryRole] = useState<RoleId | null>(
     (localStorage.getItem("competa_secondary_role") as RoleId) || null
   );
+
+  const openEditProfile = () => {
+    setEditDraft({ ...profile });
+    setNewSkill("");
+    setShowEditProfile(true);
+  };
+
+  const handleSaveProfile = () => {
+    setProfile(editDraft);
+    saveProfile(editDraft);
+    setShowEditProfile(false);
+    toast({ title: "Profile updated ✨", description: "Your changes have been saved" });
+  };
+
+  const addSkill = () => {
+    const trimmed = newSkill.trim();
+    if (trimmed && !editDraft.skills.includes(trimmed)) {
+      setEditDraft({ ...editDraft, skills: [...editDraft.skills, trimmed] });
+      setNewSkill("");
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    setEditDraft({ ...editDraft, skills: editDraft.skills.filter(s => s !== skill) });
+  };
 
   const levelConfig = {
     none: { label: "Not Verified", color: "bg-muted text-muted-foreground", icon: "🔒" },
@@ -169,7 +234,6 @@ const ProfilePage = () => {
   }
 
   // Student Profile
-  const skills = ["React", "Figma", "Python", "UI/UX", "AI/ML"];
   const stats = [
     { label: "Events", value: "12" },
     { label: "Teams", value: "4" },
@@ -180,16 +244,143 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background pb-20">
       <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
+      {/* Edit Profile Sheet */}
+      <Sheet open={showEditProfile} onOpenChange={setShowEditProfile}>
+        <SheetContent side="bottom" className="rounded-t-[2rem] max-h-[90vh] overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-lg font-display font-bold">Edit Profile</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-5 pb-6">
+            {/* Avatar */}
+            <div className="flex justify-center">
+              <div className="relative w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center text-4xl">
+                {editDraft.avatar}
+                <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-md">
+                  <Camera className="w-3.5 h-3.5 text-primary-foreground" />
+                </button>
+              </div>
+            </div>
+
+            {/* Name */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</Label>
+              <Input
+                value={editDraft.name}
+                onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
+                placeholder="Your full name"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Bio */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bio</Label>
+              <Textarea
+                value={editDraft.bio}
+                onChange={(e) => setEditDraft({ ...editDraft, bio: e.target.value })}
+                placeholder="Tell people about yourself..."
+                className="rounded-xl border-border resize-none"
+                rows={3}
+              />
+            </div>
+
+            {/* Location */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</Label>
+              <Input
+                value={editDraft.location}
+                onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })}
+                placeholder="City, Country"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Skills */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Skills</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {editDraft.skills.map((skill) => (
+                  <span key={skill} className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary flex items-center gap-1.5">
+                    {skill}
+                    <button onClick={() => removeSkill(skill)}>
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
+                  placeholder="Add a skill..."
+                  className="rounded-xl border-border flex-1"
+                />
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={addSkill}
+                  className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0"
+                >
+                  <Plus className="w-4 h-4 text-primary-foreground" />
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Portfolio Links */}
+            <div className="space-y-3">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Portfolio Links</Label>
+              <Input
+                value={editDraft.github}
+                onChange={(e) => setEditDraft({ ...editDraft, github: e.target.value })}
+                placeholder="GitHub URL"
+                className="rounded-xl border-border"
+              />
+              <Input
+                value={editDraft.linkedin}
+                onChange={(e) => setEditDraft({ ...editDraft, linkedin: e.target.value })}
+                placeholder="LinkedIn URL"
+                className="rounded-xl border-border"
+              />
+              <Input
+                value={editDraft.portfolio}
+                onChange={(e) => setEditDraft({ ...editDraft, portfolio: e.target.value })}
+                placeholder="Portfolio URL"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Save */}
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={handleSaveProfile}
+              className="w-full gradient-primary text-primary-foreground font-bold py-3.5 rounded-2xl text-sm"
+            >
+              Save Profile ✨
+            </motion.button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <div className="relative h-36 gradient-primary rounded-b-[2rem]">
-        <button className="absolute top-5 right-5 w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
-          <Settings className="w-5 h-5 text-primary-foreground" />
-        </button>
+        <div className="absolute top-5 right-5 flex gap-2">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={openEditProfile}
+            className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center"
+          >
+            <Pencil className="w-5 h-5 text-primary-foreground" />
+          </motion.button>
+          <button className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
+            <Settings className="w-5 h-5 text-primary-foreground" />
+          </button>
+        </div>
       </div>
 
       <div className="px-5 -mt-14">
         <div className="flex items-end gap-4 mb-4">
           <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-lg border-4 border-background">
-            🧑‍💻
+            {profile.avatar}
             {isFullyVerified && (
               <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-md">
                 <CheckCircle className="w-4 h-4 text-success-foreground" />
@@ -197,11 +388,14 @@ const ProfilePage = () => {
             )}
           </div>
           <div className="pb-1">
-            <h1 className="text-xl font-display font-bold">Alex Student</h1>
+            <h1 className="text-xl font-display font-bold">{profile.name}</h1>
             <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Hyderabad, India</span>
+              <span>{profile.location}</span>
             </div>
+            {profile.bio && (
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{profile.bio}</p>
+            )}
           </div>
         </div>
 
@@ -395,7 +589,7 @@ const ProfilePage = () => {
         <div className="mb-6">
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Skills</h2>
           <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
+            {profile.skills.map((skill) => (
               <span key={skill} className="text-xs font-bold px-4 py-2.5 rounded-2xl bg-card border border-border text-foreground">{skill}</span>
             ))}
           </div>
@@ -435,10 +629,10 @@ const ProfilePage = () => {
         <div className="space-y-2 mb-6">
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Portfolio</h2>
           {[
-            { label: "GitHub", url: "github.com/alexstudent" },
-            { label: "LinkedIn", url: "linkedin.com/in/alexstudent" },
-            { label: "Portfolio", url: "alexstudent.dev" },
-          ].map((link) => (
+            { label: "GitHub", url: profile.github },
+            { label: "LinkedIn", url: profile.linkedin },
+            { label: "Portfolio", url: profile.portfolio },
+          ].filter(l => l.url).map((link) => (
             <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border cursor-pointer">
               <div>
                 <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
