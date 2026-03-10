@@ -47,6 +47,7 @@ const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<"student" | "organizer" | null>(null);
+  const [studentName, setStudentName] = useState("");
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
