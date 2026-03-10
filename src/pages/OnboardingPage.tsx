@@ -216,6 +216,29 @@ const OnboardingPage = () => {
     if (role === "student") {
       if (step === 2) {
         return (
+          <div className="flex flex-col items-center justify-center px-6 flex-1">
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              className="text-6xl mb-6"
+            >
+              👋
+            </motion.div>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">What's your name?</h2>
+            <p className="text-muted-foreground text-sm mb-8">So people know who you are</p>
+            <input
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+              placeholder="e.g. Alex Kumar"
+              className="w-full max-w-sm bg-card border-2 border-border rounded-2xl px-5 py-4 text-foreground text-lg font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors text-center"
+              autoFocus
+            />
+          </div>
+        );
+      }
+
+      if (step === 3) {
+        return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your cities 🏙️</h2>
             <p className="text-muted-foreground text-sm mb-4">
@@ -268,7 +291,7 @@ const OnboardingPage = () => {
         );
       }
 
-      if (step === 3) {
+      if (step === 4) {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your skills 💪</h2>
@@ -297,7 +320,7 @@ const OnboardingPage = () => {
         );
       }
 
-      if (step === 4) {
+      if (step === 5) {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Interests 🔥</h2>
