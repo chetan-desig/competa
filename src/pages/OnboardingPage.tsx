@@ -111,9 +111,10 @@ const OnboardingPage = () => {
     if (step === 0) return true;
     if (step === 1) return !!role;
     if (role === "student") {
-      if (step === 2) return selectedCities.length > 0;
-      if (step === 3) return selectedSkills.length > 0;
-      if (step === 4) return true;
+      if (step === 2) return studentName.trim().length >= 2;
+      if (step === 3) return selectedCities.length > 0;
+      if (step === 4) return selectedSkills.length > 0;
+      if (step === 5) return true;
     }
     if (role === "organizer") {
       if (step === 2) return orgName.trim().length > 0;
