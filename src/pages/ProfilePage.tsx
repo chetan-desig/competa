@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck, Pencil, X, Plus, Camera } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
@@ -9,8 +9,44 @@ import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
 import { ROLES_CATALOG, RoleId } from "@/data/teamMatchingData";
 import { toast } from "@/hooks/use-toast";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 type PrivacyOption = "public_inside_app" | "buddies_only" | "private";
+
+interface ProfileData {
+  name: string;
+  bio: string;
+  location: string;
+  avatar: string;
+  skills: string[];
+  github: string;
+  linkedin: string;
+  portfolio: string;
+}
+
+const defaultProfile: ProfileData = {
+  name: "Alex Student",
+  bio: "",
+  location: "Hyderabad, India",
+  avatar: "🧑‍💻",
+  skills: ["React", "Figma", "Python", "UI/UX", "AI/ML"],
+  github: "github.com/alexstudent",
+  linkedin: "linkedin.com/in/alexstudent",
+  portfolio: "alexstudent.dev",
+};
+
+const loadProfile = (): ProfileData => {
+  const stored = localStorage.getItem("competa_profile");
+  if (stored) return { ...defaultProfile, ...JSON.parse(stored) };
+  return defaultProfile;
+};
+
+const saveProfile = (data: ProfileData) => {
+  localStorage.setItem("competa_profile", JSON.stringify(data));
+};
 
 const privacyOptions = [
   { id: "public_inside_app" as const, label: "Public", icon: Globe, desc: "Anyone in app can see" },
