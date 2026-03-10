@@ -234,7 +234,6 @@ const ProfilePage = () => {
   }
 
   // Student Profile
-  const skills = ["React", "Figma", "Python", "UI/UX", "AI/ML"];
   const stats = [
     { label: "Events", value: "12" },
     { label: "Teams", value: "4" },
@@ -245,16 +244,143 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background pb-20">
       <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
+      {/* Edit Profile Sheet */}
+      <Sheet open={showEditProfile} onOpenChange={setShowEditProfile}>
+        <SheetContent side="bottom" className="rounded-t-[2rem] max-h-[90vh] overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="text-lg font-display font-bold">Edit Profile</SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-5 pb-6">
+            {/* Avatar */}
+            <div className="flex justify-center">
+              <div className="relative w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center text-4xl">
+                {editDraft.avatar}
+                <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-md">
+                  <Camera className="w-3.5 h-3.5 text-primary-foreground" />
+                </button>
+              </div>
+            </div>
+
+            {/* Name */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</Label>
+              <Input
+                value={editDraft.name}
+                onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
+                placeholder="Your full name"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Bio */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bio</Label>
+              <Textarea
+                value={editDraft.bio}
+                onChange={(e) => setEditDraft({ ...editDraft, bio: e.target.value })}
+                placeholder="Tell people about yourself..."
+                className="rounded-xl border-border resize-none"
+                rows={3}
+              />
+            </div>
+
+            {/* Location */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</Label>
+              <Input
+                value={editDraft.location}
+                onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })}
+                placeholder="City, Country"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Skills */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Skills</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {editDraft.skills.map((skill) => (
+                  <span key={skill} className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary flex items-center gap-1.5">
+                    {skill}
+                    <button onClick={() => removeSkill(skill)}>
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
+                  placeholder="Add a skill..."
+                  className="rounded-xl border-border flex-1"
+                />
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={addSkill}
+                  className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0"
+                >
+                  <Plus className="w-4 h-4 text-primary-foreground" />
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Portfolio Links */}
+            <div className="space-y-3">
+              <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Portfolio Links</Label>
+              <Input
+                value={editDraft.github}
+                onChange={(e) => setEditDraft({ ...editDraft, github: e.target.value })}
+                placeholder="GitHub URL"
+                className="rounded-xl border-border"
+              />
+              <Input
+                value={editDraft.linkedin}
+                onChange={(e) => setEditDraft({ ...editDraft, linkedin: e.target.value })}
+                placeholder="LinkedIn URL"
+                className="rounded-xl border-border"
+              />
+              <Input
+                value={editDraft.portfolio}
+                onChange={(e) => setEditDraft({ ...editDraft, portfolio: e.target.value })}
+                placeholder="Portfolio URL"
+                className="rounded-xl border-border"
+              />
+            </div>
+
+            {/* Save */}
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={handleSaveProfile}
+              className="w-full gradient-primary text-primary-foreground font-bold py-3.5 rounded-2xl text-sm"
+            >
+              Save Profile ✨
+            </motion.button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <div className="relative h-36 gradient-primary rounded-b-[2rem]">
-        <button className="absolute top-5 right-5 w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
-          <Settings className="w-5 h-5 text-primary-foreground" />
-        </button>
+        <div className="absolute top-5 right-5 flex gap-2">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={openEditProfile}
+            className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center"
+          >
+            <Pencil className="w-5 h-5 text-primary-foreground" />
+          </motion.button>
+          <button className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
+            <Settings className="w-5 h-5 text-primary-foreground" />
+          </button>
+        </div>
       </div>
 
       <div className="px-5 -mt-14">
         <div className="flex items-end gap-4 mb-4">
           <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-lg border-4 border-background">
-            🧑‍💻
+            {profile.avatar}
             {isFullyVerified && (
               <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-md">
                 <CheckCircle className="w-4 h-4 text-success-foreground" />
@@ -262,11 +388,14 @@ const ProfilePage = () => {
             )}
           </div>
           <div className="pb-1">
-            <h1 className="text-xl font-display font-bold">Alex Student</h1>
+            <h1 className="text-xl font-display font-bold">{profile.name}</h1>
             <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Hyderabad, India</span>
+              <span>{profile.location}</span>
             </div>
+            {profile.bio && (
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{profile.bio}</p>
+            )}
           </div>
         </div>
 
