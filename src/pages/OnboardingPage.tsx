@@ -59,7 +59,7 @@ const OnboardingPage = () => {
   const [orgName, setOrgName] = useState("");
   const [orgEventTypes, setOrgEventTypes] = useState<string[]>([]);
 
-  const totalSteps = role === "student" ? 5 : role === "organizer" ? 5 : 2;
+  const totalSteps = role === "student" ? 6 : role === "organizer" ? 5 : 2;
 
   const toggleItem = (list: string[], setList: (v: string[]) => void, item: string, max?: number) => {
     if (list.includes(item)) {
