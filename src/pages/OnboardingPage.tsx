@@ -72,6 +72,23 @@ const OnboardingPage = () => {
   const finishOnboarding = () => {
     localStorage.setItem("competa_onboarded", "true");
     if (role) setUserRole(role);
+
+    // Save onboarding data to profile
+    if (role === "student") {
+      const cityName = CITIES.find(c => selectedCities.includes(c.id))?.name || "";
+      const profileData = {
+        name: studentName.trim() || "Student",
+        bio: "",
+        location: cityName,
+        avatar: "🧑‍💻",
+        skills: selectedSkills.length > 0 ? selectedSkills : ["React", "Figma", "Python", "UI/UX", "AI/ML"],
+        github: "",
+        linkedin: "",
+        portfolio: "",
+      };
+      localStorage.setItem("competa_profile", JSON.stringify(profileData));
+    }
+
     const dest = role === "organizer" ? "/create" : "/";
     navigate(dest, { replace: true });
   };
