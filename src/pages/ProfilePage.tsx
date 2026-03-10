@@ -629,10 +629,10 @@ const ProfilePage = () => {
         <div className="space-y-2 mb-6">
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Portfolio</h2>
           {[
-            { label: "GitHub", url: "github.com/alexstudent" },
-            { label: "LinkedIn", url: "linkedin.com/in/alexstudent" },
-            { label: "Portfolio", url: "alexstudent.dev" },
-          ].map((link) => (
+            { label: "GitHub", url: profile.github },
+            { label: "LinkedIn", url: profile.linkedin },
+            { label: "Portfolio", url: profile.portfolio },
+          ].filter(l => l.url).map((link) => (
             <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border cursor-pointer">
               <div>
                 <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
