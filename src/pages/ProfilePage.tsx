@@ -589,7 +589,7 @@ const ProfilePage = () => {
         <div className="mb-6">
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Skills</h2>
           <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
+            {profile.skills.map((skill) => (
               <span key={skill} className="text-xs font-bold px-4 py-2.5 rounded-2xl bg-card border border-border text-foreground">{skill}</span>
             ))}
           </div>
