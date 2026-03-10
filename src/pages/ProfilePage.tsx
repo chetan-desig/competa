@@ -39,9 +39,20 @@ const defaultProfile: ProfileData = {
 };
 
 const loadProfile = (): ProfileData => {
-  const stored = localStorage.getItem("competa_profile");
-  if (stored) return { ...defaultProfile, ...JSON.parse(stored) };
-  return defaultProfile;
+  try {
+    const stored = localStorage.getItem("competa_profile");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        ...defaultProfile,
+        ...parsed,
+        skills: Array.isArray(parsed.skills) ? parsed.skills : defaultProfile.skills,
+      };
+    }
+  } catch (e) {
+    console.error("Failed to load profile:", e);
+  }
+  return { ...defaultProfile };
 };
 
 const saveProfile = (data: ProfileData) => {
