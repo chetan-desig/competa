@@ -47,6 +47,7 @@ const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<"student" | "organizer" | null>(null);
+  const [studentName, setStudentName] = useState("");
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -58,7 +59,7 @@ const OnboardingPage = () => {
   const [orgName, setOrgName] = useState("");
   const [orgEventTypes, setOrgEventTypes] = useState<string[]>([]);
 
-  const totalSteps = role === "student" ? 5 : role === "organizer" ? 5 : 2;
+  const totalSteps = role === "student" ? 6 : role === "organizer" ? 5 : 2;
 
   const toggleItem = (list: string[], setList: (v: string[]) => void, item: string, max?: number) => {
     if (list.includes(item)) {
@@ -71,6 +72,23 @@ const OnboardingPage = () => {
   const finishOnboarding = () => {
     localStorage.setItem("competa_onboarded", "true");
     if (role) setUserRole(role);
+
+    // Save onboarding data to profile
+    if (role === "student") {
+      const cityName = CITIES.find(c => selectedCities.includes(c.id))?.name || "";
+      const profileData = {
+        name: studentName.trim() || "Student",
+        bio: "",
+        location: cityName,
+        avatar: "🧑‍💻",
+        skills: selectedSkills.length > 0 ? selectedSkills : ["React", "Figma", "Python", "UI/UX", "AI/ML"],
+        github: "",
+        linkedin: "",
+        portfolio: "",
+      };
+      localStorage.setItem("competa_profile", JSON.stringify(profileData));
+    }
+
     const dest = role === "organizer" ? "/create" : "/";
     navigate(dest, { replace: true });
   };
@@ -93,9 +111,10 @@ const OnboardingPage = () => {
     if (step === 0) return true;
     if (step === 1) return !!role;
     if (role === "student") {
-      if (step === 2) return selectedCities.length > 0;
-      if (step === 3) return selectedSkills.length > 0;
-      if (step === 4) return true;
+      if (step === 2) return studentName.trim().length >= 2;
+      if (step === 3) return selectedCities.length > 0;
+      if (step === 4) return selectedSkills.length > 0;
+      if (step === 5) return true;
     }
     if (role === "organizer") {
       if (step === 2) return orgName.trim().length > 0;
@@ -197,6 +216,29 @@ const OnboardingPage = () => {
     if (role === "student") {
       if (step === 2) {
         return (
+          <div className="flex flex-col items-center justify-center px-6 flex-1">
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              className="text-6xl mb-6"
+            >
+              👋
+            </motion.div>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-1">What's your name?</h2>
+            <p className="text-muted-foreground text-sm mb-8">So people know who you are</p>
+            <input
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+              placeholder="e.g. Alex Kumar"
+              className="w-full max-w-sm bg-card border-2 border-border rounded-2xl px-5 py-4 text-foreground text-lg font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors text-center"
+              autoFocus
+            />
+          </div>
+        );
+      }
+
+      if (step === 3) {
+        return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your cities 🏙️</h2>
             <p className="text-muted-foreground text-sm mb-4">
@@ -249,7 +291,7 @@ const OnboardingPage = () => {
         );
       }
 
-      if (step === 3) {
+      if (step === 4) {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Your skills 💪</h2>
@@ -278,7 +320,7 @@ const OnboardingPage = () => {
         );
       }
 
-      if (step === 4) {
+      if (step === 5) {
         return (
           <div className="flex flex-col px-6 flex-1">
             <h2 className="text-2xl font-display font-bold text-foreground mb-1">Interests 🔥</h2>
