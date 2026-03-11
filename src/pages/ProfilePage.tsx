@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Trophy, BarChart3, Users, Calendar, Eye, Check, Lock, Globe, UserCheck, Pencil, X, Plus, Camera } from "lucide-react";
+import { Settings, ChevronRight, ExternalLink, Shield, MapPin, CheckCircle, Users, Calendar, Eye, Check, Lock, Globe, UserCheck, Pencil, X, Plus, Camera, BarChart3, Sparkles, Award } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
@@ -61,7 +61,7 @@ const saveProfile = (data: ProfileData) => {
 
 const privacyOptions = [
   { id: "public_inside_app" as const, label: "Public", icon: Globe, desc: "Anyone in app can see" },
-  { id: "buddies_only" as const, label: "Buddies Only", icon: UserCheck, desc: "Only your buddies" },
+  { id: "buddies_only" as const, label: "Buddies", icon: UserCheck, desc: "Only your buddies" },
   { id: "private" as const, label: "Private", icon: Lock, desc: "Only you" },
 ];
 
@@ -246,9 +246,9 @@ const ProfilePage = () => {
 
   // Student Profile
   const stats = [
-    { label: "Events", value: "12" },
-    { label: "Teams", value: "4" },
-    { label: "Certs", value: "7" },
+    { label: "Events", value: "12", icon: Calendar },
+    { label: "Teams", value: "4", icon: Users },
+    { label: "Certs", value: "7", icon: Award },
   ];
 
   return (
@@ -263,7 +263,6 @@ const ProfilePage = () => {
           </SheetHeader>
 
           <div className="space-y-5 pb-6">
-            {/* Avatar */}
             <div className="flex justify-center">
               <div className="relative w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center text-4xl">
                 {editDraft.avatar}
@@ -273,222 +272,239 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Name */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Full Name</Label>
-              <Input
-                value={editDraft.name}
-                onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
-                placeholder="Your full name"
-                className="rounded-xl border-border"
-              />
+              <Input value={editDraft.name} onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })} placeholder="Your full name" className="rounded-xl border-border" />
             </div>
 
-            {/* Bio */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bio</Label>
-              <Textarea
-                value={editDraft.bio}
-                onChange={(e) => setEditDraft({ ...editDraft, bio: e.target.value })}
-                placeholder="Tell people about yourself..."
-                className="rounded-xl border-border resize-none"
-                rows={3}
-              />
+              <Textarea value={editDraft.bio} onChange={(e) => setEditDraft({ ...editDraft, bio: e.target.value })} placeholder="Tell people about yourself..." className="rounded-xl border-border resize-none" rows={3} />
             </div>
 
-            {/* Location */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</Label>
-              <Input
-                value={editDraft.location}
-                onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })}
-                placeholder="City, Country"
-                className="rounded-xl border-border"
-              />
+              <Input value={editDraft.location} onChange={(e) => setEditDraft({ ...editDraft, location: e.target.value })} placeholder="City, Country" className="rounded-xl border-border" />
             </div>
 
-            {/* Skills */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Skills</Label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {editDraft.skills.map((skill) => (
                   <span key={skill} className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary flex items-center gap-1.5">
                     {skill}
-                    <button onClick={() => removeSkill(skill)}>
-                      <X className="w-3 h-3" />
-                    </button>
+                    <button onClick={() => removeSkill(skill)}><X className="w-3 h-3" /></button>
                   </span>
                 ))}
               </div>
               <div className="flex gap-2">
-                <Input
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
-                  placeholder="Add a skill..."
-                  className="rounded-xl border-border flex-1"
-                />
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={addSkill}
-                  className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0"
-                >
+                <Input value={newSkill} onChange={(e) => setNewSkill(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())} placeholder="Add a skill..." className="rounded-xl border-border flex-1" />
+                <motion.button whileTap={{ scale: 0.95 }} onClick={addSkill} className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
                   <Plus className="w-4 h-4 text-primary-foreground" />
                 </motion.button>
               </div>
             </div>
 
-            {/* Portfolio Links */}
             <div className="space-y-3">
               <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Portfolio Links</Label>
-              <Input
-                value={editDraft.github}
-                onChange={(e) => setEditDraft({ ...editDraft, github: e.target.value })}
-                placeholder="GitHub URL"
-                className="rounded-xl border-border"
-              />
-              <Input
-                value={editDraft.linkedin}
-                onChange={(e) => setEditDraft({ ...editDraft, linkedin: e.target.value })}
-                placeholder="LinkedIn URL"
-                className="rounded-xl border-border"
-              />
-              <Input
-                value={editDraft.portfolio}
-                onChange={(e) => setEditDraft({ ...editDraft, portfolio: e.target.value })}
-                placeholder="Portfolio URL"
-                className="rounded-xl border-border"
-              />
+              <Input value={editDraft.github} onChange={(e) => setEditDraft({ ...editDraft, github: e.target.value })} placeholder="GitHub URL" className="rounded-xl border-border" />
+              <Input value={editDraft.linkedin} onChange={(e) => setEditDraft({ ...editDraft, linkedin: e.target.value })} placeholder="LinkedIn URL" className="rounded-xl border-border" />
+              <Input value={editDraft.portfolio} onChange={(e) => setEditDraft({ ...editDraft, portfolio: e.target.value })} placeholder="Portfolio URL" className="rounded-xl border-border" />
             </div>
 
-            {/* Save */}
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={handleSaveProfile}
-              className="w-full gradient-primary text-primary-foreground font-bold py-3.5 rounded-2xl text-sm"
-            >
+            <motion.button whileTap={{ scale: 0.97 }} onClick={handleSaveProfile} className="w-full gradient-primary text-primary-foreground font-bold py-3.5 rounded-2xl text-sm">
               Save Profile ✨
             </motion.button>
           </div>
         </SheetContent>
       </Sheet>
 
-      <div className="relative h-36 gradient-primary rounded-b-[2rem]">
+      {/* Hero Header */}
+      <div className="relative h-40 gradient-primary rounded-b-[2.5rem] overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-4 right-8 w-24 h-24 rounded-full border border-primary-foreground/20" />
+          <div className="absolute bottom-2 left-12 w-16 h-16 rounded-full border border-primary-foreground/20" />
+        </div>
         <div className="absolute top-5 right-5 flex gap-2">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={openEditProfile}
-            className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center"
-          >
+          <motion.button whileTap={{ scale: 0.9 }} onClick={openEditProfile} className="w-10 h-10 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
             <Pencil className="w-5 h-5 text-primary-foreground" />
           </motion.button>
-          <button className="w-10 h-10 rounded-2xl bg-primary-foreground/20 flex items-center justify-center">
+          <button className="w-10 h-10 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
             <Settings className="w-5 h-5 text-primary-foreground" />
           </button>
         </div>
       </div>
 
-      <div className="px-5 -mt-14">
-        <div className="flex items-end gap-4 mb-4">
-          <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-lg border-4 border-background">
-            {profile.avatar}
-            {isFullyVerified && (
-              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-md">
-                <CheckCircle className="w-4 h-4 text-success-foreground" />
-              </div>
-            )}
-          </div>
-          <div className="pb-1">
-            <h1 className="text-xl font-display font-bold">{profile.name}</h1>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{profile.location}</span>
+      <div className="px-5 -mt-16">
+        {/* Profile Card */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          className="bg-card rounded-3xl p-5 border border-border shadow-sm mb-4"
+        >
+          <div className="flex items-start gap-4">
+            <div className="relative w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center text-3xl shadow-md border-4 border-background shrink-0">
+              {profile.avatar}
+              {isFullyVerified && (
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-success flex items-center justify-center shadow-md">
+                  <CheckCircle className="w-3.5 h-3.5 text-success-foreground" />
+                </div>
+              )}
             </div>
-            {profile.bio && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{profile.bio}</p>
-            )}
+            <div className="flex-1 min-w-0 pt-1">
+              <h1 className="text-lg font-display font-bold text-card-foreground truncate">{profile.name}</h1>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium mt-0.5">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{profile.location}</span>
+              </div>
+              {profile.bio && (
+                <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{profile.bio}</p>
+              )}
+            </div>
           </div>
-        </div>
 
+          {/* Inline Stats */}
+          <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+            {stats.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div key={s.label} className="flex-1 flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2.5">
+                  <Icon className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <div>
+                    <p className="text-sm font-display font-bold text-card-foreground leading-none">{s.value}</p>
+                    <p className="text-[9px] text-muted-foreground font-medium">{s.label}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Verification Badge */}
         <motion.button
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.05 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => { if (!isFullyVerified) requireVerification("student"); }}
-          className={`w-full flex items-center gap-2 px-4 py-3 rounded-2xl mb-5 ${current.color}`}
+          className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-2xl mb-4 ${current.color}`}
         >
           <Shield className="w-4 h-4" />
           <span className="text-sm font-bold">{current.label}</span>
           {!isFullyVerified && <ChevronRight className="w-4 h-4 ml-auto" />}
         </motion.button>
 
-        {/* Privacy */}
-        <div className="mb-5">
-          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Profile Visibility</h2>
+        {/* Roles & Skills Combined */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="bg-card rounded-3xl p-5 border border-border mb-4"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Roles & Skills
+            </h2>
+            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary flex items-center gap-1">
+              {showRoleEditor ? "Cancel" : "Edit"} <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {!showRoleEditor ? (
+            <>
+              {/* Roles */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {primaryRole && (
+                  <span className="px-3 py-2 rounded-2xl gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5">
+                    {getRoleLabel(primaryRole)?.emoji} {getRoleLabel(primaryRole)?.label}
+                    <span className="text-[9px] opacity-70 ml-1">Primary</span>
+                  </span>
+                )}
+                {secondaryRole && (
+                  <span className="px-3 py-2 rounded-2xl bg-muted text-foreground text-xs font-bold flex items-center gap-1.5">
+                    {getRoleLabel(secondaryRole)?.emoji} {getRoleLabel(secondaryRole)?.label}
+                    <span className="text-[9px] text-muted-foreground ml-1">2nd</span>
+                  </span>
+                )}
+                {!primaryRole && !secondaryRole && (
+                  <button onClick={() => setShowRoleEditor(true)} className="px-3 py-2 rounded-2xl bg-muted border border-dashed border-border text-muted-foreground text-xs font-semibold">
+                    + Set your role
+                  </button>
+                )}
+              </div>
+
+              {/* Skills */}
+              <div className="flex flex-wrap gap-1.5">
+                {profile.skills.map((skill) => (
+                  <span key={skill} className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-primary/8 text-primary border border-primary/10">{skill}</span>
+                ))}
+              </div>
+            </>
+          ) : (
+            <AnimatePresence>
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4">
+                <div>
+                  <p className="text-sm font-display font-bold text-foreground mb-2">Primary Role *</p>
+                  <div className="flex flex-wrap gap-2">
+                    {ROLES_CATALOG.map((role) => (
+                      <motion.button key={role.id} whileTap={{ scale: 0.95 }} onClick={() => { setPrimaryRole(role.id); if (secondaryRole === role.id) setSecondaryRole(null); }}
+                        className={`px-3 py-2 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition-all ${primaryRole === role.id ? "gradient-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                        {role.emoji} {role.label}
+                        {primaryRole === role.id && <Check className="w-3.5 h-3.5" />}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-display font-bold text-foreground mb-2">Secondary Role (optional)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {ROLES_CATALOG.filter(r => r.id !== primaryRole).map((role) => (
+                      <motion.button key={role.id} whileTap={{ scale: 0.95 }} onClick={() => setSecondaryRole(secondaryRole === role.id ? null : role.id)}
+                        className={`px-3 py-2 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition-all ${secondaryRole === role.id ? "gradient-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                        {role.emoji} {role.label}
+                        {secondaryRole === role.id && <Check className="w-3.5 h-3.5" />}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={handleSaveRoles} className="w-full gradient-primary text-primary-foreground font-bold py-3 rounded-2xl text-sm">
+                  Update Roles ✨
+                </motion.button>
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </motion.div>
+
+        {/* Privacy Toggle */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="mb-4"
+        >
           <div className="flex gap-2">
             {privacyOptions.map((opt) => {
               const Icon = opt.icon;
               const active = privacy === opt.id;
               return (
-                <button
-                  key={opt.id}
-                  onClick={() => setPrivacy(opt.id)}
-                  className={`flex-1 flex flex-col items-center gap-1.5 p-3 rounded-2xl text-center transition-all ${
-                    active ? "gradient-primary text-primary-foreground shadow-md" : "bg-card border border-border text-foreground"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
+                <button key={opt.id} onClick={() => setPrivacy(opt.id)}
+                  className={`flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-2xl text-center transition-all ${active ? "gradient-primary text-primary-foreground shadow-md" : "bg-card border border-border text-foreground"}`}>
+                  <Icon className="w-3.5 h-3.5" />
                   <span className="text-[10px] font-bold">{opt.label}</span>
                 </button>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Stats */}
-        <div className="flex gap-3 mb-6">
-          {stats.map((s) => (
-            <div key={s.label} className="flex-1 bg-card rounded-2xl p-4 text-center border border-border">
-              <p className="text-2xl font-display font-bold text-card-foreground">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground font-semibold">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* XP & Achievements */}
-        <div className="mb-6">
-          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Achievements</h2>
-          <div className="bg-card rounded-2xl p-4 border border-border">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl gradient-gold flex items-center justify-center">
-                  <Trophy className="w-4 h-4 text-foreground" />
-                </div>
-                <span className="text-sm font-display font-bold text-card-foreground">Level 3</span>
-              </div>
-              <span className="text-xs text-muted-foreground font-medium">1,250 / 2,000 XP</span>
-            </div>
-            <div className="h-2.5 bg-muted rounded-full overflow-hidden mb-3">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "62.5%" }}
-                transition={{ duration: 1 }}
-                className="h-full gradient-primary rounded-full"
-              />
-            </div>
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar">
-              {["🏆 Winner", "🥈 Top 10", "🎯 3x Streak", "🔥 Active"].map((badge) => (
-                <span key={badge} className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-muted text-foreground whitespace-nowrap">
-                  {badge}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Buddy link */}
+        {/* Buddies */}
         <motion.button
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/people")}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-card border border-border mb-6"
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-card border border-border mb-4"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
@@ -502,112 +518,13 @@ const ProfilePage = () => {
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </motion.button>
 
-        {/* Role Management */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">Your Roles</h2>
-            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary flex items-center gap-1">
-              {showRoleEditor ? "Cancel" : "Edit"} <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-
-          {!showRoleEditor ? (
-            <div className="flex flex-wrap gap-2">
-              {primaryRole && (
-                <span className="px-4 py-2.5 rounded-2xl gradient-primary text-primary-foreground text-sm font-bold flex items-center gap-2">
-                  {getRoleLabel(primaryRole)?.emoji} {getRoleLabel(primaryRole)?.label}
-                  <span className="text-[10px] opacity-70">Primary</span>
-                </span>
-              )}
-              {secondaryRole && (
-                <span className="px-4 py-2.5 rounded-2xl bg-card border border-border text-foreground text-sm font-bold flex items-center gap-2">
-                  {getRoleLabel(secondaryRole)?.emoji} {getRoleLabel(secondaryRole)?.label}
-                  <span className="text-[10px] text-muted-foreground">Secondary</span>
-                </span>
-              )}
-              {!primaryRole && !secondaryRole && (
-                <button onClick={() => setShowRoleEditor(true)} className="px-4 py-2.5 rounded-2xl bg-card border border-dashed border-border text-muted-foreground text-sm font-semibold">
-                  + Set your role
-                </button>
-              )}
-            </div>
-          ) : (
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-4"
-              >
-                <div>
-                  <p className="text-sm font-display font-bold text-foreground mb-2">Primary Role *</p>
-                  <div className="flex flex-wrap gap-2">
-                    {ROLES_CATALOG.map((role) => (
-                      <motion.button
-                        key={role.id}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          setPrimaryRole(role.id);
-                          if (secondaryRole === role.id) setSecondaryRole(null);
-                        }}
-                        className={`px-4 py-2.5 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
-                          primaryRole === role.id
-                            ? "gradient-primary text-primary-foreground"
-                            : "bg-card text-foreground border border-border"
-                        }`}
-                      >
-                        {role.emoji} {role.label}
-                        {primaryRole === role.id && <Check className="w-4 h-4" />}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm font-display font-bold text-foreground mb-2">Secondary Role (optional)</p>
-                  <div className="flex flex-wrap gap-2">
-                    {ROLES_CATALOG.filter(r => r.id !== primaryRole).map((role) => (
-                      <motion.button
-                        key={role.id}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => setSecondaryRole(secondaryRole === role.id ? null : role.id)}
-                        className={`px-4 py-2.5 rounded-2xl text-sm font-semibold flex items-center gap-2 transition-all ${
-                          secondaryRole === role.id
-                            ? "gradient-primary text-primary-foreground"
-                            : "bg-card text-foreground border border-border"
-                        }`}
-                      >
-                        {role.emoji} {role.label}
-                        {secondaryRole === role.id && <Check className="w-4 h-4" />}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleSaveRoles}
-                  className="w-full gradient-primary text-primary-foreground font-bold py-3.5 rounded-2xl text-sm"
-                >
-                  Update Roles ✨
-                </motion.button>
-              </motion.div>
-            </AnimatePresence>
-          )}
-        </div>
-
-        {/* Skills */}
-        <div className="mb-6">
-          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Skills</h2>
-          <div className="flex flex-wrap gap-2">
-            {profile.skills.map((skill) => (
-              <span key={skill} className="text-xs font-bold px-4 py-2.5 rounded-2xl bg-card border border-border text-foreground">{skill}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Certificates Preview */}
-        <div className="mb-6">
+        {/* Certificates */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          className="mb-4"
+        >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">Certificates</h2>
             <button onClick={() => navigate("/certificates")} className="text-xs font-bold text-primary flex items-center gap-1">
@@ -618,15 +535,8 @@ const ProfilePage = () => {
             {mockCertificates.slice(0, 4).map((cert, i) => {
               const colors = ["bg-primary/10", "bg-secondary/10", "bg-accent/10", "bg-success/10"];
               return (
-                <motion.div
-                  key={cert.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  onClick={() => navigate("/certificates")}
-                  className="flex-shrink-0 w-32 cursor-pointer"
-                >
-                  <div className={`w-32 h-24 rounded-2xl flex items-center justify-center text-3xl mb-2 ${colors[i % colors.length]}`}>
+                <motion.div key={cert.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} onClick={() => navigate("/certificates")} className="flex-shrink-0 w-28 cursor-pointer">
+                  <div className={`w-28 h-20 rounded-2xl flex items-center justify-center text-2xl mb-1.5 ${colors[i % colors.length]}`}>
                     {cert.badge}
                   </div>
                   <p className="text-[10px] font-display font-bold text-card-foreground leading-tight line-clamp-2">{cert.title}</p>
@@ -634,57 +544,67 @@ const ProfilePage = () => {
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* Portfolio Links */}
-        <div className="space-y-2 mb-6">
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mb-4"
+        >
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Portfolio</h2>
-          {[
-            { label: "GitHub", url: profile.github },
-            { label: "LinkedIn", url: profile.linkedin },
-            { label: "Portfolio", url: profile.portfolio },
-          ].filter(l => l.url).map((link) => (
-            <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border cursor-pointer">
-              <div>
-                <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
-                <p className="text-xs text-muted-foreground">{link.url}</p>
-              </div>
-              <ExternalLink className="w-4 h-4 text-muted-foreground" />
-            </motion.div>
-          ))}
-        </div>
+          <div className="space-y-2">
+            {[
+              { label: "GitHub", url: profile.github },
+              { label: "LinkedIn", url: profile.linkedin },
+              { label: "Portfolio", url: profile.portfolio },
+            ].filter(l => l.url).map((link) => (
+              <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-3.5 rounded-2xl bg-card border border-border cursor-pointer">
+                <div>
+                  <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{link.url}</p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-muted-foreground" />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
-        {/* Joined / Upcoming Events */}
-        <div className="mb-6">
+        {/* My Events */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="mb-4"
+        >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">My Events</h2>
             <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary flex items-center gap-1">
-              Browse More <ChevronRight className="w-3 h-3" />
+              Browse <ChevronRight className="w-3 h-3" />
             </button>
           </div>
           <div className="space-y-2">
             {mockEvents.slice(0, 3).map((ev) => (
-              <motion.div
-                key={ev.id}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate(`/event/${ev.id}`)}
-                className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border cursor-pointer"
-              >
-                <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)} className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border cursor-pointer">
+                <img src={ev.image} alt={ev.title} className="w-12 h-12 rounded-xl object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-display font-bold text-card-foreground truncate">{ev.title}</p>
                   <p className="text-[10px] text-muted-foreground">{ev.date} · {ev.location}</p>
                 </div>
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-success/10 text-success whitespace-nowrap">
-                  Joined
-                </span>
+                <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-success/10 text-success whitespace-nowrap">Joined</span>
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Past Events */}
-        <div className="mb-6">
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mb-6"
+        >
           <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Past Events</h2>
           <div className="space-y-2">
             {[
@@ -701,7 +621,7 @@ const ProfilePage = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
       <BottomNav />
     </div>

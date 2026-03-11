@@ -8,10 +8,12 @@ import {
   Users,
   MessageCircle,
   UserPlus,
+  Check,
+  Circle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mockStudents } from "@/data/teamMatchingData";
+import { mockStudents, ROLES_CATALOG, RoleId } from "@/data/teamMatchingData";
 
 interface TeamLobbyProps {
   onBack: () => void;
@@ -19,24 +21,15 @@ interface TeamLobbyProps {
 
 const teamMembers = mockStudents.slice(0, 3);
 
-const skillProgress = [
-  { skill: "Frontend", value: 85, emoji: "⚛️" },
-  { skill: "Backend", value: 60, emoji: "🟢" },
-  { skill: "Design", value: 75, emoji: "🎨" },
-  { skill: "AI/ML", value: 25, emoji: "🧠" },
+// Roles needed for the team and which are filled
+const requiredRoles: { role: RoleId; filled: boolean }[] = [
+  { role: "frontend_developer", filled: true },
+  { role: "backend_developer", filled: true },
+  { role: "ui_ux_designer", filled: true },
+  { role: "ai_ml_engineer", filled: false },
 ];
 
-const getSkillColor = (value: number): string => {
-  if (value < 30) return "bg-destructive";
-  if (value <= 70) return "bg-[hsl(44,100%,50%)]";
-  return "bg-accent";
-};
-
-const getSkillLabel = (value: number): string => {
-  if (value < 30) return "Needs help";
-  if (value <= 70) return "Growing";
-  return "Strong";
-};
+const getRoleInfo = (id: RoleId) => ROLES_CATALOG.find(r => r.id === id);
 
 const messages = [
   { id: 1, user: "Arjun", text: "Hey team! Excited to build together 🚀", time: "2m ago" },
@@ -103,7 +96,7 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
                   {member.display_name.split(" ")[0]}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  {member.primary_role.split(" ")[0]}
+                  {member.primary_role.split("_").map(w => w[0].toUpperCase() + w.slice(1)).join(" ").split(" ")[0]}
                 </span>
               </motion.div>
             ))}
@@ -120,7 +113,6 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
               <span className="text-[10px] text-muted-foreground">Open</span>
             </motion.button>
           </div>
-          {/* Invite options */}
           {showInvite && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
@@ -137,7 +129,7 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
           )}
         </motion.div>
 
-        {/* Color-coded Skill Progress */}
+        {/* Role Coverage Checklist */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -145,36 +137,49 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
           className="glass-card rounded-3xl p-5"
         >
           <h3 className="font-semibold text-foreground text-sm mb-3">
-            ⚡ Skill Coverage
+            ⚡ Role Coverage
           </h3>
-          <div className="space-y-3">
-            {skillProgress.map((s) => (
-              <div key={s.skill} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">
-                    {s.emoji} {s.skill}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                      s.value < 30 ? "bg-destructive/10 text-destructive" :
-                      s.value <= 70 ? "bg-yellow-500/10 text-yellow-600" :
-                      "bg-accent/10 text-accent"
-                    }`}>
-                      {getSkillLabel(s.value)}
-                    </span>
-                    <span className="font-semibold text-foreground">{s.value}%</span>
+          <div className="space-y-2.5">
+            {requiredRoles.map((item, i) => {
+              const role = getRoleInfo(item.role);
+              return (
+                <motion.div
+                  key={item.role}
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.15 + i * 0.05 }}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl transition-all ${
+                    item.filled
+                      ? "bg-success/8 border border-success/15"
+                      : "bg-muted/50 border border-dashed border-border"
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                    item.filled
+                      ? "bg-success text-success-foreground"
+                      : "bg-muted text-muted-foreground"
+                  }`}>
+                    {item.filled ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : (
+                      <Circle className="w-3.5 h-3.5" />
+                    )}
                   </div>
-                </div>
-                <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${s.value}%` }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className={`h-full rounded-full ${getSkillColor(s.value)}`}
-                  />
-                </div>
-              </div>
-            ))}
+                  <div className="flex-1">
+                    <span className={`text-sm font-semibold ${item.filled ? "text-foreground" : "text-muted-foreground"}`}>
+                      {role?.emoji} {role?.label}
+                    </span>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    item.filled
+                      ? "bg-success/15 text-success"
+                      : "bg-destructive/10 text-destructive"
+                  }`}>
+                    {item.filled ? "Filled" : "Open"}
+                  </span>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -249,21 +254,14 @@ const TeamLobby = ({ onBack }: TeamLobbyProps) => {
           </div>
         </motion.div>
 
-        {/* Action Buttons — separated with distinct colors */}
+        {/* Action Button — only share invite, no submit project */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="space-y-3"
         >
           <Button className="w-full gradient-primary text-primary-foreground rounded-2xl h-12 font-semibold">
             Share Invite 🔗
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full rounded-2xl h-12 font-semibold border-2 border-accent text-accent hover:bg-accent/10"
-          >
-            Submit Project 🚀
           </Button>
         </motion.div>
       </div>
