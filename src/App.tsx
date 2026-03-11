@@ -48,6 +48,7 @@ const App = () => (
           <Route path="/teams-management" element={<TeamsManagementPage />} />
           <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/analytics/:id" element={<EventAnalyticsPage />} />
+          <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
