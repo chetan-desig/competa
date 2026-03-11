@@ -103,7 +103,7 @@ const BuddiesPage = () => {
         className="bg-card rounded-[1.5rem] border border-border overflow-hidden shadow-sm"
       >
         <button
-          onClick={() => setExpandedProfile(isExpanded ? null : buddy.id)}
+          onClick={() => navigate(`/user/${buddy.id}`)}
           className="w-full p-4 flex items-center gap-3.5 text-left"
         >
           <div className="relative">

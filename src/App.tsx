@@ -19,6 +19,7 @@ import ParticipantsPage from "./pages/ParticipantsPage";
 import TeamsManagementPage from "./pages/TeamsManagementPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import EventAnalyticsPage from "./pages/EventAnalyticsPage";
+import UserProfilePage from "./pages/UserProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/teams-management" element={<TeamsManagementPage />} />
           <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/analytics/:id" element={<EventAnalyticsPage />} />
+          <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
