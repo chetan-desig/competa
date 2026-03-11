@@ -19,6 +19,7 @@ import ParticipantsPage from "./pages/ParticipantsPage";
 import TeamsManagementPage from "./pages/TeamsManagementPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import EventAnalyticsPage from "./pages/EventAnalyticsPage";
+import UserProfilePage from "./pages/UserProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
