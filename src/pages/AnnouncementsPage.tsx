@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Send, Megaphone, Clock, CheckCircle, ChevronDown } from "lucide-react";
+import { ArrowLeft, Send, Megaphone, Clock, CheckCircle, ChevronDown, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { mockEvents } from "@/data/mockData";
@@ -61,27 +61,39 @@ const AnnouncementsPage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-6 pb-4 border-b border-border/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.button whileTap={{ scale: 0.9 }} onClick={() => navigate(-1)} className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">📢 Broadcast</p>
-              <h1 className="text-xl font-display font-bold text-foreground">Announcements</h1>
-            </div>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setShowCompose(!showCompose)}
-            className="w-10 h-10 rounded-2xl gradient-primary flex items-center justify-center shadow-lg"
-          >
-            <Send className="w-5 h-5 text-primary-foreground" />
+        <div className="flex items-center gap-3">
+          <motion.button whileTap={{ scale: 0.9 }} onClick={() => navigate(-1)} className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center">
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </motion.button>
+          <div>
+            <h1 className="text-xl font-display font-bold text-foreground">Broadcast</h1>
+            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Updates & Reminders</p>
+          </div>
         </div>
       </header>
 
-      <div className="px-5 pt-4">
+      <div className="px-5 pt-5">
+        {/* Primary CTA Card */}
+        {!showCompose && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowCompose(true)}
+            className="w-full bg-primary rounded-3xl p-5 mb-6 flex items-center gap-4 text-left shadow-lg shadow-primary/20 relative overflow-hidden group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <Megaphone className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-base font-bold text-primary-foreground leading-tight">Send New Broadcast</h2>
+              <p className="text-xs text-primary-foreground/80 mt-0.5">Reach all event participants instantly</p>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <Plus className="w-4 h-4 text-primary-foreground" />
+            </div>
+          </motion.button>
+        )}
         {/* Compose */}
         <AnimatePresence>
           {showCompose && (

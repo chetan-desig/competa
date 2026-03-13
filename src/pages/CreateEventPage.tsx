@@ -15,12 +15,7 @@ const roleOptions = [
   { id: "mentor", label: "Mentor", emoji: "🧠", icon: Zap },
 ];
 
-const matchingModes = [
-  { id: "auto", label: "Auto Match", emoji: "🤖", desc: "AI pairs participants by skills" },
-  { id: "swipe", label: "Swipe Match", emoji: "💫", desc: "Tinder-style team finding" },
-  { id: "manual", label: "Manual Teams", emoji: "✋", desc: "Participants form their own teams" },
-  { id: "none", label: "No Teams", emoji: "🚫", desc: "Individual participation only" },
-];
+// Removed matchingModes constant
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
@@ -40,9 +35,7 @@ const CreateEventPage = () => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [roleLimits, setRoleLimits] = useState<Record<string, number>>({});
 
-  // Matching
-  const [matchingMode, setMatchingMode] = useState("swipe");
-  const [matchingDeadline, setMatchingDeadline] = useState(true);
+  // Matching (Simplified)
 
   // Sections expand
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -157,11 +150,10 @@ const CreateEventPage = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-colors ${
-                  selectedCategory === cat.id
+                className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-colors ${selectedCategory === cat.id
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -177,11 +169,10 @@ const CreateEventPage = () => {
               <button
                 key={city.id}
                 onClick={() => setSelectedCity(city.id)}
-                className={`flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-2xl text-sm font-semibold transition-colors ${
-                  selectedCity === city.id
+                className={`flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-2xl text-sm font-semibold transition-colors ${selectedCity === city.id
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-muted text-muted-foreground"
-                }`}
+                  }`}
               >
                 <span>{city.emoji}</span>
                 <span>{city.name}</span>
@@ -249,9 +240,8 @@ const CreateEventPage = () => {
                   </div>
                   <button
                     onClick={() => setWaitlistEnabled(!waitlistEnabled)}
-                    className={`w-12 h-7 rounded-full relative transition-colors ${
-                      waitlistEnabled ? "bg-primary" : "bg-border"
-                    }`}
+                    className={`w-12 h-7 rounded-full relative transition-colors ${waitlistEnabled ? "bg-primary" : "bg-border"
+                      }`}
                   >
                     <motion.div
                       animate={{ x: waitlistEnabled ? 20 : 2 }}
@@ -288,11 +278,10 @@ const CreateEventPage = () => {
                       <div key={role.id} className="flex items-center justify-between">
                         <button
                           onClick={() => toggleRole(role.id)}
-                          className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${
-                            active
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all ${active
                               ? "bg-primary/15 text-primary ring-1 ring-primary/30"
                               : "bg-muted text-muted-foreground hover:bg-primary/5"
-                          }`}
+                            }`}
                         >
                           <span>{role.emoji}</span>
                           <span>{role.label}</span>
@@ -321,68 +310,31 @@ const CreateEventPage = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* ── Matching ── */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="rounded-3xl bg-muted/50 backdrop-blur-sm border border-border/50 overflow-hidden"
         >
-          <SectionHeader title="Team Matching" emoji="🔗" sectionKey="matching" />
+          <SectionHeader title="Team Recruitment" emoji="🔗" sectionKey="matching" />
           <AnimatePresence>
             {expandedSections.matching && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="px-4 pb-4 space-y-3 overflow-hidden"
+                className="px-4 pb-4 space-y-3 overflow-hidden text-center"
               >
-                <p className="text-xs text-muted-foreground">How should participants find their teams?</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {matchingModes.map((mode) => (
-                    <button
-                      key={mode.id}
-                      onClick={() => setMatchingMode(mode.id)}
-                      className={`p-3 rounded-2xl text-left transition-all ${
-                        matchingMode === mode.id
-                          ? "bg-primary/15 ring-1 ring-primary/30"
-                          : "bg-muted hover:bg-primary/5"
-                      }`}
-                    >
-                      <span className="text-xl">{mode.emoji}</span>
-                      <p className={`text-sm font-bold mt-1 ${matchingMode === mode.id ? "text-primary" : "text-foreground"}`}>
-                        {mode.label}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{mode.desc}</p>
-                    </button>
-                  ))}
+                <div className="py-4 px-2">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-sm font-bold text-foreground">Role-Based Recruitment</h3>
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                    Participants will find each other based on the roles you've enabled.
+                    They can browse profiles and send invites to form teams.
+                  </p>
                 </div>
-
-                {matchingMode !== "none" && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-between pt-2"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Matching Deadline
-                      </p>
-                      <p className="text-xs text-muted-foreground">Close matching 24h before event</p>
-                    </div>
-                    <button
-                      onClick={() => setMatchingDeadline(!matchingDeadline)}
-                      className={`w-12 h-7 rounded-full relative transition-colors ${
-                        matchingDeadline ? "bg-primary" : "bg-border"
-                      }`}
-                    >
-                      <motion.div
-                        animate={{ x: matchingDeadline ? 20 : 2 }}
-                        className="w-5 h-5 rounded-full bg-background shadow-md absolute top-1"
-                      />
-                    </button>
-                  </motion.div>
-                )}
               </motion.div>
             )}
           </AnimatePresence>

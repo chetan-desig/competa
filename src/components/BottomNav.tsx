@@ -10,26 +10,26 @@ const BottomNav = () => {
 
   const tabs = isOrganizer
     ? [
-        { path: "/", icon: Home, label: "Dashboard" },
-        { path: "/participants", icon: Users, label: "Students" },
-        { path: "/create", icon: PlusCircle, label: "Create", isCenter: true },
-        { path: "/messages", icon: MessageCircle, label: "Messages", badge: 4 },
-        { path: "/profile", icon: User, label: "Profile" },
-      ]
+      { path: "/", icon: Home, label: "Dashboard" },
+      { path: "/participants", icon: Users, label: "Roster" },
+      { path: "/create", icon: PlusCircle, label: "Host", isCenter: true },
+      { path: "/messages", icon: MessageCircle, label: "Inbox", badge: 4 },
+      { path: "/profile", icon: User, label: "Account" },
+    ]
     : [
-        { path: "/", icon: Home, label: "Home" },
-        { path: "/search", icon: Search, label: "Search" },
-        { path: "/team-matching", icon: Users, label: "Teams", isCenter: true },
-        { path: "/messages", icon: MessageCircle, label: "Chats", badge: 4 },
-        { path: "/profile", icon: User, label: "Profile" },
-      ];
+      { path: "/", icon: Home, label: "Home" },
+      { path: "/search", icon: Search, label: "Search" },
+      { path: "/team-matching", icon: Users, label: "Teams", isCenter: true },
+      { path: "/messages", icon: MessageCircle, label: "Chats", badge: 4 },
+      { path: "/profile", icon: User, label: "Profile" },
+    ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
       {/* Frosted glass with top glow line */}
       <div className="absolute inset-0 bg-card/70 backdrop-blur-2xl border-t border-border/40" />
       <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-      
+
       <div className="relative flex items-center justify-around h-[68px] max-w-lg mx-auto px-2">
         {tabs.map((tab) => {
           const isActive = location.pathname === tab.path ||
@@ -73,9 +73,8 @@ const BottomNav = () => {
             >
               <div className="relative">
                 <Icon
-                  className={`w-[22px] h-[22px] transition-all duration-200 ${
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  }`}
+                  className={`w-[22px] h-[22px] transition-all duration-200 ${isActive ? "text-primary" : "text-muted-foreground"
+                    }`}
                   strokeWidth={isActive ? 2.5 : 2}
                 />
                 {tab.badge && tab.badge > 0 && (
@@ -85,9 +84,8 @@ const BottomNav = () => {
                 )}
               </div>
               <span
-                className={`text-[10px] font-semibold transition-colors duration-200 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`text-[10px] font-semibold transition-colors duration-200 ${isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
               >
                 {tab.label}
               </span>

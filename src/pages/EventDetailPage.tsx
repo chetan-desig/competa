@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock, Edit3, BarChart3, Megaphone, UserCheck, Eye, ChevronRight, AlertTriangle, Trash2, MessageCircle, CalendarCheck, Send, Trophy, Ticket } from "lucide-react";
+import { ArrowLeft, Bookmark, Share2, MapPin, Calendar, Users, Clock, Edit3, BarChart3, Megaphone, UserCheck, Eye, ChevronRight, AlertTriangle, Trash2, MessageCircle, CalendarCheck, Send, Trophy, Ticket, Shield } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { mockTeams } from "@/data/teamMatchingData";
 import { useState } from "react";
@@ -100,11 +100,11 @@ const EventDetailPage = () => {
           </div>
         </div>
 
-        {/* Organizer badge */}
+        {/* Status Label */}
         {isOrganizer && (
-          <div className="absolute bottom-16 left-5">
-            <span className="bg-accent text-accent-foreground text-[10px] font-bold px-3 py-1.5 rounded-xl uppercase tracking-wider">
-              ⚙️ Managing
+          <div className="absolute bottom-14 left-5">
+            <span className="bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-lg border border-border shadow-sm flex items-center gap-1.5">
+              <Shield className="w-3 h-3 text-primary" /> Management Mode
             </span>
           </div>
         )}
@@ -210,21 +210,26 @@ const EventDetailPage = () => {
           {/* ─── ORGANIZER: Event Management Section ─── */}
           {isOrganizer && (
             <div className="space-y-5 border-t border-border pt-5 mt-2">
-              {/* Quick Stats */}
+              {/* Analytics */}
               <div>
-                <h3 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
-                  📊 Event Analytics
-                </h3>
-                <div className="grid grid-cols-4 gap-2">
-                  {eventStats.map((stat) => {
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                    Quick Insights
+                  </h3>
+                  <button className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors">Details</button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {eventStats.map((stat, i) => {
                     const Icon = stat.icon;
                     return (
-                      <div key={stat.label} className="bg-muted rounded-2xl p-3 text-center">
-                        <div className={`w-7 h-7 rounded-xl ${stat.color} flex items-center justify-center mx-auto mb-1.5`}>
-                          <Icon className="w-3.5 h-3.5" />
+                      <div key={stat.label} className="bg-muted/40 border border-border/40 rounded-xl p-3 flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg ${stat.color} flex items-center justify-center shrink-0`}>
+                          <Icon className="w-4 h-4" />
                         </div>
-                        <p className="text-sm font-display font-bold text-card-foreground">{stat.value}</p>
-                        <p className="text-[9px] text-muted-foreground font-medium">{stat.label}</p>
+                        <div>
+                          <p className="text-xs font-bold text-foreground leading-none">{stat.value}</p>
+                          <p className="text-[9px] text-muted-foreground mt-1">{stat.label}</p>
+                        </div>
                       </div>
                     );
                   })}
@@ -287,11 +292,10 @@ const EventDetailPage = () => {
                             {team.members.length}/{team.max_size} members · {team.open_roles.length} roles open
                           </p>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
-                          team.members.length >= team.max_size 
-                            ? "bg-success/10 text-success" 
-                            : "bg-accent/10 text-accent"
-                        }`}>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${team.members.length >= team.max_size
+                          ? "bg-success/10 text-success"
+                          : "bg-accent/10 text-accent"
+                          }`}>
                           {team.members.length >= team.max_size ? "Full" : "Open"}
                         </span>
                       </div>
@@ -412,11 +416,10 @@ const EventDetailPage = () => {
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={handleJoin}
-                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
-                  joined
-                    ? "bg-muted text-muted-foreground"
-                    : "gradient-primary text-primary-foreground shadow-lg"
-                }`}
+                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
+                  ? "bg-muted text-muted-foreground"
+                  : "gradient-primary text-primary-foreground shadow-lg"
+                  }`}
               >
                 {joined ? "✅ Registered" : "Join Solo"}
               </motion.button>
@@ -433,11 +436,10 @@ const EventDetailPage = () => {
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={handleJoin}
-                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
-                  joined
-                    ? "bg-muted text-muted-foreground"
-                    : "gradient-primary text-primary-foreground shadow-lg"
-                }`}
+                className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
+                  ? "bg-muted text-muted-foreground"
+                  : "gradient-primary text-primary-foreground shadow-lg"
+                  }`}
               >
                 {joined ? "✅ Joined!" : "Join Event"}
               </motion.button>

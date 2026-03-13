@@ -140,3 +140,20 @@ export const mockCertificates = [
   { id: "3", title: "Design Sprint Champion", event: "DesignJam 2025", date: "Nov 2025", badge: "🎨" },
   { id: "4", title: "AI/ML Bootcamp", event: "IIT Madras", date: "Oct 2025", badge: "🤖" },
 ];
+
+export interface Activity {
+  id: string;
+  text: string;
+  time: string;
+  emoji: string;
+  type: "registration" | "view" | "team" | "milestone";
+}
+
+export const mockActivities: Activity[] = [
+  { id: "1", text: "New registration for HackVerse 3.0", time: "Just now", emoji: "⚡", type: "registration" },
+  { id: "2", text: "Team 'Bit Busters' joined DesignJam", time: "2 min ago", emoji: "👥", type: "team" },
+  { id: "3", text: "React Masterclass reached 500 views", time: "5 min ago", emoji: "📈", type: "milestone" },
+  { id: "4", text: "New participant from IIT Delhi", time: "12 min ago", emoji: "👤", type: "registration" },
+  { id: "5", text: "HackVerse 3.0: 80% seats filled", time: "25 min ago", emoji: "🔥", type: "milestone" },
+  { id: "6", text: "Team 'Cloud Ninjas' created", time: "40 min ago", emoji: "🎨", type: "team" },
+];
