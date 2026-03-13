@@ -143,26 +143,27 @@ const ProfilePage = () => {
       <div className="min-h-screen bg-background pb-24">
         <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
-        <div className="relative h-44 gradient-primary rounded-b-[2.5rem] overflow-hidden">
-          <div className="absolute inset-0 opacity-15 overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full border-8 border-primary-foreground/10" />
-            <div className="absolute top-20 left-10 w-24 h-24 rounded-full border-4 border-primary-foreground/10" />
+        <div className="relative h-56 gradient-primary rounded-b-[3rem] overflow-hidden">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+            <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-white/5 blur-2xl" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
         </div>
 
-        <div className="px-6 -mt-16">
-          <div className="flex items-end gap-5 mb-6">
-            <div className="relative w-28 h-28 rounded-[2rem] bg-card flex items-center justify-center text-5xl shadow-xl border-4 border-background shrink-0">
+        <div className="px-6 -mt-20 relative z-10">
+          <div className="flex items-end gap-5 mb-8">
+            <div className="relative w-32 h-32 rounded-[2.5rem] bg-card flex items-center justify-center text-6xl shadow-2xl border-4 border-background shrink-0 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
               🏢
               {isFullyVerified && (
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
-                  <CheckCircle className="w-4.5 h-4.5 text-success-foreground" />
+                <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
+                  <CheckCircle className="w-5 h-5 text-success-foreground" />
                 </div>
               )}
             </div>
-            <div className="pb-2">
-              <h1 className="text-2xl font-display font-bold text-foreground leading-tight">TechHub Events</h1>
-              <p className="text-sm text-muted-foreground font-semibold flex items-center gap-1.5">
+            <div className="pb-4">
+              <h1 className="text-3xl font-display font-bold text-foreground leading-tight tracking-tight">TechHub Events</h1>
+              <p className="text-sm text-muted-foreground font-semibold flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/5 w-fit mt-1">
                 <Sparkles className="w-3.5 h-3.5 text-primary" /> Event Organizer
               </p>
             </div>
@@ -171,44 +172,52 @@ const ProfilePage = () => {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => { if (!isFullyVerified) requireVerification("organizer"); }}
-            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl mb-8 shadow-sm ${current.color}`}
+            className={`w-full flex items-center gap-4 px-6 py-5 rounded-[2rem] mb-8 shadow-lg shadow-primary/5 transition-all hover:shadow-primary/10 ${current.color} border border-white/10`}
           >
-            <Shield className="w-5 h-5" />
-            <span className="text-sm font-bold tracking-tight">{current.label}</span>
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+              <Shield className="w-5.5 h-5.5" />
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">Account Status</p>
+              <p className="text-sm font-bold tracking-tight">{current.label}</p>
+            </div>
             {!isFullyVerified && <ChevronRight className="w-5 h-5 ml-auto opacity-50" />}
           </motion.button>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-2 gap-4 mb-10">
             {orgStats.map((s) => {
               const Icon = s.icon;
               return (
-                <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
-                    <Icon className="w-4 h-4 text-primary" />
+                <div key={s.label} className="bg-card rounded-[2rem] p-6 border border-border/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-primary" />
                   </div>
                   <p className="text-2xl font-display font-bold text-card-foreground leading-none">{s.value}</p>
-                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mt-2">{s.label}</p>
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mt-3">{s.label}</p>
                 </div>
               );
             })}
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Organization</h2>
-            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                  <MapPin className="w-4 h-4 text-primary" />
+          <div className="mb-10">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 px-2">Organization</h2>
+            <div className="bg-card rounded-[2.5rem] p-8 border border-border/50 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+              <div className="relative space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="text-sm text-card-foreground font-bold">Hyderabad, Telangana</span>
                 </div>
-                <span className="text-sm text-card-foreground font-bold">Hyderabad, Telangana</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                We organize premium hackathons, intensive workshops, and high-impact tech events for ambitious students across India.
-              </p>
-              <div className="flex flex-wrap gap-2.5 pt-2">
-                {["Hackathons", "Workshops", "Tech Talks"].map((tag) => (
-                  <span key={tag} className="text-[10px] font-bold px-4 py-2 rounded-xl bg-muted text-foreground border border-border/50">{tag}</span>
-                ))}
+                <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                  We organize premium hackathons, intensive workshops, and high-impact tech events for ambitious students across India.
+                </p>
+                <div className="flex flex-wrap gap-2.5 pt-2">
+                  {["Hackathons", "Workshops", "Tech Talks"].map((tag) => (
+                    <span key={tag} className="text-[10px] font-bold px-4 py-2 rounded-xl bg-muted/50 text-foreground border border-border/50 hover:bg-primary hover:text-white transition-colors cursor-default">{tag}</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -342,65 +351,71 @@ const ProfilePage = () => {
       </Sheet>
 
       {/* Hero Header */}
-      <div className="relative h-44 gradient-primary rounded-b-[2.5rem] overflow-hidden">
-        <div className="absolute inset-0 opacity-15">
-          <div className="absolute top-6 right-10 w-28 h-28 rounded-full border-8 border-primary-foreground/10" />
-          <div className="absolute bottom-4 left-10 w-20 h-20 rounded-full border-4 border-primary-foreground/10" />
+      <div className="relative h-56 gradient-primary rounded-b-[3rem] overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 right-10 w-48 h-48 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute bottom-10 left-10 w-32 h-32 rounded-full bg-white/5 blur-2xl" />
         </div>
-        <div className="absolute top-6 right-6 flex gap-3">
-          <motion.button whileTap={{ scale: 0.9 }} onClick={openEditProfile} className="w-11 h-11 rounded-2xl bg-primary-foreground/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-            <Pencil className="w-5 h-5 text-primary-foreground" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
+        <div className="absolute top-8 right-6 flex gap-3">
+          <motion.button whileTap={{ scale: 0.9 }} onClick={openEditProfile} className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/20 shadow-lg group hover:bg-white/30 transition-colors">
+            <Pencil className="w-5.5 h-5.5 text-white group-hover:scale-110 transition-transform" />
           </motion.button>
-          <motion.button whileTap={{ scale: 0.9 }} className="w-11 h-11 rounded-2xl bg-primary-foreground/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-            <Settings className="w-5 h-5 text-primary-foreground" />
+          <motion.button whileTap={{ scale: 0.9 }} className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/20 shadow-lg group hover:bg-white/30 transition-colors">
+            <Settings className="w-5.5 h-5.5 text-white group-hover:scale-110 transition-transform" />
           </motion.button>
         </div>
       </div>
 
-      <div className="px-6 -mt-16">
+      <div className="px-6 -mt-24 relative z-10">
         {/* Profile Card */}
         <motion.div 
           initial={{ y: 20, opacity: 0 }} 
           animate={{ y: 0, opacity: 1 }} 
-          className="bg-card rounded-[2.5rem] p-6 border border-border shadow-xl mb-6 relative z-10"
+          className="bg-card rounded-[3rem] p-8 border border-border/50 shadow-2xl mb-8 relative group"
         >
-          <div className="flex items-start gap-5">
-            <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-xl border-4 border-background shrink-0">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors" />
+          
+          <div className="flex flex-col items-center text-center">
+            <div className="relative w-32 h-32 rounded-[2.5rem] bg-secondary/10 flex items-center justify-center text-6xl shadow-xl border-4 border-background mb-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
               {profile.avatar}
               {isFullyVerified && (
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
-                  <CheckCircle className="w-4 h-4 text-success-foreground" />
+                <div className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
+                  <CheckCircle className="w-5 h-5 text-success-foreground" />
                 </div>
               )}
             </div>
-            <div className="flex-1 min-w-0 pt-2">
-              <h1 className="text-xl font-display font-bold text-card-foreground truncate leading-tight">{profile.name}</h1>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-semibold mt-1">
-                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                <span className="truncate">{profile.location}</span>
-              </div>
-              {profile.bio && (
-                <p className="text-sm text-muted-foreground mt-3 line-clamp-2 leading-relaxed italic">"{profile.bio}"</p>
-              )}
+            
+            <h1 className="text-2xl font-display font-bold text-card-foreground tracking-tight">{profile.name}</h1>
+            
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-semibold mt-2 px-4 py-1.5 rounded-full bg-muted/50 border border-border/30">
+              <MapPin className="w-4 h-4 text-primary shrink-0" />
+              <span>{profile.location}</span>
             </div>
-          </div>
 
-          {/* Inline Stats */}
-          <div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-border/50">
-            {stats.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div key={s.label} className="flex flex-col items-center gap-1.5 bg-muted/40 rounded-2xl py-3 px-1 hover:bg-muted transition-colors">
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-3.5 h-3.5 text-primary" />
+            {profile.bio && (
+              <p className="text-sm text-card-foreground/80 mt-6 leading-relaxed italic max-w-xs font-medium">
+                "{profile.bio}"
+              </p>
+            )}
+
+            {/* Inline Stats */}
+            <div className="grid grid-cols-3 gap-6 w-full mt-8 pt-8 border-t border-border/50">
+              {stats.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <div key={s.label} className="flex flex-col items-center gap-2 group/stat">
+                    <div className="w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center group-hover/stat:bg-primary group-hover/stat:text-white transition-all duration-300 shadow-sm">
+                      <Icon className="w-5 h-5 text-primary group-hover/stat:text-white transition-colors" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xl font-display font-bold text-card-foreground leading-none">{s.value}</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1.5">{s.label}</p>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-base font-display font-bold text-card-foreground leading-none">{s.value}</p>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">{s.label}</p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </motion.div>
 
@@ -422,14 +437,14 @@ const ProfilePage = () => {
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-3xl p-6 border border-border shadow-md mb-6"
+          className="bg-card rounded-[2.5rem] p-8 border border-border/50 shadow-lg mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" /> Roles & Skills
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+              <Sparkles className="w-4.5 h-4.5 text-primary" /> Roles & Skills
             </h2>
-            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline transition-all">
-              {showRoleEditor ? "Cancel" : "Edit"} <ChevronRight className="w-3.5 h-3.5" />
+            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary px-3 py-1.5 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors">
+              {showRoleEditor ? "Cancel" : "Edit Details"}
             </button>
           </div>
 
@@ -502,17 +517,19 @@ const ProfilePage = () => {
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
-          className="mb-6"
+          className="mb-8"
         >
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             {privacyOptions.map((opt) => {
               const Icon = opt.icon;
               const active = privacy === opt.id;
               return (
                 <button key={opt.id} onClick={() => setPrivacy(opt.id)}
-                  className={`flex-1 flex flex-col items-center gap-1.5 py-4 px-2 rounded-2xl text-center transition-all shadow-sm ${active ? "gradient-primary text-primary-foreground scale-[1.02]" : "bg-card border border-border text-foreground hover:bg-muted/50"}`}>
-                  <Icon className="w-4 h-4" />
-                  <span className="text-[10px] font-bold tracking-tight">{opt.label}</span>
+                  className={`flex-1 flex flex-col items-center gap-2 py-5 px-3 rounded-[2rem] text-center transition-all duration-300 border ${active ? "gradient-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.05] border-transparent" : "bg-card border-border/50 text-foreground hover:bg-muted/50 shadow-sm"}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${active ? "bg-white/20" : "bg-primary/5 text-primary"}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-bold tracking-widest uppercase opacity-90">{opt.label}</span>
                 </button>
               );
             })}
@@ -525,74 +542,45 @@ const ProfilePage = () => {
           transition={{ delay: 0.2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/people")}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-card border border-border shadow-md mb-6 hover:border-primary/20 transition-all"
+          className="w-full flex items-center justify-between p-6 rounded-[2.5rem] bg-card border border-border/50 shadow-lg mb-8 group hover:border-primary/30 transition-all duration-300"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/10">
-              <Users className="w-5 h-5 text-secondary" />
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/10 group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+              <Users className="w-6 h-6 text-secondary group-hover:text-white transition-colors" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-display font-bold text-card-foreground">My Buddies</p>
-              <p className="text-[11px] text-muted-foreground font-medium">1 connected · 1 pending</p>
+              <p className="text-sm font-display font-bold text-card-foreground">My Connections</p>
+              <p className="text-[11px] text-muted-foreground font-semibold mt-1">12 connected · 3 pending</p>
             </div>
           </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground opacity-50" />
+          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          </div>
         </motion.button>
 
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="mb-8"
+          className="mb-10"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest">Certificates</h2>
-            <button onClick={() => navigate("/certificates")} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline">
-              View All <ChevronRight className="w-3.5 h-3.5" />
+          <div className="flex items-center justify-between mb-6 px-2">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-[0.2em]">Certificate Vault</h2>
+            <button onClick={() => navigate("/certificates")} className="text-xs font-bold text-primary hover:underline transition-all">
+              View All
             </button>
           </div>
-          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
+          <div className="flex gap-5 overflow-x-auto hide-scrollbar pb-4 -mx-2 px-2">
             {mockCertificates.slice(0, 4).map((cert, i) => {
               const bgColors = ["bg-primary/5", "bg-secondary/5", "bg-accent/5", "bg-success/5"];
               const borderColors = ["border-primary/10", "border-secondary/10", "border-accent/10", "border-success/10"];
               return (
-                <motion.div key={cert.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} onClick={() => navigate("/certificates")} className="flex-shrink-0 w-32 cursor-pointer group">
-                  <div className={`w-32 h-24 rounded-3xl flex items-center justify-center text-3xl mb-3 border ${bgColors[i % bgColors.length]} ${borderColors[i % borderColors.length]} shadow-sm group-hover:shadow-md transition-all`}>
-                    {cert.badge}
+                <motion.div key={cert.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + i * 0.1 }} onClick={() => navigate("/certificates")} className="flex-shrink-0 w-36 cursor-pointer group">
+                  <div className={`w-36 h-28 rounded-[2rem] flex items-center justify-center text-4xl mb-4 border ${bgColors[i % bgColors.length]} ${borderColors[i % borderColors.length]} shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 bg-white/40 backdrop-blur-sm relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                    <span className="relative z-10 filter drop-shadow-md">{cert.badge}</span>
                   </div>
-                  <p className="text-[11px] font-display font-bold text-card-foreground leading-snug line-clamp-2 px-1 group-hover:text-primary transition-colors">{cert.title}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
-          <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Portfolio</h2>
-          <div className="space-y-3">
-            {[
-              { label: "GitHub", url: profile.github, icon: Globe },
-              { label: "LinkedIn", url: profile.linkedin, icon: Users },
-              { label: "Portfolio", url: profile.portfolio, icon: Sparkles },
-            ].filter(l => l.url).map((link) => {
-              const Icon = link.icon;
-              return (
-                <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-[1.25rem] bg-card border border-border shadow-sm hover:border-primary/20 transition-all cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                      <Icon className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
-                      <p className="text-[10px] text-muted-foreground font-medium">{link.url}</p>
-                    </div>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-muted-foreground opacity-50" />
+                  <p className="text-[11px] font-display font-bold text-card-foreground leading-snug line-clamp-2 px-2 group-hover:text-primary transition-colors text-center">{cert.title}</p>
                 </motion.div>
               );
             })}
@@ -603,23 +591,67 @@ const ProfilePage = () => {
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.35 }}
-          className="mb-8"
+          className="mb-10"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest">My Events</h2>
-            <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline">
-              Browse <ChevronRight className="w-3.5 h-3.5" />
+          <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-[0.2em] mb-6 px-2">Portfolio & Socials</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {[
+              { label: "GitHub", url: profile.github, icon: Globe, color: "bg-slate-900", textColor: "text-white" },
+              { label: "LinkedIn", url: profile.linkedin, icon: Users, color: "bg-blue-600", textColor: "text-white" },
+              { label: "Portfolio", url: profile.portfolio, icon: Sparkles, color: "bg-primary", textColor: "text-white" },
+            ].filter(l => l.url).map((link) => {
+              const Icon = link.icon;
+              return (
+                <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-5 rounded-[2rem] bg-card border border-border/50 shadow-md hover:shadow-xl hover:border-primary/30 transition-all cursor-pointer group">
+                  <div className="flex items-center gap-5">
+                    <div className={`w-12 h-12 rounded-2xl ${link.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                      <Icon className={`w-6 h-6 ${link.textColor}`} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
+                      <p className="text-[10px] text-muted-foreground font-semibold tracking-wide truncate max-w-[180px]">{link.url}</p>
+                    </div>
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                    <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mb-10"
+        >
+          <div className="flex items-center justify-between mb-6 px-2">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-[0.2em]">Joined Events</h2>
+            <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary hover:underline">
+              Explore More
             </button>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {mockEvents.slice(0, 3).map((ev) => (
-              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)} className="flex items-center gap-4 bg-card rounded-2xl p-4 border border-border shadow-sm hover:border-primary/20 transition-all cursor-pointer">
-                <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-display font-bold text-card-foreground truncate leading-tight">{ev.title}</p>
-                  <p className="text-[11px] text-muted-foreground font-medium mt-1 uppercase tracking-tight">{ev.date} · {ev.location}</p>
+              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)} className="flex items-center gap-5 bg-card rounded-[2.25rem] p-5 border border-border/50 shadow-md hover:shadow-xl hover:border-primary/30 transition-all cursor-pointer group">
+                <div className="relative shrink-0">
+                  <img src={ev.image} alt={ev.title} className="w-20 h-20 rounded-[1.5rem] object-cover shadow-md group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full gradient-primary flex items-center justify-center border-2 border-background shadow-lg">
+                    <Calendar className="w-4 h-4 text-white" />
+                  </div>
                 </div>
-                <span className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-success/10 text-success border border-success/10 whitespace-nowrap">JOINED</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-display font-bold text-card-foreground truncate leading-tight group-hover:text-primary transition-colors">{ev.title}</p>
+                  <p className="text-[10px] text-muted-foreground font-bold mt-2 uppercase tracking-wide opacity-70">{ev.date} · {ev.location}</p>
+                  <div className="mt-3">
+                    <span className="text-[9px] font-bold px-3 py-1.5 rounded-full bg-success/10 text-success border border-success/20 uppercase tracking-tighter">Attending</span>
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
               </motion.div>
             ))}
           </div>
