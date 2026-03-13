@@ -140,103 +140,125 @@ const ProfilePage = () => {
     ];
 
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-24">
         <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
-        <div className="relative h-36 gradient-primary rounded-b-[2rem]" />
+        <div className="relative h-44 gradient-primary rounded-b-[2.5rem] overflow-hidden">
+          <div className="absolute inset-0 opacity-15 overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full border-8 border-primary-foreground/10" />
+            <div className="absolute top-20 left-10 w-24 h-24 rounded-full border-4 border-primary-foreground/10" />
+          </div>
+        </div>
 
-        <div className="px-5 -mt-14">
-          <div className="flex items-end gap-4 mb-4">
-            <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-lg border-4 border-background">
+        <div className="px-6 -mt-16">
+          <div className="flex items-end gap-5 mb-6">
+            <div className="relative w-28 h-28 rounded-[2rem] bg-card flex items-center justify-center text-5xl shadow-xl border-4 border-background shrink-0">
               🏢
               {isFullyVerified && (
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-md">
-                  <CheckCircle className="w-4 h-4 text-success-foreground" />
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
+                  <CheckCircle className="w-4.5 h-4.5 text-success-foreground" />
                 </div>
               )}
             </div>
-            <div className="pb-1">
-              <h1 className="text-xl font-display font-bold">TechHub Events</h1>
-              <p className="text-sm text-muted-foreground font-medium">🎤 Event Organizer</p>
+            <div className="pb-2">
+              <h1 className="text-2xl font-display font-bold text-foreground leading-tight">TechHub Events</h1>
+              <p className="text-sm text-muted-foreground font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary" /> Event Organizer
+              </p>
             </div>
           </div>
 
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => { if (!isFullyVerified) requireVerification("organizer"); }}
-            className={`w-full flex items-center gap-2 px-4 py-3 rounded-2xl mb-5 ${current.color}`}
+            className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl mb-8 shadow-sm ${current.color}`}
           >
-            <Shield className="w-4 h-4" />
-            <span className="text-sm font-bold">{current.label}</span>
-            {!isFullyVerified && <ChevronRight className="w-4 h-4 ml-auto" />}
+            <Shield className="w-5 h-5" />
+            <span className="text-sm font-bold tracking-tight">{current.label}</span>
+            {!isFullyVerified && <ChevronRight className="w-5 h-5 ml-auto opacity-50" />}
           </motion.button>
 
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-8">
             {orgStats.map((s) => {
               const Icon = s.icon;
               return (
-                <div key={s.label} className="bg-card rounded-2xl p-4 border border-border">
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                    <Icon className="w-3.5 h-3.5 text-primary" />
+                <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm hover:shadow-md transition-shadow">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                    <Icon className="w-4 h-4 text-primary" />
                   </div>
-                  <p className="text-xl font-display font-bold text-card-foreground">{s.value}</p>
-                  <p className="text-[10px] text-muted-foreground font-medium">{s.label}</p>
+                  <p className="text-2xl font-display font-bold text-card-foreground leading-none">{s.value}</p>
+                  <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mt-2">{s.label}</p>
                 </div>
               );
             })}
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Organization</h2>
-            <div className="bg-card rounded-2xl p-4 border border-border space-y-3">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-card-foreground font-medium">Hyderabad, Telangana</span>
+          <div className="mb-8">
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Organization</h2>
+            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                  <MapPin className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-card-foreground font-bold">Hyderabad, Telangana</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We organize hackathons, workshops, and tech events for students across India.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                We organize premium hackathons, intensive workshops, and high-impact tech events for ambitious students across India.
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2.5 pt-2">
                 {["Hackathons", "Workshops", "Tech Talks"].map((tag) => (
-                  <span key={tag} className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-muted text-foreground">{tag}</span>
+                  <span key={tag} className="text-[10px] font-bold px-4 py-2 rounded-xl bg-muted text-foreground border border-border/50">{tag}</span>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Top Events</h2>
-            <div className="space-y-2">
+          <div className="mb-8">
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Top Events</h2>
+            <div className="space-y-3">
               {[
-                { name: "HackVerse 3.0", attendees: 450, rating: "4.9" },
-                { name: "React Masterclass", attendees: 800, rating: "4.7" },
-                { name: "Startup Weekend", attendees: 300, rating: "4.8" },
+                { name: "HackVerse 3.0", attendees: 450, rating: "4.9", color: "bg-primary/10" },
+                { name: "React Masterclass", attendees: 800, rating: "4.7", color: "bg-secondary/10" },
+                { name: "Startup Weekend", attendees: 300, rating: "4.8", color: "bg-accent/10" },
               ].map((ev) => (
-                <div key={ev.name} className="flex items-center justify-between bg-card rounded-2xl px-4 py-3 border border-border">
-                  <div>
-                    <p className="text-sm font-display font-bold text-card-foreground">{ev.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{ev.attendees} participants</p>
+                <div key={ev.name} className="flex items-center justify-between bg-card rounded-2xl p-4 border border-border shadow-sm hover:border-primary/20 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl ${ev.color} flex items-center justify-center text-lg`}>
+                      🔥
+                    </div>
+                    <div>
+                      <p className="text-sm font-display font-bold text-card-foreground">{ev.name}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium">{ev.attendees} participants</p>
+                    </div>
                   </div>
-                  <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary">⭐ {ev.rating}</span>
+                  <span className="text-xs font-bold px-3 py-2 rounded-xl bg-primary/10 text-primary border border-primary/5">⭐ {ev.rating}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Links</h2>
+          <div className="space-y-3">
+            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Links</h2>
             {[
-              { label: "Website", url: "techhubevents.com" },
-              { label: "LinkedIn", url: "linkedin.com/company/techhub" },
-            ].map((link) => (
-              <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border cursor-pointer">
-                <div>
-                  <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
-                  <p className="text-xs text-muted-foreground">{link.url}</p>
-                </div>
-                <ExternalLink className="w-4 h-4 text-muted-foreground" />
-              </motion.div>
-            ))}
+              { label: "Website", url: "techhubevents.com", icon: Globe },
+              { label: "LinkedIn", url: "linkedin.com/company/techhub", icon: Users },
+            ].map((link) => {
+              const Icon = link.icon;
+              return (
+                <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-5 rounded-2x border border-border bg-card shadow-sm hover:border-primary/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                      <Icon className="w-4.5 h-4.5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
+                      <p className="text-[11px] text-muted-foreground">{link.url}</p>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-muted-foreground opacity-50" />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
         <BottomNav />
@@ -252,7 +274,7 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-24">
       <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
       {/* Edit Profile Sheet */}
@@ -320,59 +342,61 @@ const ProfilePage = () => {
       </Sheet>
 
       {/* Hero Header */}
-      <div className="relative h-40 gradient-primary rounded-b-[2.5rem] overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-8 w-24 h-24 rounded-full border border-primary-foreground/20" />
-          <div className="absolute bottom-2 left-12 w-16 h-16 rounded-full border border-primary-foreground/20" />
+      <div className="relative h-44 gradient-primary rounded-b-[2.5rem] overflow-hidden">
+        <div className="absolute inset-0 opacity-15">
+          <div className="absolute top-6 right-10 w-28 h-28 rounded-full border-8 border-primary-foreground/10" />
+          <div className="absolute bottom-4 left-10 w-20 h-20 rounded-full border-4 border-primary-foreground/10" />
         </div>
-        <div className="absolute top-5 right-5 flex gap-2">
-          <motion.button whileTap={{ scale: 0.9 }} onClick={openEditProfile} className="w-10 h-10 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
+        <div className="absolute top-6 right-6 flex gap-3">
+          <motion.button whileTap={{ scale: 0.9 }} onClick={openEditProfile} className="w-11 h-11 rounded-2xl bg-primary-foreground/20 backdrop-blur-md flex items-center justify-center border border-white/10">
             <Pencil className="w-5 h-5 text-primary-foreground" />
           </motion.button>
-          <button className="w-10 h-10 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
+          <motion.button whileTap={{ scale: 0.9 }} className="w-11 h-11 rounded-2xl bg-primary-foreground/20 backdrop-blur-md flex items-center justify-center border border-white/10">
             <Settings className="w-5 h-5 text-primary-foreground" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      <div className="px-5 -mt-16">
+      <div className="px-6 -mt-16">
         {/* Profile Card */}
         <motion.div 
           initial={{ y: 20, opacity: 0 }} 
           animate={{ y: 0, opacity: 1 }} 
-          className="bg-card rounded-3xl p-5 border border-border shadow-sm mb-4"
+          className="bg-card rounded-[2.5rem] p-6 border border-border shadow-xl mb-6 relative z-10"
         >
-          <div className="flex items-start gap-4">
-            <div className="relative w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center text-3xl shadow-md border-4 border-background shrink-0">
+          <div className="flex items-start gap-5">
+            <div className="relative w-24 h-24 rounded-3xl bg-secondary flex items-center justify-center text-4xl shadow-xl border-4 border-background shrink-0">
               {profile.avatar}
               {isFullyVerified && (
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-success flex items-center justify-center shadow-md">
-                  <CheckCircle className="w-3.5 h-3.5 text-success-foreground" />
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center shadow-lg border-2 border-background">
+                  <CheckCircle className="w-4 h-4 text-success-foreground" />
                 </div>
               )}
             </div>
-            <div className="flex-1 min-w-0 pt-1">
-              <h1 className="text-lg font-display font-bold text-card-foreground truncate">{profile.name}</h1>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium mt-0.5">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <div className="flex-1 min-w-0 pt-2">
+              <h1 className="text-xl font-display font-bold text-card-foreground truncate leading-tight">{profile.name}</h1>
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground font-semibold mt-1">
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
                 <span className="truncate">{profile.location}</span>
               </div>
               {profile.bio && (
-                <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{profile.bio}</p>
+                <p className="text-sm text-muted-foreground mt-3 line-clamp-2 leading-relaxed italic">"{profile.bio}"</p>
               )}
             </div>
           </div>
 
           {/* Inline Stats */}
-          <div className="flex gap-2 mt-4 pt-4 border-t border-border">
+          <div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-border/50">
             {stats.map((s) => {
               const Icon = s.icon;
               return (
-                <div key={s.label} className="flex-1 flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2.5">
-                  <Icon className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <div>
-                    <p className="text-sm font-display font-bold text-card-foreground leading-none">{s.value}</p>
-                    <p className="text-[9px] text-muted-foreground font-medium">{s.label}</p>
+                <div key={s.label} className="flex flex-col items-center gap-1.5 bg-muted/40 rounded-2xl py-3 px-1 hover:bg-muted transition-colors">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-base font-display font-bold text-card-foreground leading-none">{s.value}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">{s.label}</p>
                   </div>
                 </div>
               );
@@ -387,26 +411,25 @@ const ProfilePage = () => {
           transition={{ delay: 0.05 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => { if (!isFullyVerified) requireVerification("student"); }}
-          className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-2xl mb-4 ${current.color}`}
+          className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl mb-6 shadow-sm ${current.color}`}
         >
-          <Shield className="w-4 h-4" />
-          <span className="text-sm font-bold">{current.label}</span>
-          {!isFullyVerified && <ChevronRight className="w-4 h-4 ml-auto" />}
+          <Shield className="w-5 h-5" />
+          <span className="text-sm font-bold tracking-tight">{current.label}</span>
+          {!isFullyVerified && <ChevronRight className="w-5 h-5 ml-auto opacity-50" />}
         </motion.button>
 
-        {/* Roles & Skills Combined */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-card rounded-3xl p-5 border border-border mb-4"
+          className="bg-card rounded-3xl p-6 border border-border shadow-md mb-6"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Roles & Skills
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" /> Roles & Skills
             </h2>
-            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary flex items-center gap-1">
-              {showRoleEditor ? "Cancel" : "Edit"} <ChevronRight className="w-3 h-3" />
+            <button onClick={() => setShowRoleEditor(!showRoleEditor)} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline transition-all">
+              {showRoleEditor ? "Cancel" : "Edit"} <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -434,9 +457,9 @@ const ProfilePage = () => {
               </div>
 
               {/* Skills */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {profile.skills.map((skill) => (
-                  <span key={skill} className="text-[11px] font-bold px-3 py-1.5 rounded-xl bg-primary/8 text-primary border border-primary/10">{skill}</span>
+                  <span key={skill} className="text-[10px] font-bold px-4 py-2 rounded-xl bg-primary/10 text-primary border border-primary/5 shadow-sm">{skill}</span>
                 ))}
               </div>
             </>
@@ -475,149 +498,157 @@ const ProfilePage = () => {
           )}
         </motion.div>
 
-        {/* Privacy Toggle */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.15 }}
-          className="mb-4"
+          className="mb-6"
         >
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {privacyOptions.map((opt) => {
               const Icon = opt.icon;
               const active = privacy === opt.id;
               return (
                 <button key={opt.id} onClick={() => setPrivacy(opt.id)}
-                  className={`flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-2xl text-center transition-all ${active ? "gradient-primary text-primary-foreground shadow-md" : "bg-card border border-border text-foreground"}`}>
-                  <Icon className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-bold">{opt.label}</span>
+                  className={`flex-1 flex flex-col items-center gap-1.5 py-4 px-2 rounded-2xl text-center transition-all shadow-sm ${active ? "gradient-primary text-primary-foreground scale-[1.02]" : "bg-card border border-border text-foreground hover:bg-muted/50"}`}>
+                  <Icon className="w-4 h-4" />
+                  <span className="text-[10px] font-bold tracking-tight">{opt.label}</span>
                 </button>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Buddies */}
         <motion.button
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/people")}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-card border border-border mb-4"
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-card border border-border shadow-md mb-6 hover:border-primary/20 transition-all"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
-              <Users className="w-4 h-4 text-secondary" />
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/10">
+              <Users className="w-5 h-5 text-secondary" />
             </div>
             <div className="text-left">
               <p className="text-sm font-display font-bold text-card-foreground">My Buddies</p>
-              <p className="text-[10px] text-muted-foreground">1 connected · 1 pending</p>
+              <p className="text-[11px] text-muted-foreground font-medium">1 connected · 1 pending</p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <ChevronRight className="w-5 h-5 text-muted-foreground opacity-50" />
         </motion.button>
 
-        {/* Certificates */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="mb-4"
+          className="mb-8"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">Certificates</h2>
-            <button onClick={() => navigate("/certificates")} className="text-xs font-bold text-primary flex items-center gap-1">
-              View All <ChevronRight className="w-3 h-3" />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest">Certificates</h2>
+            <button onClick={() => navigate("/certificates")} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline">
+              View All <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
             {mockCertificates.slice(0, 4).map((cert, i) => {
-              const colors = ["bg-primary/10", "bg-secondary/10", "bg-accent/10", "bg-success/10"];
+              const bgColors = ["bg-primary/5", "bg-secondary/5", "bg-accent/5", "bg-success/5"];
+              const borderColors = ["border-primary/10", "border-secondary/10", "border-accent/10", "border-success/10"];
               return (
-                <motion.div key={cert.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} onClick={() => navigate("/certificates")} className="flex-shrink-0 w-28 cursor-pointer">
-                  <div className={`w-28 h-20 rounded-2xl flex items-center justify-center text-2xl mb-1.5 ${colors[i % colors.length]}`}>
+                <motion.div key={cert.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} onClick={() => navigate("/certificates")} className="flex-shrink-0 w-32 cursor-pointer group">
+                  <div className={`w-32 h-24 rounded-3xl flex items-center justify-center text-3xl mb-3 border ${bgColors[i % bgColors.length]} ${borderColors[i % borderColors.length]} shadow-sm group-hover:shadow-md transition-all`}>
                     {cert.badge}
                   </div>
-                  <p className="text-[10px] font-display font-bold text-card-foreground leading-tight line-clamp-2">{cert.title}</p>
+                  <p className="text-[11px] font-display font-bold text-card-foreground leading-snug line-clamp-2 px-1 group-hover:text-primary transition-colors">{cert.title}</p>
                 </motion.div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Portfolio Links */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mb-4"
+          className="mb-8"
         >
-          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Portfolio</h2>
-          <div className="space-y-2">
+          <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Portfolio</h2>
+          <div className="space-y-3">
             {[
-              { label: "GitHub", url: profile.github },
-              { label: "LinkedIn", url: profile.linkedin },
-              { label: "Portfolio", url: profile.portfolio },
-            ].filter(l => l.url).map((link) => (
-              <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-3.5 rounded-2xl bg-card border border-border cursor-pointer">
-                <div>
-                  <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{link.url}</p>
-                </div>
-                <ExternalLink className="w-4 h-4 text-muted-foreground" />
-              </motion.div>
-            ))}
+              { label: "GitHub", url: profile.github, icon: Globe },
+              { label: "LinkedIn", url: profile.linkedin, icon: Users },
+              { label: "Portfolio", url: profile.portfolio, icon: Sparkles },
+            ].filter(l => l.url).map((link) => {
+              const Icon = link.icon;
+              return (
+                <motion.div key={link.label} whileTap={{ scale: 0.98 }} className="flex items-center justify-between p-4 rounded-[1.25rem] bg-card border border-border shadow-sm hover:border-primary/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                      <Icon className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-display font-bold text-card-foreground">{link.label}</p>
+                      <p className="text-[10px] text-muted-foreground font-medium">{link.url}</p>
+                    </div>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-muted-foreground opacity-50" />
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
-        {/* My Events */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.35 }}
-          className="mb-4"
+          className="mb-8"
         >
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">My Events</h2>
-            <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary flex items-center gap-1">
-              Browse <ChevronRight className="w-3 h-3" />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest">My Events</h2>
+            <button onClick={() => navigate("/search")} className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline">
+              Browse <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {mockEvents.slice(0, 3).map((ev) => (
-              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)} className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border cursor-pointer">
-                <img src={ev.image} alt={ev.title} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)} className="flex items-center gap-4 bg-card rounded-2xl p-4 border border-border shadow-sm hover:border-primary/20 transition-all cursor-pointer">
+                <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-display font-bold text-card-foreground truncate">{ev.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{ev.date} · {ev.location}</p>
+                  <p className="text-sm font-display font-bold text-card-foreground truncate leading-tight">{ev.title}</p>
+                  <p className="text-[11px] text-muted-foreground font-medium mt-1 uppercase tracking-tight">{ev.date} · {ev.location}</p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-success/10 text-success whitespace-nowrap">Joined</span>
+                <span className="text-[10px] font-bold px-3 py-1.5 rounded-xl bg-success/10 text-success border border-success/10 whitespace-nowrap">JOINED</span>
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        {/* Past Events */}
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mb-6"
+          className="mb-10"
         >
-          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-3">Past Events</h2>
-          <div className="space-y-2">
+          <h2 className="text-[11px] font-display font-bold text-muted-foreground uppercase tracking-widest mb-4">Past Achievements</h2>
+          <div className="space-y-3">
             {[
-              { name: "HackVerse 2.0", result: "🏆 Winner", date: "Jan 2026" },
-              { name: "DesignJam 2025", result: "🎨 Top 5", date: "Nov 2025" },
-              { name: "React Workshop", result: "📜 Completed", date: "Oct 2025" },
+              { name: "HackVerse 2.0", result: "🏆 Winner", date: "Jan 2026", icon: "🥇" },
+              { name: "DesignJam 2025", result: "🎨 Top 5", date: "Nov 2025", icon: "✨" },
+              { name: "React Workshop", result: "📜 Completed", date: "Oct 2025", icon: "🎓" },
             ].map((ev) => (
-              <div key={ev.name} className="flex items-center justify-between bg-card rounded-2xl px-4 py-3 border border-border">
-                <div>
-                  <p className="text-sm font-display font-bold text-card-foreground">{ev.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{ev.date}</p>
+              <div key={ev.name} className="flex items-center justify-between bg-card rounded-2xl p-4 border border-border shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-orange/10 flex items-center justify-center text-lg">
+                    {ev.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-display font-bold text-card-foreground">{ev.name}</p>
+                    <p className="text-[11px] text-muted-foreground font-medium">{ev.date}</p>
+                  </div>
                 </div>
-                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-primary/10 text-primary">{ev.result}</span>
+                <span className="text-xs font-bold px-3 py-2 rounded-xl bg-primary/10 text-primary border border-primary/5 uppercase tracking-tight">{ev.result}</span>
               </div>
             ))}
           </div>
