@@ -240,7 +240,7 @@ const HomePage = () => {
                 { label: "Students", icon: Users, path: "/participants", color: "bg-primary/5 text-primary" },
                 { label: "Teams", icon: Shield, path: "/teams-management", color: "bg-secondary/5 text-secondary" },
                 { label: "Broadcast", icon: Megaphone, path: "/announcements", color: "bg-accent/5 text-accent" },
-                { label: "Data", icon: BarChart3, path: "/analytics/1", color: "bg-success/5 text-success" },
+                { label: "Data", icon: BarChart3, path: "/organizer-analytics", color: "bg-success/5 text-success" },
               ].map((action, i) => {
                 const Icon = action.icon;
                 return (
