@@ -1,0 +1,245 @@
+{
+  "global_states": ["loading", "empty", "error", "success", "permission_denied"],
+
+  "roles": {
+    "student": {
+      "permissions": [
+        "view_events",
+        "join_event",
+        "create_team",
+        "join_team",
+        "send_team_request",
+        "message_users",
+        "view_profiles",
+        "add_buddy"
+      ]
+    },
+    "organizer": {
+      "permissions": [
+        "create_event",
+        "edit_event",
+        "view_participants",
+        "approve_teams",
+        "reject_teams",
+        "send_announcements",
+        "view_analytics"
+      ]
+    }
+  },
+
+  "event_logic": {
+    "join_event": {
+      "conditions": [
+        {
+          "if": "event.requires_team == false",
+          "action": "allow_join_solo"
+        },
+        {
+          "if": "event.requires_team == true",
+          "action": "redirect_to_team_flow"
+        }
+      ],
+      "validations": [
+        "registration_open == true",
+        "user_not_already_registered"
+      ]
+    }
+  },
+
+  "team_logic": {
+    "create_team": {
+      "conditions": [
+        "user_not_in_team",
+        "team_size_limit_not_exceeded"
+      ],
+      "validations": [
+        "team_name_unique",
+        "required_roles_defined"
+      ],
+      "state": "pending_approval"
+    },
+
+    "join_team": {
+      "conditions": [
+        {
+          "if": "team.is_full == true",
+          "action": "disable_join"
+        },
+        {
+          "if": "role_already_filled == true",
+          "action": "show_role_error"
+        },
+        {
+          "if": "user_already_in_team == true",
+          "action": "block_request"
+        }
+      ],
+      "flow": [
+        "send_request",
+        "set_status_pending",
+        "notify_team_leader"
+      ]
+    },
+
+    "team_states": [
+      "pending_approval",
+      "approved",
+      "rejected",
+      "full",
+      "locked"
+    ],
+
+    "team_approval": {
+      "flow": [
+        "team_created_by_student",
+        "team_visible_to_organizer",
+        "organizer_reviews_team",
+        "approve_or_reject"
+      ],
+      "actions": {
+        "approve": "team_status = approved",
+        "reject": "team_status = rejected"
+      }
+    }
+  },
+
+  "team_workspace_logic": {
+    "conditions": [
+      "user_is_team_member"
+    ],
+    "features": [
+      "view_members",
+      "chat",
+      "assign_roles",
+      "leave_team"
+    ],
+    "leader_permissions": [
+      "accept_requests",
+      "reject_requests",
+      "remove_member",
+      "lock_team"
+    ]
+  },
+
+  "messaging_logic": {
+    "allowed_if": [
+      "users_are_buddies",
+      "users_are_in_same_team",
+      "organizer_to_participant"
+    ],
+    "blocked_if": [
+      "no_connection",
+      "user_blocked"
+    ],
+    "states": [
+      "message_sent",
+      "message_failed"
+    ]
+  },
+
+  "buddy_system_logic": {
+    "states": [
+      "not_connected",
+      "request_sent",
+      "pending",
+      "connected",
+      "rejected"
+    ],
+    "flow": [
+      "send_request",
+      "receiver_accepts_or_rejects",
+      "update_connection_status"
+    ]
+  },
+
+  "notification_logic": {
+    "triggers": [
+      "team_request_sent",
+      "team_request_approved",
+      "team_request_rejected",
+      "new_message",
+      "event_announcement",
+      "event_reminder",
+      "certificate_awarded"
+    ]
+  },
+
+  "certificate_logic": {
+    "conditions": [
+      "event_completed == true"
+    ],
+    "states": [
+      "earned",
+      "not_earned"
+    ],
+    "actions": [
+      "generate_certificate",
+      "assign_badge",
+      "display_in_profile"
+    ]
+  },
+
+  "search_logic": {
+    "filters": [
+      "category",
+      "city",
+      "date",
+      "online_offline"
+    ],
+    "states": [
+      "results_found",
+      "no_results"
+    ]
+  },
+
+  "profile_logic": {
+    "visibility": [
+      "public_inside_app",
+      "buddies_only",
+      "private"
+    ],
+    "sections": [
+      "skills",
+      "events",
+      "teams",
+      "certificates",
+      "achievements",
+      "xp"
+    ]
+  },
+
+  "organizer_logic": {
+    "event_creation": {
+      "validations": [
+        "title_required",
+        "date_must_be_future",
+        "team_size_valid",
+        "registration_deadline_valid"
+      ],
+      "states": [
+        "draft",
+        "published",
+        "cancelled",
+        "closed"
+      ]
+    },
+
+    "participant_management": {
+      "actions": [
+        "view_participants",
+        "search",
+        "filter",
+        "export_list"
+      ]
+    },
+
+    "analytics_logic": {
+      "metrics": [
+        "views",
+        "registrations",
+        "team_formation_rate",
+        "engagement"
+      ]
+    }
+  }
+}
