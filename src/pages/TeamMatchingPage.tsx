@@ -38,7 +38,7 @@ const AutoMatchCard = ({
   onSwipe: (dir: "left" | "right") => void;
 }) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-18, 18]);
+  const rotate = useTransform(x, [-200, 200], [-12, 12]);
   const matchOpacity = useTransform(x, [0, 80], [0, 1]);
   const skipOpacity = useTransform(x, [-80, 0], [1, 0]);
 
@@ -49,6 +49,8 @@ const AutoMatchCard = ({
 
   const matchingRole = team.open_roles.includes(userRole);
   const compatibility = Math.min(99, team.completion + (matchingRole ? 35 : 15));
+  const filledCount = team.members.length;
+  const totalSlots = team.max_size;
 
   return (
     <motion.div
@@ -58,96 +60,105 @@ const AutoMatchCard = ({
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
-      initial={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6 }}
-      animate={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6 }}
+      initial={{ scale: isTop ? 1 : 0.93, opacity: isTop ? 1 : 0.5 }}
+      animate={{ scale: isTop ? 1 : 0.93, opacity: isTop ? 1 : 0.5 }}
       exit={{ x: 300, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-border bg-card">
-        {/* Team image top half */}
-        <div className="relative h-[45%]">
-          <img src={team.team_image} alt={team.team_name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-          
-          {/* Swipe labels */}
-          {isTop && (
-            <>
-              <motion.div
-                style={{ opacity: matchOpacity }}
-                className="absolute top-6 left-5 z-20 border-4 border-green-400 rounded-xl px-4 py-2 -rotate-12 bg-green-400/20"
-              >
-                <span className="text-green-400 font-black text-2xl">JOIN</span>
-              </motion.div>
-              <motion.div
-                style={{ opacity: skipOpacity }}
-                className="absolute top-6 right-5 z-20 border-4 border-red-400 rounded-xl px-4 py-2 rotate-12 bg-red-400/20"
-              >
-                <span className="text-red-400 font-black text-2xl">SKIP</span>
-              </motion.div>
-            </>
-          )}
+      <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-border/50 bg-card flex flex-col">
+        {/* Swipe labels */}
+        {isTop && (
+          <>
+            <motion.div
+              style={{ opacity: matchOpacity }}
+              className="absolute top-8 left-6 z-30 border-[3px] border-green-400 rounded-2xl px-5 py-2 -rotate-12 bg-green-400/20 backdrop-blur-sm"
+            >
+              <span className="text-green-400 font-black text-3xl tracking-wide">JOIN</span>
+            </motion.div>
+            <motion.div
+              style={{ opacity: skipOpacity }}
+              className="absolute top-8 right-6 z-30 border-[3px] border-red-400 rounded-2xl px-5 py-2 rotate-12 bg-red-400/20 backdrop-blur-sm"
+            >
+              <span className="text-red-400 font-black text-3xl tracking-wide">SKIP</span>
+            </motion.div>
+          </>
+        )}
 
-          {/* Compatibility badge */}
-          <div className="absolute top-4 left-4 z-10 bg-gradient-to-r from-primary to-accent rounded-full px-3 py-1 flex items-center gap-1.5 shadow-lg">
-            <Zap className="w-3 h-3 text-primary-foreground" />
-            <span className="text-xs font-bold text-primary-foreground">{compatibility}% Match</span>
+        {/* Top section - gradient bg with team info */}
+        <div className="relative px-6 pt-8 pb-6 bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5">
+          {/* Match badge */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="bg-gradient-to-r from-primary to-accent rounded-2xl px-4 py-1.5 flex items-center gap-2 shadow-lg">
+              <Zap className="w-4 h-4 text-primary-foreground" />
+              <span className="text-sm font-bold text-primary-foreground">{compatibility}% Match</span>
+            </div>
+            <div className="bg-card/80 backdrop-blur-sm rounded-2xl px-3 py-1.5 border border-border/50">
+              <span className="text-xs font-semibold text-foreground">
+                {filledCount}/{totalSlots} joined
+              </span>
+            </div>
           </div>
 
-          {/* Member count */}
-          <div className="absolute top-4 right-4 z-10 bg-card/80 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-xs font-semibold text-foreground">
-              {team.members.length}/{team.max_size} members
-            </span>
+          {/* Team emoji/icon + name */}
+          <div className="text-center space-y-2">
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/20 flex items-center justify-center">
+              <Users className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-display font-bold text-foreground">{team.team_name}</h2>
+            <p className="text-sm text-muted-foreground">{filledCount} member{filledCount > 1 ? "s" : ""} · {team.open_roles.length} open slot{team.open_roles.length > 1 ? "s" : ""}</p>
           </div>
         </div>
 
-        {/* Team info bottom half */}
-        <div className="p-5 space-y-3">
+        {/* Content section */}
+        <div className="flex-1 px-6 py-5 space-y-5 overflow-y-auto">
+          {/* Team completion visual */}
           <div>
-            <h2 className="text-2xl font-display font-bold text-foreground">{team.team_name}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="flex -space-x-2">
-                {team.member_avatars.map((av, i) => (
-                  <img key={i} src={av} alt="" className="w-7 h-7 rounded-full border-2 border-card object-cover" />
-                ))}
-              </div>
-              <span className="text-xs text-muted-foreground">{team.members.map((m) => m.name).join(", ")}</span>
-            </div>
-          </div>
-
-          {/* Completion bar */}
-          <div>
-            <div className="flex items-center justify-between text-[11px] mb-1">
-              <span className="text-muted-foreground font-medium">Team Completion</span>
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="text-muted-foreground font-medium">Team Progress</span>
               <span className="font-bold text-foreground">{team.completion}%</span>
             </div>
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${team.completion}%` }}
-                className={`h-full rounded-full ${team.completion < 30 ? "bg-destructive" : team.completion < 70 ? "bg-accent" : "bg-primary"}`}
-              />
+            <div className="flex gap-1.5">
+              {Array.from({ length: totalSlots }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`flex-1 h-2.5 rounded-full transition-colors ${
+                    i < filledCount ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="flex justify-between mt-1">
+              {Array.from({ length: totalSlots }).map((_, i) => (
+                <span key={i} className={`text-[9px] flex-1 text-center ${i < filledCount ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                  {i < filledCount ? "✓" : "open"}
+                </span>
+              ))}
             </div>
           </div>
 
           {/* Looking for roles */}
           <div>
-            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Looking for</p>
-            <div className="flex flex-wrap gap-1.5">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Looking for</p>
+            <div className="space-y-2">
               {team.open_roles.map((roleId) => {
                 const role = getRoleInfo(roleId);
                 const isYourRole = roleId === userRole;
                 return (
-                  <span
+                  <div
                     key={roleId}
-                    className={`text-xs font-semibold px-3 py-1.5 rounded-2xl flex items-center gap-1 ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl border ${
                       isYourRole
-                        ? "bg-primary/15 text-primary border border-primary/30"
-                        : "bg-muted text-foreground"
+                        ? "bg-primary/10 border-primary/30"
+                        : "bg-muted/50 border-transparent"
                     }`}
                   >
-                    {role.emoji} {role.label}
-                    {isYourRole && <span className="text-[9px] ml-0.5">← You!</span>}
-                  </span>
+                    <span className="text-lg">{role.emoji}</span>
+                    <span className={`text-sm font-semibold flex-1 ${isYourRole ? "text-primary" : "text-foreground"}`}>
+                      {role.label}
+                    </span>
+                    {isYourRole && (
+                      <span className="text-[10px] font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-lg">Your Role</span>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -155,15 +166,18 @@ const AutoMatchCard = ({
 
           {/* Registered events */}
           {team.registered_events.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {team.registered_events.map((eid) => {
-                const ev = mockEvents.find((e) => e.id === eid);
-                return ev ? (
-                  <span key={eid} className="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-accent/10 text-accent">
-                    🎯 {ev.title}
-                  </span>
-                ) : null;
-              })}
+            <div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Competing in</p>
+              <div className="flex flex-wrap gap-2">
+                {team.registered_events.map((eid) => {
+                  const ev = mockEvents.find((e) => e.id === eid);
+                  return ev ? (
+                    <span key={eid} className="text-xs font-semibold px-3 py-1.5 rounded-2xl bg-accent/10 text-accent border border-accent/20">
+                      🎯 {ev.title}
+                    </span>
+                  ) : null;
+                })}
+              </div>
             </div>
           )}
         </div>
