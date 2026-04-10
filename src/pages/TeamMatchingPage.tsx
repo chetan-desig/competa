@@ -284,6 +284,24 @@ const TeamMatchingPage = () => {
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </motion.button>
 
+            {/* Auto-Match CTA */}
+            {userRole && autoMatchTeams.length > 0 && (
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                onClick={() => { setAutoMatchIndex(0); setMatchedTeam(null); setMode("auto_match"); }}
+                className="w-full bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20 rounded-3xl p-4 flex items-center gap-4 text-left"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-display text-sm font-bold text-foreground">Auto Match</h3>
+                  <p className="text-xs text-muted-foreground">{autoMatchTeams.length} teams need your role — swipe to join!</p>
+                </div>
+                <Heart className="w-4 h-4 text-primary" />
+              </motion.button>
+            )}
+
             {/* My teams list */}
             <p className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider pt-2">
               {myTeams.length > 0 ? `Your Teams (${myTeams.length})` : "No Teams Yet"}
