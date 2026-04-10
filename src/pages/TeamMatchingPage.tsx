@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import TeamLobby from "@/components/TeamLobby";
 import MatchOverlay from "@/components/MatchOverlay";
+import Confetti from "@/components/Confetti";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
 import { useRole } from "@/hooks/useRole";
