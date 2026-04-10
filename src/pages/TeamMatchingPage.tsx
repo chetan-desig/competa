@@ -81,6 +81,42 @@ const TeamMatchingPage = () => {
     return filtered;
   }, [selectedEventId, userRole, teams]);
 
+  // Auto-match: teams that need the user's role, excluding skipped and own teams
+  const autoMatchTeams = useMemo(() => {
+    if (!userRole) return [];
+    return teams.filter(
+      (t) =>
+        t.open_roles.includes(userRole) &&
+        !skippedTeams.includes(t.team_id) &&
+        t.creator_id !== currentUserId &&
+        !t.members.some((m) => m.user_id === currentUserId)
+    );
+  }, [userRole, teams, skippedTeams]);
+
+  const handleAutoSwipe = useCallback((direction: "left" | "right") => {
+    const currentTeam = autoMatchTeams[autoMatchIndex];
+    if (!currentTeam) return;
+    
+    setSwipeDirection(direction);
+    
+    if (direction === "right") {
+      // Match! Send join request
+      setJoinedTeams((prev) => ({ ...prev, [currentTeam.team_id]: "pending" }));
+      setMatchedTeam(currentTeam);
+      toast({
+        title: "Match Request Sent! 🎉",
+        description: `You want to join ${currentTeam.team_name} as ${getRoleInfo(userRole!).label}`,
+      });
+    } else {
+      setSkippedTeams((prev) => [...prev, currentTeam.team_id]);
+    }
+    
+    setTimeout(() => {
+      setSwipeDirection(null);
+      setAutoMatchIndex((prev) => Math.min(prev + 1, autoMatchTeams.length));
+    }, 300);
+  }, [autoMatchIndex, autoMatchTeams, userRole]);
+
   // Buddies (connected students) for invite
   const buddies = mockStudents.filter((s) => s.user_id !== currentUserId);
 
