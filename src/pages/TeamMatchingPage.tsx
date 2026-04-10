@@ -21,7 +21,7 @@ import {
   TeamCard,
 } from "@/data/teamMatchingData";
 
-type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "create_team" | "lobby" | "team_detail" | "invite_buddies" | "register_event";
+type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "create_team" | "lobby" | "team_detail" | "invite_buddies" | "register_event" | "auto_match";
 
 const TeamMatchingPage = () => {
   const navigate = useNavigate();
