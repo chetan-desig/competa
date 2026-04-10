@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowUpRight, Users, Plus, Check, Minus, Loader2, Calendar, 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import TeamLobby from "@/components/TeamLobby";
+import MatchOverlay from "@/components/MatchOverlay";
 import VerificationModal from "@/components/VerificationModal";
-import Confetti from "@/components/Confetti";
 import { useVerification } from "@/hooks/useVerification";
 import { useRole } from "@/hooks/useRole";
 import { Button } from "@/components/ui/button";
