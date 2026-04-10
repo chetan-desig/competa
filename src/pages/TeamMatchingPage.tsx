@@ -44,6 +44,12 @@ const TeamMatchingPage = () => {
   const [myTeamId, setMyTeamId] = useState<string | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<TeamCard | null>(null);
 
+  // Auto-match state
+  const [autoMatchIndex, setAutoMatchIndex] = useState(0);
+  const [skippedTeams, setSkippedTeams] = useState<string[]>([]);
+  const [matchedTeam, setMatchedTeam] = useState<TeamCard | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
+
   // Teams data (mutable for demo)
   const [teams, setTeams] = useState<TeamCard[]>(mockTeams);
 
