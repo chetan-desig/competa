@@ -1071,6 +1071,110 @@ const TeamMatchingPage = () => {
         </motion.div>
       )}
 
+      {/* ─── AUTO MATCH (Tinder-style) ─── */}
+      {mode === "auto_match" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-screen flex flex-col">
+          <MatchOverlay
+            match={matchedTeam ? {
+              id: matchedTeam.team_id,
+              name: matchedTeam.team_name,
+              photo: matchedTeam.team_image,
+              role: matchedTeam.open_roles.map((r) => getRoleInfo(r).label).join(", "),
+              type: "team",
+            } : null}
+            onClose={() => setMatchedTeam(null)}
+            onViewLobby={() => { setMatchedTeam(null); setMode("lobby"); }}
+          />
+
+          <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl px-5 pt-6 pb-4 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setMode("my_teams")}>
+                <ArrowLeft className="w-6 h-6 text-foreground" />
+              </button>
+              <div className="flex-1">
+                <h1 className="text-xl font-display font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" /> Auto Match
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Swipe right to request join · {autoMatchTeams.length - autoMatchIndex} teams left
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 flex flex-col items-center justify-center px-5 pb-8">
+            {autoMatchIndex < autoMatchTeams.length ? (
+              <>
+                {/* Swipe card area */}
+                <div className="relative w-full max-w-sm aspect-[3/4] mb-6">
+                  <AnimatePresence>
+                    {autoMatchTeams.slice(autoMatchIndex, autoMatchIndex + 2).reverse().map((team, stackIdx) => {
+                      const isTop = stackIdx === (Math.min(autoMatchTeams.length - autoMatchIndex, 2) - 1);
+                      return (
+                        <AutoMatchCard
+                          key={team.team_id}
+                          team={team}
+                          isTop={isTop}
+                          userRole={userRole!}
+                          getRoleInfo={getRoleInfo}
+                          onSwipe={handleAutoSwipe}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex items-center gap-6">
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    onClick={() => handleAutoSwipe("left")}
+                    className="w-16 h-16 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center shadow-lg"
+                  >
+                    <X className="w-7 h-7 text-destructive" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
+                    className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center"
+                  >
+                    <RotateCcw className="w-5 h-5 text-muted-foreground" />
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    onClick={() => handleAutoSwipe("right")}
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg"
+                  >
+                    <Heart className="w-7 h-7 text-primary-foreground" />
+                  </motion.button>
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <p className="text-5xl mb-4">🎯</p>
+                <p className="font-display font-bold text-xl text-foreground mb-2">No more teams</p>
+                <p className="text-sm text-muted-foreground mb-6">You've seen all teams matching your role</p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
+                    className="rounded-2xl"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-1" /> Start Over
+                  </Button>
+                  <Button
+                    onClick={() => setMode("my_teams")}
+                    className="rounded-2xl gradient-primary text-primary-foreground"
+                  >
+                    Back to Teams
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       {(mode === "my_teams" || mode === "browse_teams" || mode === "select_event") && <BottomNav />}
     </div>
   );
