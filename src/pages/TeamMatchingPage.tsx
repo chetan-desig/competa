@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Users, Plus, Check, Minus, Loader2, Calendar, MapPin, X, Shield, UserPlus, ChevronRight } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { ArrowLeft, ArrowUpRight, Users, Plus, Check, Minus, Loader2, Calendar, MapPin, X, Shield, UserPlus, ChevronRight, Zap, Heart, RotateCcw, Sparkles } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import TeamLobby from "@/components/TeamLobby";
