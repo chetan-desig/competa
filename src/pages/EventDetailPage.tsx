@@ -430,13 +430,13 @@ const EventDetailPage = () => {
             <>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={handleJoin}
+                onClick={() => handleJoin("solo")}
                 className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
                   ? "bg-muted text-muted-foreground"
                   : "gradient-primary text-primary-foreground shadow-lg"
                   }`}
               >
-                {joined ? "✅ Registered" : "Join Solo"}
+                {joined ? "✅ Registered" : event.isPaid ? `Join · ₹${event.price}` : "Join Solo"}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}
@@ -450,13 +450,13 @@ const EventDetailPage = () => {
             <>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={handleJoin}
+                onClick={() => handleJoin("solo")}
                 className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
                   ? "bg-muted text-muted-foreground"
                   : "gradient-primary text-primary-foreground shadow-lg"
                   }`}
               >
-                {joined ? "✅ Joined!" : "Join Event"}
+                {joined ? "✅ Joined!" : event.isPaid ? `Join · ₹${event.price}` : "Join Event"}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}
