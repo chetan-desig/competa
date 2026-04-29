@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, CreditCard, Smartphone, Wallet, Shield, Lock, Calendar, MapPin, Users, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, CreditCard, Smartphone, Wallet, Shield, Lock, Calendar, MapPin, Users, Sparkles, Ticket } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { toast } from "sonner";
+import EventTicket from "@/components/EventTicket";
 
 type Step = "review" | "method" | "processing" | "success";
 type PayMethod = "upi" | "card" | "wallet";
@@ -23,6 +24,10 @@ const PaymentPage = () => {
   const event = mockEvents.find((e) => e.id === id);
   const [step, setStep] = useState<Step>("review");
   const [method, setMethod] = useState<PayMethod>("upi");
+  const ticketId = useMemo(
+    () => `${(id || "EVT").toUpperCase()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    [id]
+  );
 
   if (!event || !event.isPaid) {
     return (
