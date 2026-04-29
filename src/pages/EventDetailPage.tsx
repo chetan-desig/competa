@@ -29,13 +29,20 @@ const EventDetailPage = () => {
   const teamsForEvent = mockTeams.filter((t) => t.registered_events.includes(event.id));
   const openTeams = teamsForEvent.filter((t) => t.open_roles.length > 0);
 
-  const handleJoin = () => {
+  const handleJoin = (mode: "solo" | "team" = "solo") => {
     if (joined) {
       setJoined(false);
       return;
     }
-    const verified = requireVerification("student", () => setJoined(true));
-    if (verified) setJoined(true);
+    const proceed = () => {
+      if (event.isPaid) {
+        navigate(`/checkout/${event.id}?mode=${mode}`);
+      } else {
+        setJoined(true);
+      }
+    };
+    const verified = requireVerification("student", proceed);
+    if (verified) proceed();
   };
 
   // Mock organizer stats for this event
@@ -127,6 +134,14 @@ const EventDetailPage = () => {
                   <span className="bg-accent/10 text-accent text-xs font-bold px-3 py-1 rounded-xl flex items-center gap-1">
                     <Users className="w-3 h-3" /> Team Event
                   </span>
+                )}
+                {event.isPaid ? (
+                  <span className="bg-success/10 text-success text-xs font-bold px-3 py-1 rounded-xl">
+                    💰 ₹{event.pricingMode === "per_team" && event.teamPrice ? event.teamPrice : event.price}
+                    {event.pricingMode === "per_team" ? "/team" : "/person"}
+                  </span>
+                ) : (
+                  <span className="bg-muted text-muted-foreground text-xs font-bold px-3 py-1 rounded-xl">FREE</span>
                 )}
               </div>
               <h1 className="text-2xl font-extrabold text-card-foreground">{event.title}</h1>
@@ -415,13 +430,13 @@ const EventDetailPage = () => {
             <>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={handleJoin}
+                onClick={() => handleJoin("solo")}
                 className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
                   ? "bg-muted text-muted-foreground"
                   : "gradient-primary text-primary-foreground shadow-lg"
                   }`}
               >
-                {joined ? "✅ Registered" : "Join Solo"}
+                {joined ? "✅ Registered" : event.isPaid ? `Join · ₹${event.price}` : "Join Solo"}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}
@@ -435,13 +450,13 @@ const EventDetailPage = () => {
             <>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={handleJoin}
+                onClick={() => handleJoin("solo")}
                 className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${joined
                   ? "bg-muted text-muted-foreground"
                   : "gradient-primary text-primary-foreground shadow-lg"
                   }`}
               >
-                {joined ? "✅ Joined!" : "Join Event"}
+                {joined ? "✅ Joined!" : event.isPaid ? `Join · ₹${event.price}` : "Join Event"}
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}

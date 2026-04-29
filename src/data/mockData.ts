@@ -20,6 +20,11 @@ export interface Event {
   tags: string[];
   requiresTeam?: boolean;
   maxTeamSize?: number;
+  // Pricing
+  isPaid?: boolean;
+  price?: number; // INR per person
+  teamPrice?: number; // INR per team (overrides per-person when joining as team)
+  pricingMode?: "per_person" | "per_team"; // how the fee is charged
 }
 
 export const categories = [
@@ -55,6 +60,10 @@ export const mockEvents: Event[] = [
     tags: ["AI/ML", "Web3", "FinTech"],
     requiresTeam: true,
     maxTeamSize: 4,
+    isPaid: true,
+    price: 299,
+    teamPrice: 999,
+    pricingMode: "per_team",
   },
   {
     id: "2",
@@ -85,6 +94,9 @@ export const mockEvents: Event[] = [
     organizer: "DevCommunity India",
     description: "Learn React 19, Server Components, and modern patterns from industry experts.",
     tags: ["React", "TypeScript", "Frontend"],
+    isPaid: true,
+    price: 499,
+    pricingMode: "per_person",
   },
   {
     id: "4",
