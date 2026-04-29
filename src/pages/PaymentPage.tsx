@@ -292,19 +292,17 @@ const PaymentPage = () => {
               <div className="flex gap-3">
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    toast.success("Receipt sent to your email");
-                  }}
+                  onClick={() => navigate(`/event/${event.id}`)}
                   className="flex-1 py-4 rounded-2xl bg-muted text-foreground font-bold text-sm"
                 >
-                  Email Receipt
+                  Done
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => navigate(`/event/${event.id}`)}
-                  className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-lg"
+                  onClick={() => navigate(`/ticket/${event.id}?mode=${mode}`)}
+                  className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-lg flex items-center justify-center gap-2"
                 >
-                  View Event
+                  <Ticket className="w-4 h-4" /> View Ticket
                 </motion.button>
               </div>
             )}
