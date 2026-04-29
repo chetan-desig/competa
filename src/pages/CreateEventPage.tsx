@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Users, Shield, Shuffle, Plus, Minus, ChevronDown, ChevronUp, Clock, Trophy, Code, Palette, Mic, Megaphone, Zap } from "lucide-react";
+import { Camera, Users, Shield, Shuffle, Plus, Minus, ChevronDown, ChevronUp, Clock, Trophy, Code, Palette, Mic, Megaphone, Zap, IndianRupee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { categories, cities } from "@/data/mockData";
@@ -37,11 +37,17 @@ const CreateEventPage = () => {
 
   // Matching (Simplified)
 
+  // Pricing
+  const [isPaid, setIsPaid] = useState(false);
+  const [pricingMode, setPricingMode] = useState<"per_person" | "per_team">("per_person");
+  const [price, setPrice] = useState<number>(199);
+
   // Sections expand
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     participants: false,
     roles: false,
     matching: false,
+    pricing: false,
   });
 
   useEffect(() => {
