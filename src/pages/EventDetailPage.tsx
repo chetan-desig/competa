@@ -39,6 +39,8 @@ const EventDetailPage = () => {
         navigate(`/checkout/${event.id}?mode=${mode}`);
       } else {
         setJoined(true);
+        toast.success("You're in! 🎉", { description: "Your ticket is ready." });
+        navigate(`/ticket/${event.id}?mode=${mode}`);
       }
     };
     const verified = requireVerification("student", proceed);
@@ -201,7 +203,7 @@ const EventDetailPage = () => {
                   { label: "Share with Buddies", icon: Send, action: () => { toast.success("Share link copied!"); }, color: "bg-secondary/10 text-secondary" },
                   { label: "View Schedule", icon: CalendarCheck, action: () => toast.info("Full schedule coming soon!"), color: "bg-success/10 text-success" },
                   { label: "View Prizes", icon: Trophy, action: () => toast.info("Prize details coming soon!"), color: "bg-accent/10 text-accent" },
-                  { label: "My Ticket", icon: Ticket, action: () => toast.info("E-ticket coming soon!"), color: "bg-primary/10 text-primary" },
+                  { label: "My Ticket", icon: Ticket, action: () => navigate(`/ticket/${event.id}`), color: "bg-primary/10 text-primary" },
                 ].slice(0, 4).map((item) => {
                   const Icon = item.icon;
                   return (
