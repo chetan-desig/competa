@@ -316,6 +316,101 @@ const CreateEventPage = () => {
           </AnimatePresence>
         </motion.div>
 
+        {/* ── Pricing ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18 }}
+          className="rounded-3xl bg-muted/50 backdrop-blur-sm border border-border/50 overflow-hidden"
+        >
+          <SectionHeader title="Entry Fee" emoji="💰" sectionKey="pricing" />
+          <AnimatePresence>
+            {expandedSections.pricing && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="px-4 pb-4 space-y-4 overflow-hidden"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Charge for entry</p>
+                    <p className="text-xs text-muted-foreground">Collect payments from participants</p>
+                  </div>
+                  <button
+                    onClick={() => setIsPaid(!isPaid)}
+                    className={`w-12 h-7 rounded-full relative transition-colors ${isPaid ? "bg-primary" : "bg-border"}`}
+                  >
+                    <motion.div
+                      animate={{ x: isPaid ? 20 : 2 }}
+                      className="w-5 h-5 rounded-full bg-background shadow-md absolute top-1"
+                    />
+                  </button>
+                </div>
+
+                {isPaid && (
+                  <>
+                    <div>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Charge by</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { id: "per_person", label: "Per Person", emoji: "👤" },
+                          { id: "per_team", label: "Per Team", emoji: "👥" },
+                        ].map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setPricingMode(opt.id as "per_person" | "per_team")}
+                            className={`py-3 rounded-2xl text-sm font-semibold transition-all ${
+                              pricingMode === opt.id
+                                ? "bg-primary text-primary-foreground shadow-md"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {opt.emoji} {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                        Amount ({pricingMode === "per_team" ? "per team" : "per person"})
+                      </p>
+                      <div className="flex items-center gap-2 bg-muted rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary/30">
+                        <IndianRupee className="w-4 h-4 text-muted-foreground" />
+                        <input
+                          type="number"
+                          min={1}
+                          value={price}
+                          onChange={(e) => setPrice(Math.max(1, Number(e.target.value) || 0))}
+                          className="flex-1 bg-transparent text-foreground text-sm font-bold focus:outline-none"
+                        />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-2">
+                        You'll receive ₹{Math.round(price * 0.98)} per booking after a 2% platform fee.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {[99, 199, 299, 499, 999].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPrice(p)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                            price === p ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          ₹{p}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
