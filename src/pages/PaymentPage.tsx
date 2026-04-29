@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, CreditCard, Smartphone, Wallet, Shield, Lock, Calendar, MapPin, Users, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, CreditCard, Smartphone, Wallet, Shield, Lock, Calendar, MapPin, Users, Sparkles, Ticket } from "lucide-react";
 import { mockEvents } from "@/data/mockData";
 import { toast } from "sonner";
+import EventTicket from "@/components/EventTicket";
 
 type Step = "review" | "method" | "processing" | "success";
 type PayMethod = "upi" | "card" | "wallet";
@@ -23,6 +24,10 @@ const PaymentPage = () => {
   const event = mockEvents.find((e) => e.id === id);
   const [step, setStep] = useState<Step>("review");
   const [method, setMethod] = useState<PayMethod>("upi");
+  const ticketId = useMemo(
+    () => `${(id || "EVT").toUpperCase()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+    [id]
+  );
 
   if (!event || !event.isPaid) {
     return (
@@ -225,33 +230,35 @@ const PaymentPage = () => {
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center text-center pt-12"
+              className="flex flex-col items-center text-center pt-6"
             >
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-24 h-24 rounded-full bg-success/15 flex items-center justify-center mb-5"
+                className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mb-3"
               >
-                <Check className="w-12 h-12 text-success" strokeWidth={3} />
+                <Check className="w-8 h-8 text-success" strokeWidth={3} />
               </motion.div>
-              <h2 className="text-2xl font-extrabold text-foreground mb-2">Payment Successful</h2>
-              <p className="text-sm text-muted-foreground mb-6 px-6">
-                Your spot at <span className="font-bold text-foreground">{event.title}</span> is confirmed.
+              <h2 className="text-xl font-extrabold text-foreground mb-1">Payment Successful</h2>
+              <p className="text-xs text-muted-foreground mb-5 px-6">
+                Here's your event pass — show the QR at the gate.
               </p>
 
-              <div className="w-full bg-card rounded-3xl p-5 border border-border/40 text-left">
-                <div className="flex justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Amount Paid</span>
-                  <span className="text-sm font-bold text-foreground">₹{total}</span>
+              <EventTicket event={event} ticketId={ticketId} mode={mode} />
+
+              <div className="w-full bg-muted/40 rounded-2xl p-4 border border-border/40 mt-4 text-left">
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-[11px] text-muted-foreground">Amount Paid</span>
+                  <span className="text-xs font-bold text-foreground">₹{total}</span>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Method</span>
-                  <span className="text-sm font-semibold text-foreground capitalize">{method}</span>
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-[11px] text-muted-foreground">Method</span>
+                  <span className="text-xs font-semibold text-foreground capitalize">{method}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-muted-foreground">Order ID</span>
-                  <span className="text-xs font-mono text-foreground">#{Date.now().toString().slice(-8)}</span>
+                  <span className="text-[11px] text-muted-foreground">Order ID</span>
+                  <span className="text-[11px] font-mono text-foreground">#{Date.now().toString().slice(-8)}</span>
                 </div>
               </div>
             </motion.div>
@@ -285,19 +292,17 @@ const PaymentPage = () => {
               <div className="flex gap-3">
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    toast.success("Receipt sent to your email");
-                  }}
+                  onClick={() => navigate(`/event/${event.id}`)}
                   className="flex-1 py-4 rounded-2xl bg-muted text-foreground font-bold text-sm"
                 >
-                  Email Receipt
+                  Done
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => navigate(`/event/${event.id}`)}
-                  className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-lg"
+                  onClick={() => navigate(`/ticket/${event.id}?mode=${mode}`)}
+                  className="flex-1 py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm shadow-lg flex items-center justify-center gap-2"
                 >
-                  View Event
+                  <Ticket className="w-4 h-4" /> View Ticket
                 </motion.button>
               </div>
             )}

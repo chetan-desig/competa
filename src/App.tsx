@@ -23,6 +23,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import NotFound from "./pages/NotFound";
 import OrganizerAnalyticsPage from "./pages/OrganizerAnalyticsPage";
 import PaymentPage from "./pages/PaymentPage";
+import TicketPage from "./pages/TicketPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/analytics/:id" element={<EventAnalyticsPage />} />
           <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/checkout/:id" element={<PaymentPage />} />
+          <Route path="/ticket/:id" element={<TicketPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
