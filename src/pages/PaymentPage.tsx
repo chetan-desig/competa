@@ -230,33 +230,35 @@ const PaymentPage = () => {
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center text-center pt-12"
+              className="flex flex-col items-center text-center pt-6"
             >
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-24 h-24 rounded-full bg-success/15 flex items-center justify-center mb-5"
+                className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mb-3"
               >
-                <Check className="w-12 h-12 text-success" strokeWidth={3} />
+                <Check className="w-8 h-8 text-success" strokeWidth={3} />
               </motion.div>
-              <h2 className="text-2xl font-extrabold text-foreground mb-2">Payment Successful</h2>
-              <p className="text-sm text-muted-foreground mb-6 px-6">
-                Your spot at <span className="font-bold text-foreground">{event.title}</span> is confirmed.
+              <h2 className="text-xl font-extrabold text-foreground mb-1">Payment Successful</h2>
+              <p className="text-xs text-muted-foreground mb-5 px-6">
+                Here's your event pass — show the QR at the gate.
               </p>
 
-              <div className="w-full bg-card rounded-3xl p-5 border border-border/40 text-left">
-                <div className="flex justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Amount Paid</span>
-                  <span className="text-sm font-bold text-foreground">₹{total}</span>
+              <EventTicket event={event} ticketId={ticketId} mode={mode} />
+
+              <div className="w-full bg-muted/40 rounded-2xl p-4 border border-border/40 mt-4 text-left">
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-[11px] text-muted-foreground">Amount Paid</span>
+                  <span className="text-xs font-bold text-foreground">₹{total}</span>
                 </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Method</span>
-                  <span className="text-sm font-semibold text-foreground capitalize">{method}</span>
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-[11px] text-muted-foreground">Method</span>
+                  <span className="text-xs font-semibold text-foreground capitalize">{method}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-muted-foreground">Order ID</span>
-                  <span className="text-xs font-mono text-foreground">#{Date.now().toString().slice(-8)}</span>
+                  <span className="text-[11px] text-muted-foreground">Order ID</span>
+                  <span className="text-[11px] font-mono text-foreground">#{Date.now().toString().slice(-8)}</span>
                 </div>
               </div>
             </motion.div>
