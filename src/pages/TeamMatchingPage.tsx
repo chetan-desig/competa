@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Users, Plus, Check, Minus, Loader2, Calendar, MapPin, X, Shield, UserPlus, ChevronRight, Zap, Heart, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Users, Plus, Check, Minus, Loader2, Calendar, MapPin, X, Shield, UserPlus, ChevronRight, Zap, Heart, RotateCcw, Sparkles, Brain, Trophy, Activity, MessageCircle, CircleDot } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import TeamLobby from "@/components/TeamLobby";
@@ -23,7 +23,7 @@ import {
 
 type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "create_team" | "lobby" | "team_detail" | "invite_buddies" | "register_event" | "auto_match";
 
-/* ─── Swipeable Auto-Match Card ─── */
+/* ─── Futuristic AI Auto-Match Card ─── */
 const AutoMatchCard = ({
   team,
   isTop,
@@ -38,7 +38,7 @@ const AutoMatchCard = ({
   onSwipe: (dir: "left" | "right") => void;
 }) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-12, 12]);
+  const rotate = useTransform(x, [-200, 200], [-10, 10]);
   const matchOpacity = useTransform(x, [0, 80], [0, 1]);
   const skipOpacity = useTransform(x, [-80, 0], [1, 0]);
 
@@ -51,6 +51,17 @@ const AutoMatchCard = ({
   const compatibility = Math.min(99, team.completion + (matchingRole ? 35 : 15));
   const filledCount = team.members.length;
   const totalSlots = team.max_size;
+  const openSlots = totalSlots - filledCount;
+  const userRoleLabel = getRoleInfo(userRole).label;
+
+  const seed = team.team_id.length + team.team_name.length;
+  const creative = Math.min(96, 70 + ((seed * 7) % 27));
+  const communication = Math.min(94, 65 + ((seed * 11) % 30));
+  const productivity = Math.min(95, 72 + ((seed * 5) % 24));
+
+  const allRoleSlots = team.required_roles.length
+    ? team.required_roles
+    : [...team.members.map((m) => m.role as RoleId), ...team.open_roles];
 
   return (
     <motion.div
@@ -60,126 +71,165 @@ const AutoMatchCard = ({
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
-      initial={{ scale: isTop ? 1 : 0.93, opacity: isTop ? 1 : 0.5 }}
-      animate={{ scale: isTop ? 1 : 0.93, opacity: isTop ? 1 : 0.5 }}
+      initial={{ scale: isTop ? 1 : 0.94, opacity: isTop ? 1 : 0.5, y: isTop ? 0 : 12 }}
+      animate={{ scale: isTop ? 1 : 0.94, opacity: isTop ? 1 : 0.5, y: isTop ? 0 : 12 }}
       exit={{ x: 300, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-border/50 bg-card flex flex-col">
-        {/* Swipe labels */}
+      <div className="relative w-full h-full rounded-[2rem] overflow-hidden">
+        {/* Ambient mesh background */}
+        <div className="absolute inset-0 bg-white" />
+        <div className="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#A259FF]/30 blur-3xl" />
+        <div className="absolute top-20 -right-20 w-72 h-72 rounded-full bg-cyan-400/25 blur-3xl" />
+        <div className="absolute -bottom-24 left-10 w-80 h-80 rounded-full bg-emerald-300/30 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/65 to-white/90" />
+
         {isTop && (
           <>
-            <motion.div
-              style={{ opacity: matchOpacity }}
-              className="absolute top-8 left-6 z-30 border-[3px] border-green-400 rounded-2xl px-5 py-2 -rotate-12 bg-green-400/20 backdrop-blur-sm"
-            >
-              <span className="text-green-400 font-black text-3xl tracking-wide">JOIN</span>
-            </motion.div>
-            <motion.div
-              style={{ opacity: skipOpacity }}
-              className="absolute top-8 right-6 z-30 border-[3px] border-red-400 rounded-2xl px-5 py-2 rotate-12 bg-red-400/20 backdrop-blur-sm"
-            >
-              <span className="text-red-400 font-black text-3xl tracking-wide">SKIP</span>
-            </motion.div>
+            <motion.div className="absolute top-16 left-8 w-1.5 h-1.5 rounded-full bg-[#A259FF]"
+              animate={{ y: [0, -10, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity }} />
+            <motion.div className="absolute top-32 right-10 w-1 h-1 rounded-full bg-cyan-400"
+              animate={{ y: [0, -14, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 4, repeat: Infinity, delay: 0.5 }} />
+            <motion.div className="absolute bottom-40 left-12 w-1 h-1 rounded-full bg-emerald-400"
+              animate={{ y: [0, -8, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 3.5, repeat: Infinity, delay: 1 }} />
           </>
         )}
 
-        {/* Top section - gradient bg with team info */}
-        <div className="relative px-6 pt-8 pb-6 bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5">
-          {/* Match badge */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="bg-gradient-to-r from-primary to-accent rounded-2xl px-4 py-1.5 flex items-center gap-2 shadow-lg">
-              <Zap className="w-4 h-4 text-primary-foreground" />
-              <span className="text-sm font-bold text-primary-foreground">{compatibility}% Match</span>
+        <div className="relative w-full h-full flex flex-col border border-white/60 rounded-[2rem] shadow-[0_20px_60px_-20px_rgba(162,89,255,0.35)] backdrop-blur-xl">
+          {isTop && (
+            <>
+              <motion.div style={{ opacity: matchOpacity }}
+                className="absolute top-8 left-6 z-30 border-2 border-emerald-500 rounded-2xl px-4 py-1.5 -rotate-12 bg-emerald-500/15 backdrop-blur-md shadow-lg shadow-emerald-500/30">
+                <span className="text-emerald-600 font-black text-2xl tracking-wider">CONNECT</span>
+              </motion.div>
+              <motion.div style={{ opacity: skipOpacity }}
+                className="absolute top-8 right-6 z-30 border-2 border-rose-500 rounded-2xl px-4 py-1.5 rotate-12 bg-rose-500/15 backdrop-blur-md shadow-lg shadow-rose-500/30">
+                <span className="text-rose-600 font-black text-2xl tracking-wider">SKIP</span>
+              </motion.div>
+            </>
+          )}
+
+          {/* HERO */}
+          <div className="relative px-6 pt-7 pb-5">
+            <div className="flex items-center justify-center mb-5">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#A259FF] via-cyan-400 to-emerald-400 blur-md opacity-60" />
+                <div className="relative bg-white rounded-full px-4 py-1.5 flex items-center gap-2 border border-white/80 shadow-lg">
+                  <Sparkles className="w-3.5 h-3.5 text-[#A259FF]" />
+                  <span className="text-xs font-bold bg-gradient-to-r from-[#A259FF] via-cyan-500 to-emerald-500 bg-clip-text text-transparent tracking-wide">
+                    {compatibility}% ELITE MATCH
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="bg-card/80 backdrop-blur-sm rounded-2xl px-3 py-1.5 border border-border/50">
-              <span className="text-xs font-semibold text-foreground">
-                {filledCount}/{totalSlots} joined
-              </span>
+
+            <div className="relative w-24 h-24 mx-auto mb-3">
+              <motion.div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 blur-lg opacity-70"
+                animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.85, 0.5] }} transition={{ duration: 3, repeat: Infinity }} />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 p-[2px]">
+                <div className="w-full h-full rounded-full bg-white flex items-center justify-center shadow-inner">
+                  <Users className="w-10 h-10 text-[#A259FF]" strokeWidth={1.5} />
+                </div>
+              </div>
             </div>
+
+            <h2 className="text-center text-2xl font-display font-bold text-slate-900 tracking-tight">
+              {team.team_name}
+            </h2>
+            <p className="text-center text-xs text-slate-500 mt-1 font-medium">
+              {filledCount}/{totalSlots} joined · {openSlots} open slot{openSlots !== 1 ? "s" : ""}
+            </p>
           </div>
 
-          {/* Team emoji/icon + name */}
-          <div className="text-center space-y-2">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/20 flex items-center justify-center">
-              <Users className="w-10 h-10 text-primary" />
+          <div className="flex-1 px-5 pb-5 space-y-3 overflow-y-auto scrollbar-none">
+            {/* AI Insight */}
+            <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-[#A259FF]/10 via-cyan-400/10 to-emerald-400/10 border border-[#A259FF]/20 backdrop-blur-md">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#A259FF]" />
+                <span className="text-[10px] font-bold text-[#A259FF] uppercase tracking-widest">AI Insight</span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                Your <span className="font-semibold text-slate-900">{userRoleLabel}</span> skills perfectly complement this team's vision.
+              </p>
             </div>
-            <h2 className="text-2xl font-display font-bold text-foreground">{team.team_name}</h2>
-            <p className="text-sm text-muted-foreground">{filledCount} member{filledCount > 1 ? "s" : ""} · {team.open_roles.length} open slot{team.open_roles.length > 1 ? "s" : ""}</p>
-          </div>
-        </div>
 
-        {/* Content section */}
-        <div className="flex-1 px-6 py-5 space-y-5 overflow-y-auto">
-          {/* Team completion visual */}
-          <div>
-            <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-muted-foreground font-medium">Team Progress</span>
-              <span className="font-bold text-foreground">{team.completion}%</span>
+            {/* Why you match */}
+            <div>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Why you match</p>
+              <div className="flex flex-wrap gap-1.5">
+                {["Shared Interest: AI", "Night Owl Workflow", "Similar Goals", "Skill Compatibility"].map((chip, i) => (
+                  <span key={i} className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 backdrop-blur-sm shadow-sm">
+                    {chip}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-1.5">
-              {Array.from({ length: totalSlots }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`flex-1 h-2.5 rounded-full transition-colors ${
-                    i < filledCount ? "bg-primary" : "bg-muted"
-                  }`}
-                />
+
+            {/* Team Chemistry */}
+            <div className="rounded-2xl p-3.5 bg-white/70 border border-white/80 backdrop-blur-md shadow-sm">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2.5">Team Chemistry</p>
+              {[
+                { label: "Creative Compatibility", value: creative, cls: "from-[#A259FF] to-fuchsia-400" },
+                { label: "Communication Match", value: communication, cls: "from-cyan-400 to-blue-500" },
+                { label: "Productivity Sync", value: productivity, cls: "from-emerald-400 to-teal-500" },
+              ].map((row) => (
+                <div key={row.label} className="mb-2 last:mb-0">
+                  <div className="flex justify-between text-[11px] mb-1">
+                    <span className="text-slate-600 font-medium">{row.label}</span>
+                    <span className="font-bold text-slate-900">{row.value}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${row.value}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className={`h-full rounded-full bg-gradient-to-r ${row.cls} shadow-[0_0_8px_rgba(162,89,255,0.4)]`} />
+                  </div>
+                </div>
               ))}
             </div>
-            <div className="flex justify-between mt-1">
-              {Array.from({ length: totalSlots }).map((_, i) => (
-                <span key={i} className={`text-[9px] flex-1 text-center ${i < filledCount ? "text-primary font-semibold" : "text-muted-foreground"}`}>
-                  {i < filledCount ? "✓" : "open"}
-                </span>
-              ))}
-            </div>
-          </div>
 
-          {/* Looking for roles */}
-          <div>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Looking for</p>
-            <div className="space-y-2">
-              {team.open_roles.map((roleId) => {
-                const role = getRoleInfo(roleId);
-                const isYourRole = roleId === userRole;
-                return (
-                  <div
-                    key={roleId}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl border ${
-                      isYourRole
-                        ? "bg-primary/10 border-primary/30"
-                        : "bg-muted/50 border-transparent"
-                    }`}
-                  >
-                    <span className="text-lg">{role.emoji}</span>
-                    <span className={`text-sm font-semibold flex-1 ${isYourRole ? "text-primary" : "text-foreground"}`}>
+            {/* Team Balance */}
+            <div>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Team Needs</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allRoleSlots.slice(0, 6).map((roleId, i) => {
+                  const role = getRoleInfo(roleId);
+                  const filled = !team.open_roles.includes(roleId);
+                  return (
+                    <span key={`${roleId}-${i}`}
+                      className={`text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border backdrop-blur-sm ${
+                        filled ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-rose-50 border-rose-200 text-rose-700"
+                      }`}>
+                      {filled ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       {role.label}
                     </span>
-                    {isYourRole && (
-                      <span className="text-[10px] font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-lg">Your Role</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Registered events */}
-          {team.registered_events.length > 0 && (
-            <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Competing in</p>
-              <div className="flex flex-wrap gap-2">
-                {team.registered_events.map((eid) => {
-                  const ev = mockEvents.find((e) => e.id === eid);
-                  return ev ? (
-                    <span key={eid} className="text-xs font-semibold px-3 py-1.5 rounded-2xl bg-accent/10 text-accent border border-accent/20">
-                      🎯 {ev.title}
-                    </span>
-                  ) : null;
+                  );
                 })}
               </div>
             </div>
-          )}
+
+            {/* AI Prediction */}
+            <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border border-amber-200/60">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Trophy className="w-3.5 h-3.5 text-amber-600" />
+                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">AI Prediction</span>
+              </div>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                High probability of reaching <span className="font-semibold text-slate-900">finals</span> in product-focused hackathons.
+              </p>
+            </div>
+
+            {/* Activity status */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
+                <Zap className="w-3 h-3 text-amber-500" /> Replies Fast
+              </span>
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
+                <CircleDot className="w-3 h-3 text-emerald-500" /> Active Today
+              </span>
+              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
+                <Trophy className="w-3 h-3 text-[#A259FF]" /> 2 Hackathons
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -1236,7 +1286,25 @@ const TeamMatchingPage = () => {
 
       {/* ─── AUTO MATCH (Tinder-style) ─── */}
       {mode === "auto_match" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 bg-background flex flex-col">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden">
+          {/* Cinematic mesh background */}
+          <div className="absolute inset-0 bg-[#FAFBFF]" />
+          <motion.div
+            className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-[#A259FF]/20 blur-3xl"
+            animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-1/3 -right-40 w-[26rem] h-[26rem] rounded-full bg-cyan-400/20 blur-3xl"
+            animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
+            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -bottom-40 left-1/4 w-[30rem] h-[30rem] rounded-full bg-emerald-300/20 blur-3xl"
+            animate={{ x: [0, 20, 0], y: [0, -25, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+
           <MatchOverlay
             match={matchedTeam ? {
               id: matchedTeam.team_id,
@@ -1249,27 +1317,28 @@ const TeamMatchingPage = () => {
             onViewLobby={() => { setMatchedTeam(null); setMode("lobby"); }}
           />
 
-          {/* Minimal header */}
-          <header className="flex items-center gap-3 px-5 pt-5 pb-3">
-            <button onClick={() => setMode("my_teams")} className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+          {/* Header */}
+          <header className="relative z-10 flex items-center gap-3 px-5 pt-6 pb-3">
+            <button
+              onClick={() => setMode("my_teams")}
+              className="w-11 h-11 rounded-full bg-white/70 border border-white/80 backdrop-blur-xl flex items-center justify-center shadow-[0_4px_16px_-4px_rgba(162,89,255,0.25)]"
+            >
+              <ArrowLeft className="w-5 h-5 text-slate-700" />
             </button>
             <div className="flex-1 text-center">
-              <h1 className="text-base font-display font-bold text-foreground flex items-center justify-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-primary" /> Auto Match
-              </h1>
-              <p className="text-[11px] text-muted-foreground">
-                {autoMatchTeams.length - autoMatchIndex} team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} left
+              <h1 className="text-lg font-display font-bold text-slate-900 tracking-tight">Auto Match</h1>
+              <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#A259FF]" />
+                {autoMatchTeams.length - autoMatchIndex} ideal team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} found
               </p>
             </div>
-            <div className="w-10" /> {/* spacer */}
+            <div className="w-11" />
           </header>
 
-          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-4 min-h-0">
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 pb-5 min-h-0">
             {autoMatchIndex < autoMatchTeams.length ? (
               <>
-                {/* Full-height swipe card area */}
-                <div className="relative w-full max-w-sm flex-1 mb-5 min-h-0">
+                <div className="relative w-full max-w-sm flex-1 mb-6 min-h-0">
                   <AnimatePresence>
                     {autoMatchTeams.slice(autoMatchIndex, autoMatchIndex + 2).reverse().map((team, stackIdx) => {
                       const isTop = stackIdx === (Math.min(autoMatchTeams.length - autoMatchIndex, 2) - 1);
@@ -1287,30 +1356,37 @@ const TeamMatchingPage = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons */}
-                <div className="flex items-center gap-5 pb-2">
+                {/* Premium floating actions */}
+                <div className="flex items-center gap-5">
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => handleAutoSwipe("left")}
-                    className="w-16 h-16 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center shadow-lg active:shadow-sm transition-shadow"
+                    className="relative w-16 h-16 rounded-full bg-white border border-rose-100 flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(244,63,94,0.45)]"
                   >
-                    <X className="w-7 h-7 text-destructive" />
+                    <div className="absolute inset-0 rounded-full bg-rose-400/20 blur-md -z-10" />
+                    <X className="w-7 h-7 text-rose-500" strokeWidth={2.5} />
                   </motion.button>
+
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
-                    className="w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center"
+                    className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-slate-200 flex items-center justify-center shadow-sm"
                   >
-                    <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                    <RotateCcw className="w-4 h-4 text-slate-500" />
                   </motion.button>
+
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => handleAutoSwipe("right")}
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg active:shadow-sm transition-shadow"
+                    className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-[0_10px_28px_-6px_rgba(162,89,255,0.6)]"
                   >
-                    <Heart className="w-7 h-7 text-primary-foreground" />
+                    <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 blur-md opacity-80" />
+                    <div className="relative w-full h-full rounded-full bg-gradient-to-tr from-[#A259FF] via-fuchsia-500 to-emerald-400 flex items-center justify-center">
+                      <Heart className="w-7 h-7 text-white" strokeWidth={2.5} fill="white" />
+                    </div>
                   </motion.button>
                 </div>
+                <p className="text-[10px] text-slate-400 mt-3 font-medium tracking-wide">SWIPE OR TAP TO CONNECT</p>
               </>
             ) : (
               <div className="text-center px-6">
