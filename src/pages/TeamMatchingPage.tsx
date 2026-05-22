@@ -1286,7 +1286,25 @@ const TeamMatchingPage = () => {
 
       {/* ─── AUTO MATCH (Tinder-style) ─── */}
       {mode === "auto_match" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 bg-background flex flex-col">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden">
+          {/* Cinematic mesh background */}
+          <div className="absolute inset-0 bg-[#FAFBFF]" />
+          <motion.div
+            className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-[#A259FF]/20 blur-3xl"
+            animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-1/3 -right-40 w-[26rem] h-[26rem] rounded-full bg-cyan-400/20 blur-3xl"
+            animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
+            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -bottom-40 left-1/4 w-[30rem] h-[30rem] rounded-full bg-emerald-300/20 blur-3xl"
+            animate={{ x: [0, 20, 0], y: [0, -25, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+
           <MatchOverlay
             match={matchedTeam ? {
               id: matchedTeam.team_id,
@@ -1299,27 +1317,28 @@ const TeamMatchingPage = () => {
             onViewLobby={() => { setMatchedTeam(null); setMode("lobby"); }}
           />
 
-          {/* Minimal header */}
-          <header className="flex items-center gap-3 px-5 pt-5 pb-3">
-            <button onClick={() => setMode("my_teams")} className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+          {/* Header */}
+          <header className="relative z-10 flex items-center gap-3 px-5 pt-6 pb-3">
+            <button
+              onClick={() => setMode("my_teams")}
+              className="w-11 h-11 rounded-full bg-white/70 border border-white/80 backdrop-blur-xl flex items-center justify-center shadow-[0_4px_16px_-4px_rgba(162,89,255,0.25)]"
+            >
+              <ArrowLeft className="w-5 h-5 text-slate-700" />
             </button>
             <div className="flex-1 text-center">
-              <h1 className="text-base font-display font-bold text-foreground flex items-center justify-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-primary" /> Auto Match
-              </h1>
-              <p className="text-[11px] text-muted-foreground">
-                {autoMatchTeams.length - autoMatchIndex} team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} left
+              <h1 className="text-lg font-display font-bold text-slate-900 tracking-tight">Auto Match</h1>
+              <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#A259FF]" />
+                {autoMatchTeams.length - autoMatchIndex} ideal team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} found
               </p>
             </div>
-            <div className="w-10" /> {/* spacer */}
+            <div className="w-11" />
           </header>
 
-          <div className="flex-1 flex flex-col items-center justify-center px-4 pb-4 min-h-0">
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 pb-5 min-h-0">
             {autoMatchIndex < autoMatchTeams.length ? (
               <>
-                {/* Full-height swipe card area */}
-                <div className="relative w-full max-w-sm flex-1 mb-5 min-h-0">
+                <div className="relative w-full max-w-sm flex-1 mb-6 min-h-0">
                   <AnimatePresence>
                     {autoMatchTeams.slice(autoMatchIndex, autoMatchIndex + 2).reverse().map((team, stackIdx) => {
                       const isTop = stackIdx === (Math.min(autoMatchTeams.length - autoMatchIndex, 2) - 1);
@@ -1337,30 +1356,37 @@ const TeamMatchingPage = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons */}
-                <div className="flex items-center gap-5 pb-2">
+                {/* Premium floating actions */}
+                <div className="flex items-center gap-5">
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => handleAutoSwipe("left")}
-                    className="w-16 h-16 rounded-full bg-card border-2 border-destructive/30 flex items-center justify-center shadow-lg active:shadow-sm transition-shadow"
+                    className="relative w-16 h-16 rounded-full bg-white border border-rose-100 flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(244,63,94,0.45)]"
                   >
-                    <X className="w-7 h-7 text-destructive" />
+                    <div className="absolute inset-0 rounded-full bg-rose-400/20 blur-md -z-10" />
+                    <X className="w-7 h-7 text-rose-500" strokeWidth={2.5} />
                   </motion.button>
+
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
-                    className="w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center"
+                    className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-slate-200 flex items-center justify-center shadow-sm"
                   >
-                    <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                    <RotateCcw className="w-4 h-4 text-slate-500" />
                   </motion.button>
+
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={() => handleAutoSwipe("right")}
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg active:shadow-sm transition-shadow"
+                    className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-[0_10px_28px_-6px_rgba(162,89,255,0.6)]"
                   >
-                    <Heart className="w-7 h-7 text-primary-foreground" />
+                    <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 blur-md opacity-80" />
+                    <div className="relative w-full h-full rounded-full bg-gradient-to-tr from-[#A259FF] via-fuchsia-500 to-emerald-400 flex items-center justify-center">
+                      <Heart className="w-7 h-7 text-white" strokeWidth={2.5} fill="white" />
+                    </div>
                   </motion.button>
                 </div>
+                <p className="text-[10px] text-slate-400 mt-3 font-medium tracking-wide">SWIPE OR TAP TO CONNECT</p>
               </>
             ) : (
               <div className="text-center px-6">
