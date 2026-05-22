@@ -65,7 +65,7 @@ const AutoMatchCard = ({
 
   return (
     <motion.div
-      className="absolute inset-0"
+      className="absolute inset-0 flex items-center justify-center px-4"
       style={{ x, rotate, zIndex: isTop ? 10 : 0 }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
@@ -75,161 +75,99 @@ const AutoMatchCard = ({
       animate={{ scale: isTop ? 1 : 0.94, opacity: isTop ? 1 : 0.5, y: isTop ? 0 : 12 }}
       exit={{ x: 300, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full h-full rounded-[2rem] overflow-hidden">
-        {/* Ambient mesh background */}
-        <div className="absolute inset-0 bg-white" />
-        <div className="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#A259FF]/30 blur-3xl" />
-        <div className="absolute top-20 -right-20 w-72 h-72 rounded-full bg-cyan-400/25 blur-3xl" />
-        <div className="absolute -bottom-24 left-10 w-80 h-80 rounded-full bg-emerald-300/30 blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/65 to-white/90" />
-
+      <div className="relative w-full max-w-sm bg-white rounded-3xl border border-slate-200 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.15)] overflow-hidden">
         {isTop && (
           <>
-            <motion.div className="absolute top-16 left-8 w-1.5 h-1.5 rounded-full bg-[#A259FF]"
-              animate={{ y: [0, -10, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 3, repeat: Infinity }} />
-            <motion.div className="absolute top-32 right-10 w-1 h-1 rounded-full bg-cyan-400"
-              animate={{ y: [0, -14, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 4, repeat: Infinity, delay: 0.5 }} />
-            <motion.div className="absolute bottom-40 left-12 w-1 h-1 rounded-full bg-emerald-400"
-              animate={{ y: [0, -8, 0], opacity: [0.5, 1, 0.5] }} transition={{ duration: 3.5, repeat: Infinity, delay: 1 }} />
+            <motion.div style={{ opacity: matchOpacity }}
+              className="absolute top-5 left-5 z-30 border-2 border-emerald-500 rounded-xl px-3 py-1 -rotate-12 bg-white">
+              <span className="text-emerald-600 font-bold text-lg tracking-wider">CONNECT</span>
+            </motion.div>
+            <motion.div style={{ opacity: skipOpacity }}
+              className="absolute top-5 right-5 z-30 border-2 border-rose-500 rounded-xl px-3 py-1 rotate-12 bg-white">
+              <span className="text-rose-600 font-bold text-lg tracking-wider">SKIP</span>
+            </motion.div>
           </>
         )}
 
-        <div className="relative w-full h-full flex flex-col border border-white/60 rounded-[2rem] shadow-[0_20px_60px_-20px_rgba(162,89,255,0.35)] backdrop-blur-xl">
-          {isTop && (
-            <>
-              <motion.div style={{ opacity: matchOpacity }}
-                className="absolute top-8 left-6 z-30 border-2 border-emerald-500 rounded-2xl px-4 py-1.5 -rotate-12 bg-emerald-500/15 backdrop-blur-md shadow-lg shadow-emerald-500/30">
-                <span className="text-emerald-600 font-black text-2xl tracking-wider">CONNECT</span>
-              </motion.div>
-              <motion.div style={{ opacity: skipOpacity }}
-                className="absolute top-8 right-6 z-30 border-2 border-rose-500 rounded-2xl px-4 py-1.5 rotate-12 bg-rose-500/15 backdrop-blur-md shadow-lg shadow-rose-500/30">
-                <span className="text-rose-600 font-black text-2xl tracking-wider">SKIP</span>
-              </motion.div>
-            </>
-          )}
-
-          {/* HERO */}
-          <div className="relative px-6 pt-7 pb-5">
-            <div className="flex items-center justify-center mb-5">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#A259FF] via-cyan-400 to-emerald-400 blur-md opacity-60" />
-                <div className="relative bg-white rounded-full px-4 py-1.5 flex items-center gap-2 border border-white/80 shadow-lg">
-                  <Sparkles className="w-3.5 h-3.5 text-[#A259FF]" />
-                  <span className="text-xs font-bold bg-gradient-to-r from-[#A259FF] via-cyan-500 to-emerald-500 bg-clip-text text-transparent tracking-wide">
-                    {compatibility}% ELITE MATCH
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative w-24 h-24 mx-auto mb-3">
-              <motion.div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 blur-lg opacity-70"
-                animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.85, 0.5] }} transition={{ duration: 3, repeat: Infinity }} />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 p-[2px]">
-                <div className="w-full h-full rounded-full bg-white flex items-center justify-center shadow-inner">
-                  <Users className="w-10 h-10 text-[#A259FF]" strokeWidth={1.5} />
-                </div>
-              </div>
-            </div>
-
-            <h2 className="text-center text-2xl font-display font-bold text-slate-900 tracking-tight">
-              {team.team_name}
-            </h2>
-            <p className="text-center text-xs text-slate-500 mt-1 font-medium">
-              {filledCount}/{totalSlots} joined · {openSlots} open slot{openSlots !== 1 ? "s" : ""}
-            </p>
+        {/* Header */}
+        <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Team details</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Auto-matched for you</p>
           </div>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
+            {compatibility}% match
+          </span>
+        </div>
 
-          <div className="flex-1 px-5 pb-5 space-y-3 overflow-y-auto scrollbar-none">
-            {/* AI Insight */}
-            <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-[#A259FF]/10 via-cyan-400/10 to-emerald-400/10 border border-[#A259FF]/20 backdrop-blur-md">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-[#A259FF]" />
-                <span className="text-[10px] font-bold text-[#A259FF] uppercase tracking-widest">AI Insight</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                Your <span className="font-semibold text-slate-900">{userRoleLabel}</span> skills perfectly complement this team's vision.
-              </p>
-            </div>
+        {/* Identity */}
+        <div className="px-5 pt-4 flex items-center gap-3">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <Users className="w-7 h-7 text-slate-500" strokeWidth={1.75} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-base font-bold text-slate-900 truncate">{team.team_name}</h3>
+            <span className="inline-flex items-center gap-1 mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+              <Shield className="w-3 h-3" /> Verified
+            </span>
+          </div>
+        </div>
 
-            {/* Why you match */}
+        {/* Stats block */}
+        <div className="mx-5 mt-4 rounded-2xl bg-slate-50 p-3.5">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Why you match</p>
-              <div className="flex flex-wrap gap-1.5">
-                {["Shared Interest: AI", "Night Owl Workflow", "Similar Goals", "Skill Compatibility"].map((chip, i) => (
-                  <span key={i} className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 backdrop-blur-sm shadow-sm">
-                    {chip}
-                  </span>
-                ))}
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
+                <Users className="w-3.5 h-3.5 text-violet-500" /> Members
               </div>
+              <p className="text-base font-bold text-slate-900">{filledCount}/{totalSlots}</p>
             </div>
+            <div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
+                <Check className="w-3.5 h-3.5 text-emerald-500" /> Open
+              </div>
+              <p className="text-base font-bold text-slate-900">{openSlots} slot{openSlots !== 1 ? "s" : ""}</p>
+            </div>
+          </div>
+        </div>
 
-            {/* Team Chemistry */}
-            <div className="rounded-2xl p-3.5 bg-white/70 border border-white/80 backdrop-blur-md shadow-sm">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2.5">Team Chemistry</p>
-              {[
-                { label: "Creative Compatibility", value: creative, cls: "from-[#A259FF] to-fuchsia-400" },
-                { label: "Communication Match", value: communication, cls: "from-cyan-400 to-blue-500" },
-                { label: "Productivity Sync", value: productivity, cls: "from-emerald-400 to-teal-500" },
-              ].map((row) => (
-                <div key={row.label} className="mb-2 last:mb-0">
-                  <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-600 font-medium">{row.label}</span>
-                    <span className="font-bold text-slate-900">{row.value}%</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${row.value}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                      className={`h-full rounded-full bg-gradient-to-r ${row.cls} shadow-[0_0_8px_rgba(162,89,255,0.4)]`} />
-                  </div>
-                </div>
+        {/* Info rows */}
+        <div className="px-5 pt-4 space-y-2.5 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-700">Needs your role</span>
+            <span className="text-slate-900 font-medium">{userRoleLabel}</span>
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <span className="font-semibold text-slate-700 flex-shrink-0">Open roles</span>
+            <div className="flex flex-wrap justify-end gap-1.5">
+              {team.open_roles.slice(0, 3).map((r) => (
+                <span key={r} className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-rose-50 text-rose-700">
+                  {getRoleInfo(r).label}
+                </span>
               ))}
             </div>
-
-            {/* Team Balance */}
-            <div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Team Needs</p>
-              <div className="flex flex-wrap gap-1.5">
-                {allRoleSlots.slice(0, 6).map((roleId, i) => {
-                  const role = getRoleInfo(roleId);
-                  const filled = !team.open_roles.includes(roleId);
-                  return (
-                    <span key={`${roleId}-${i}`}
-                      className={`text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border backdrop-blur-sm ${
-                        filled ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-rose-50 border-rose-200 text-rose-700"
-                      }`}>
-                      {filled ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                      {role.label}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* AI Prediction */}
-            <div className="relative rounded-2xl p-3.5 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border border-amber-200/60">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Trophy className="w-3.5 h-3.5 text-amber-600" />
-                <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">AI Prediction</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                High probability of reaching <span className="font-semibold text-slate-900">finals</span> in product-focused hackathons.
-              </p>
-            </div>
-
-            {/* Activity status */}
-            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-500" /> Replies Fast
-              </span>
-              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
-                <CircleDot className="w-3 h-3 text-emerald-500" /> Active Today
-              </span>
-              <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/80 border border-slate-200 text-slate-700 flex items-center gap-1">
-                <Trophy className="w-3 h-3 text-[#A259FF]" /> 2 Hackathons
-              </span>
-            </div>
           </div>
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-700">Chemistry</span>
+            <span className="text-slate-900 font-medium">{Math.round((creative + communication + productivity) / 3)}%</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="px-5 py-4 mt-4 flex items-center gap-2.5">
+          <button
+            onClick={() => isTop && onSwipe("left")}
+            className="w-11 h-11 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 active:scale-95 transition-transform"
+            aria-label="Skip"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => isTop && onSwipe("right")}
+            className="flex-1 h-11 rounded-full bg-violet-600 text-white font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          >
+            <Heart className="w-4 h-4" /> Connect
+          </button>
         </div>
       </div>
     </motion.div>
