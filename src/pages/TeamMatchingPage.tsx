@@ -25,12 +25,12 @@ type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "crea
 
 /* ─── Clean Auto-Match Card (team-only, no person image) ─── */
 const TEAM_GRADIENTS = [
-  "from-orange-500 via-red-500 to-rose-600",
-  "from-violet-500 via-fuchsia-500 to-pink-500",
-  "from-cyan-500 via-blue-500 to-indigo-600",
-  "from-emerald-500 via-teal-500 to-cyan-600",
-  "from-amber-500 via-orange-500 to-red-500",
-  "from-purple-600 via-indigo-500 to-blue-600",
+  "from-[#A259FF] via-[#7C3AED] to-[#5B21B6]",
+  "from-[#A259FF] via-fuchsia-500 to-[#E94B6A]",
+  "from-[#FFB23F] via-[#F97316] to-[#E94B6A]",
+  "from-emerald-500 via-teal-500 to-[#0EA5A5]",
+  "from-[#FFB23F] via-amber-500 to-[#A259FF]",
+  "from-[#0EA5A5] via-[#A259FF] to-[#7C3AED]",
 ];
 
 const AutoMatchCard = ({
@@ -84,12 +84,12 @@ const AutoMatchCard = ({
       animate={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6, y: isTop ? 0 : 10 }}
       exit={{ x: 320, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-neutral-900 shadow-2xl flex flex-col">
+      <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-card border border-border shadow-xl flex flex-col">
         {/* Hero gradient area */}
         <div className={`relative bg-gradient-to-br ${gradient} flex-1 min-h-0`}>
           {/* Match badge */}
           <div className="absolute top-4 left-4 z-20">
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/40 text-white backdrop-blur-md">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/30 text-white backdrop-blur-md">
               Match {compatibility}%
             </span>
           </div>
@@ -99,22 +99,22 @@ const AutoMatchCard = ({
             <>
               <motion.div
                 style={{ opacity: matchOpacity }}
-                className="absolute top-16 left-5 z-20 border-2 border-emerald-300 rounded-xl px-3 py-1 -rotate-12 bg-emerald-500/20 backdrop-blur-sm"
+                className="absolute top-16 left-5 z-20 border-2 border-white rounded-xl px-3 py-1 -rotate-12 bg-accent/30 backdrop-blur-sm"
               >
-                <span className="text-emerald-50 font-bold text-base tracking-wider">CONNECT</span>
+                <span className="text-white font-bold text-base tracking-wider">CONNECT</span>
               </motion.div>
               <motion.div
                 style={{ opacity: skipOpacity }}
-                className="absolute top-16 right-5 z-20 border-2 border-rose-300 rounded-xl px-3 py-1 rotate-12 bg-rose-500/20 backdrop-blur-sm"
+                className="absolute top-16 right-5 z-20 border-2 border-white rounded-xl px-3 py-1 rotate-12 bg-destructive/30 backdrop-blur-sm"
               >
-                <span className="text-rose-50 font-bold text-base tracking-wider">SKIP</span>
+                <span className="text-white font-bold text-base tracking-wider">SKIP</span>
               </motion.div>
             </>
           )}
 
           {/* Centerpiece: team initials mark */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-36 h-36 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center">
+            <div className="w-36 h-36 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
               <span className="text-white text-5xl font-bold tracking-tight">{initials}</span>
             </div>
           </div>
@@ -123,27 +123,27 @@ const AutoMatchCard = ({
           <div className="absolute bottom-5 left-5 right-5 z-10">
             <div className="flex items-center gap-2">
               <h3 className="text-2xl font-bold text-white truncate">{team.team_name}</h3>
-              <Shield className="w-5 h-5 text-emerald-300 flex-shrink-0" fill="currentColor" />
+              <Shield className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" />
             </div>
-            <p className="text-sm text-white/85 mt-0.5">
+            <p className="text-sm text-white/90 mt-0.5">
               {filledCount}/{totalSlots} members · {openSlots} open
             </p>
           </div>
         </div>
 
         {/* Info strip */}
-        <div className="bg-neutral-900 px-5 py-4 space-y-3">
+        <div className="bg-card px-5 py-4 space-y-3 border-t border-border">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-400">Needs your role</span>
-            <span className="text-white font-semibold">{userRoleLabel}</span>
+            <span className="text-muted-foreground">Needs your role</span>
+            <span className="text-foreground font-semibold">{userRoleLabel}</span>
           </div>
           <div className="flex items-start justify-between gap-3 text-sm">
-            <span className="text-neutral-400 flex-shrink-0">Open roles</span>
+            <span className="text-muted-foreground flex-shrink-0">Open roles</span>
             <div className="flex flex-wrap justify-end gap-1.5">
               {team.open_roles.slice(0, 3).map((r) => (
                 <span
                   key={r}
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-white/10 text-white"
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-primary/10 text-primary"
                 >
                   {getRoleInfo(r).label}
                 </span>
@@ -1206,7 +1206,7 @@ const TeamMatchingPage = () => {
 
       {/* ─── AUTO MATCH (Tinder-style) ─── */}
       {mode === "auto_match" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-neutral-950">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background">
           <MatchOverlay
             match={matchedTeam ? {
               id: matchedTeam.team_id,
@@ -1223,13 +1223,13 @@ const TeamMatchingPage = () => {
           <header className="flex items-center gap-3 px-5 pt-6 pb-3">
             <button
               onClick={() => setMode("my_teams")}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex-1 text-center">
-              <h1 className="text-base font-bold text-white tracking-tight">Auto Match</h1>
-              <p className="text-[11px] text-neutral-400 mt-0.5">
+              <h1 className="text-base font-bold text-foreground tracking-tight">Auto Match</h1>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {autoMatchTeams.length - autoMatchIndex} team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} for you
               </p>
             </div>
@@ -1271,10 +1271,10 @@ const TeamMatchingPage = () => {
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
-                    className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+                    className="w-12 h-12 rounded-full bg-muted flex items-center justify-center"
                     aria-label="Reset"
                   >
-                    <RotateCcw className="w-5 h-5 text-white" />
+                    <RotateCcw className="w-5 h-5 text-muted-foreground" />
                   </motion.button>
 
                   <motion.button
