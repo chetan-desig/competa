@@ -152,28 +152,6 @@ const AutoMatchCard = ({
           </div>
         </div>
       </div>
-
-        {/* Info strip */}
-        <div className="bg-neutral-900 px-5 py-4 space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-400">Needs your role</span>
-            <span className="text-white font-semibold">{userRoleLabel}</span>
-          </div>
-          <div className="flex items-start justify-between gap-3 text-sm">
-            <span className="text-neutral-400 flex-shrink-0">Open roles</span>
-            <div className="flex flex-wrap justify-end gap-1.5">
-              {team.open_roles.slice(0, 3).map((r) => (
-                <span
-                  key={r}
-                  className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-white/10 text-white"
-                >
-                  {getRoleInfo(r).label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
     </motion.div>
   );
 };
