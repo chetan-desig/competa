@@ -1206,7 +1206,7 @@ const TeamMatchingPage = () => {
 
       {/* ─── AUTO MATCH (Tinder-style) ─── */}
       {mode === "auto_match" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-neutral-950">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background">
           <MatchOverlay
             match={matchedTeam ? {
               id: matchedTeam.team_id,
@@ -1223,13 +1223,13 @@ const TeamMatchingPage = () => {
           <header className="flex items-center gap-3 px-5 pt-6 pb-3">
             <button
               onClick={() => setMode("my_teams")}
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex-1 text-center">
-              <h1 className="text-base font-bold text-white tracking-tight">Auto Match</h1>
-              <p className="text-[11px] text-neutral-400 mt-0.5">
+              <h1 className="text-base font-bold text-foreground tracking-tight">Auto Match</h1>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {autoMatchTeams.length - autoMatchIndex} team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} for you
               </p>
             </div>
