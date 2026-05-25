@@ -25,12 +25,12 @@ type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "crea
 
 /* ─── Clean Auto-Match Card (team-only, no person image) ─── */
 const TEAM_GRADIENTS = [
-  "from-orange-500 via-red-500 to-rose-600",
-  "from-violet-500 via-fuchsia-500 to-pink-500",
-  "from-cyan-500 via-blue-500 to-indigo-600",
-  "from-emerald-500 via-teal-500 to-cyan-600",
-  "from-amber-500 via-orange-500 to-red-500",
-  "from-purple-600 via-indigo-500 to-blue-600",
+  "from-[#A259FF] via-[#7C3AED] to-[#5B21B6]",
+  "from-[#A259FF] via-fuchsia-500 to-[#E94B6A]",
+  "from-[#FFB23F] via-[#F97316] to-[#E94B6A]",
+  "from-emerald-500 via-teal-500 to-[#0EA5A5]",
+  "from-[#FFB23F] via-amber-500 to-[#A259FF]",
+  "from-[#0EA5A5] via-[#A259FF] to-[#7C3AED]",
 ];
 
 const AutoMatchCard = ({
