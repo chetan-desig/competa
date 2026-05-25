@@ -23,7 +23,16 @@ import {
 
 type Mode = "my_teams" | "browse_teams" | "select_event" | "event_teams" | "create_team" | "lobby" | "team_detail" | "invite_buddies" | "register_event" | "auto_match";
 
-/* ─── Futuristic AI Auto-Match Card ─── */
+/* ─── Clean Auto-Match Card (team-only, no person image) ─── */
+const TEAM_GRADIENTS = [
+  "from-orange-500 via-red-500 to-rose-600",
+  "from-violet-500 via-fuchsia-500 to-pink-500",
+  "from-cyan-500 via-blue-500 to-indigo-600",
+  "from-emerald-500 via-teal-500 to-cyan-600",
+  "from-amber-500 via-orange-500 to-red-500",
+  "from-purple-600 via-indigo-500 to-blue-600",
+];
+
 const AutoMatchCard = ({
   team,
   isTop,
@@ -38,7 +47,7 @@ const AutoMatchCard = ({
   onSwipe: (dir: "left" | "right") => void;
 }) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-10, 10]);
+  const rotate = useTransform(x, [-200, 200], [-8, 8]);
   const matchOpacity = useTransform(x, [0, 80], [0, 1]);
   const skipOpacity = useTransform(x, [-80, 0], [1, 0]);
 
@@ -55,119 +64,92 @@ const AutoMatchCard = ({
   const userRoleLabel = getRoleInfo(userRole).label;
 
   const seed = team.team_id.length + team.team_name.length;
-  const creative = Math.min(96, 70 + ((seed * 7) % 27));
-  const communication = Math.min(94, 65 + ((seed * 11) % 30));
-  const productivity = Math.min(95, 72 + ((seed * 5) % 24));
-
-  const allRoleSlots = team.required_roles.length
-    ? team.required_roles
-    : [...team.members.map((m) => m.role as RoleId), ...team.open_roles];
+  const gradient = TEAM_GRADIENTS[seed % TEAM_GRADIENTS.length];
+  const initials = team.team_name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <motion.div
-      className="absolute inset-0 flex items-center justify-center px-4"
+      className="absolute inset-0"
       style={{ x, rotate, zIndex: isTop ? 10 : 0 }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
-      initial={{ scale: isTop ? 1 : 0.94, opacity: isTop ? 1 : 0.5, y: isTop ? 0 : 12 }}
-      animate={{ scale: isTop ? 1 : 0.94, opacity: isTop ? 1 : 0.5, y: isTop ? 0 : 12 }}
-      exit={{ x: 300, opacity: 0, transition: { duration: 0.3 } }}
+      initial={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6, y: isTop ? 0 : 10 }}
+      animate={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6, y: isTop ? 0 : 10 }}
+      exit={{ x: 320, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full max-w-sm bg-white rounded-3xl border border-slate-200 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.15)] overflow-hidden">
-        {isTop && (
-          <>
-            <motion.div style={{ opacity: matchOpacity }}
-              className="absolute top-5 left-5 z-30 border-2 border-emerald-500 rounded-xl px-3 py-1 -rotate-12 bg-white">
-              <span className="text-emerald-600 font-bold text-lg tracking-wider">CONNECT</span>
-            </motion.div>
-            <motion.div style={{ opacity: skipOpacity }}
-              className="absolute top-5 right-5 z-30 border-2 border-rose-500 rounded-xl px-3 py-1 rotate-12 bg-white">
-              <span className="text-rose-600 font-bold text-lg tracking-wider">SKIP</span>
-            </motion.div>
-          </>
-        )}
-
-        {/* Header */}
-        <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-slate-100">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Team details</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Auto-matched for you</p>
-          </div>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
-            {compatibility}% match
-          </span>
-        </div>
-
-        {/* Identity */}
-        <div className="px-5 pt-4 flex items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-            <Users className="w-7 h-7 text-slate-500" strokeWidth={1.75} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-base font-bold text-slate-900 truncate">{team.team_name}</h3>
-            <span className="inline-flex items-center gap-1 mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-              <Shield className="w-3 h-3" /> Verified
+      <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-neutral-900 shadow-2xl flex flex-col">
+        {/* Hero gradient area */}
+        <div className={`relative bg-gradient-to-br ${gradient} flex-1 min-h-0`}>
+          {/* Match badge */}
+          <div className="absolute top-4 left-4 z-20">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/40 text-white backdrop-blur-md">
+              Match {compatibility}%
             </span>
           </div>
-        </div>
 
-        {/* Stats block */}
-        <div className="mx-5 mt-4 rounded-2xl bg-slate-50 p-3.5">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                <Users className="w-3.5 h-3.5 text-violet-500" /> Members
-              </div>
-              <p className="text-base font-bold text-slate-900">{filledCount}/{totalSlots}</p>
+          {/* Swipe labels */}
+          {isTop && (
+            <>
+              <motion.div
+                style={{ opacity: matchOpacity }}
+                className="absolute top-16 left-5 z-20 border-2 border-emerald-300 rounded-xl px-3 py-1 -rotate-12 bg-emerald-500/20 backdrop-blur-sm"
+              >
+                <span className="text-emerald-50 font-bold text-base tracking-wider">CONNECT</span>
+              </motion.div>
+              <motion.div
+                style={{ opacity: skipOpacity }}
+                className="absolute top-16 right-5 z-20 border-2 border-rose-300 rounded-xl px-3 py-1 rotate-12 bg-rose-500/20 backdrop-blur-sm"
+              >
+                <span className="text-rose-50 font-bold text-base tracking-wider">SKIP</span>
+              </motion.div>
+            </>
+          )}
+
+          {/* Centerpiece: team initials mark */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-36 h-36 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center">
+              <span className="text-white text-5xl font-bold tracking-tight">{initials}</span>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                <Check className="w-3.5 h-3.5 text-emerald-500" /> Open
-              </div>
-              <p className="text-base font-bold text-slate-900">{openSlots} slot{openSlots !== 1 ? "s" : ""}</p>
+          </div>
+
+          {/* Name + verified */}
+          <div className="absolute bottom-5 left-5 right-5 z-10">
+            <div className="flex items-center gap-2">
+              <h3 className="text-2xl font-bold text-white truncate">{team.team_name}</h3>
+              <Shield className="w-5 h-5 text-emerald-300 flex-shrink-0" fill="currentColor" />
             </div>
+            <p className="text-sm text-white/85 mt-0.5">
+              {filledCount}/{totalSlots} members · {openSlots} open
+            </p>
           </div>
         </div>
 
-        {/* Info rows */}
-        <div className="px-5 pt-4 space-y-2.5 text-sm">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-700">Needs your role</span>
-            <span className="text-slate-900 font-medium">{userRoleLabel}</span>
+        {/* Info strip */}
+        <div className="bg-neutral-900 px-5 py-4 space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-neutral-400">Needs your role</span>
+            <span className="text-white font-semibold">{userRoleLabel}</span>
           </div>
-          <div className="flex items-start justify-between gap-3">
-            <span className="font-semibold text-slate-700 flex-shrink-0">Open roles</span>
+          <div className="flex items-start justify-between gap-3 text-sm">
+            <span className="text-neutral-400 flex-shrink-0">Open roles</span>
             <div className="flex flex-wrap justify-end gap-1.5">
               {team.open_roles.slice(0, 3).map((r) => (
-                <span key={r} className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-rose-50 text-rose-700">
+                <span
+                  key={r}
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-white/10 text-white"
+                >
                   {getRoleInfo(r).label}
                 </span>
               ))}
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-700">Chemistry</span>
-            <span className="text-slate-900 font-medium">{Math.round((creative + communication + productivity) / 3)}%</span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="px-5 py-4 mt-4 flex items-center gap-2.5">
-          <button
-            onClick={() => isTop && onSwipe("left")}
-            className="w-11 h-11 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 active:scale-95 transition-transform"
-            aria-label="Skip"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => isTop && onSwipe("right")}
-            className="flex-1 h-11 rounded-full bg-violet-600 text-white font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-          >
-            <Heart className="w-4 h-4" /> Connect
-          </button>
         </div>
       </div>
     </motion.div>
@@ -1224,25 +1206,7 @@ const TeamMatchingPage = () => {
 
       {/* ─── AUTO MATCH (Tinder-style) ─── */}
       {mode === "auto_match" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden">
-          {/* Cinematic mesh background */}
-          <div className="absolute inset-0 bg-[#FAFBFF]" />
-          <motion.div
-            className="absolute -top-40 -left-32 w-[28rem] h-[28rem] rounded-full bg-[#A259FF]/20 blur-3xl"
-            animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute top-1/3 -right-40 w-[26rem] h-[26rem] rounded-full bg-cyan-400/20 blur-3xl"
-            animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
-            transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute -bottom-40 left-1/4 w-[30rem] h-[30rem] rounded-full bg-emerald-300/20 blur-3xl"
-            animate={{ x: [0, 20, 0], y: [0, -25, 0] }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          />
-
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-neutral-950">
           <MatchOverlay
             match={matchedTeam ? {
               id: matchedTeam.team_id,
@@ -1256,27 +1220,26 @@ const TeamMatchingPage = () => {
           />
 
           {/* Header */}
-          <header className="relative z-10 flex items-center gap-3 px-5 pt-6 pb-3">
+          <header className="flex items-center gap-3 px-5 pt-6 pb-3">
             <button
               onClick={() => setMode("my_teams")}
-              className="w-11 h-11 rounded-full bg-white/70 border border-white/80 backdrop-blur-xl flex items-center justify-center shadow-[0_4px_16px_-4px_rgba(162,89,255,0.25)]"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
             >
-              <ArrowLeft className="w-5 h-5 text-slate-700" />
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <div className="flex-1 text-center">
-              <h1 className="text-lg font-display font-bold text-slate-900 tracking-tight">Auto Match</h1>
-              <p className="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#A259FF]" />
-                {autoMatchTeams.length - autoMatchIndex} ideal team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} found
+              <h1 className="text-base font-bold text-white tracking-tight">Auto Match</h1>
+              <p className="text-[11px] text-neutral-400 mt-0.5">
+                {autoMatchTeams.length - autoMatchIndex} team{autoMatchTeams.length - autoMatchIndex !== 1 ? "s" : ""} for you
               </p>
             </div>
-            <div className="w-11" />
+            <div className="w-10" />
           </header>
 
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 pb-5 min-h-0">
+          <div className="flex-1 flex flex-col px-4 pb-4 min-h-0">
             {autoMatchIndex < autoMatchTeams.length ? (
               <>
-                <div className="relative w-full max-w-sm flex-1 mb-6 min-h-0">
+                <div className="relative w-full flex-1 mb-5 min-h-0">
                   <AnimatePresence>
                     {autoMatchTeams.slice(autoMatchIndex, autoMatchIndex + 2).reverse().map((team, stackIdx) => {
                       const isTop = stackIdx === (Math.min(autoMatchTeams.length - autoMatchIndex, 2) - 1);
@@ -1294,38 +1257,37 @@ const TeamMatchingPage = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Premium floating actions */}
-                <div className="flex items-center gap-5">
+                {/* Clean action bar */}
+                <div className="flex items-center justify-center gap-5">
                   <motion.button
-                    whileTap={{ scale: 0.85 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleAutoSwipe("left")}
-                    className="relative w-16 h-16 rounded-full bg-white border border-rose-100 flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(244,63,94,0.45)]"
+                    className="w-14 h-14 rounded-full bg-rose-500 flex items-center justify-center shadow-lg"
+                    aria-label="Skip"
                   >
-                    <div className="absolute inset-0 rounded-full bg-rose-400/20 blur-md -z-10" />
-                    <X className="w-7 h-7 text-rose-500" strokeWidth={2.5} />
+                    <X className="w-6 h-6 text-white" strokeWidth={2.5} />
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.85 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => { setSkippedTeams([]); setAutoMatchIndex(0); }}
-                    className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-slate-200 flex items-center justify-center shadow-sm"
+                    className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+                    aria-label="Reset"
                   >
-                    <RotateCcw className="w-4 h-4 text-slate-500" />
+                    <RotateCcw className="w-5 h-5 text-white" />
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.85 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleAutoSwipe("right")}
-                    className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-[0_10px_28px_-6px_rgba(162,89,255,0.6)]"
+                    className="w-14 h-14 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg"
+                    aria-label="Connect"
                   >
-                    <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#A259FF] via-cyan-400 to-emerald-400 blur-md opacity-80" />
-                    <div className="relative w-full h-full rounded-full bg-gradient-to-tr from-[#A259FF] via-fuchsia-500 to-emerald-400 flex items-center justify-center">
-                      <Heart className="w-7 h-7 text-white" strokeWidth={2.5} fill="white" />
-                    </div>
+                    <Heart className="w-6 h-6 text-white" strokeWidth={2.5} fill="white" />
                   </motion.button>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-3 font-medium tracking-wide">SWIPE OR TAP TO CONNECT</p>
               </>
+
             ) : (
               <div className="text-center px-6">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-muted flex items-center justify-center">
