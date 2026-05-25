@@ -84,12 +84,12 @@ const AutoMatchCard = ({
       animate={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.6, y: isTop ? 0 : 10 }}
       exit={{ x: 320, opacity: 0, transition: { duration: 0.3 } }}
     >
-      <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-neutral-900 shadow-2xl flex flex-col">
+      <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-card border border-border shadow-xl flex flex-col">
         {/* Hero gradient area */}
         <div className={`relative bg-gradient-to-br ${gradient} flex-1 min-h-0`}>
           {/* Match badge */}
           <div className="absolute top-4 left-4 z-20">
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/40 text-white backdrop-blur-md">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/30 text-white backdrop-blur-md">
               Match {compatibility}%
             </span>
           </div>
@@ -99,22 +99,22 @@ const AutoMatchCard = ({
             <>
               <motion.div
                 style={{ opacity: matchOpacity }}
-                className="absolute top-16 left-5 z-20 border-2 border-emerald-300 rounded-xl px-3 py-1 -rotate-12 bg-emerald-500/20 backdrop-blur-sm"
+                className="absolute top-16 left-5 z-20 border-2 border-white rounded-xl px-3 py-1 -rotate-12 bg-accent/30 backdrop-blur-sm"
               >
-                <span className="text-emerald-50 font-bold text-base tracking-wider">CONNECT</span>
+                <span className="text-white font-bold text-base tracking-wider">CONNECT</span>
               </motion.div>
               <motion.div
                 style={{ opacity: skipOpacity }}
-                className="absolute top-16 right-5 z-20 border-2 border-rose-300 rounded-xl px-3 py-1 rotate-12 bg-rose-500/20 backdrop-blur-sm"
+                className="absolute top-16 right-5 z-20 border-2 border-white rounded-xl px-3 py-1 rotate-12 bg-destructive/30 backdrop-blur-sm"
               >
-                <span className="text-rose-50 font-bold text-base tracking-wider">SKIP</span>
+                <span className="text-white font-bold text-base tracking-wider">SKIP</span>
               </motion.div>
             </>
           )}
 
           {/* Centerpiece: team initials mark */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-36 h-36 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center">
+            <div className="w-36 h-36 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
               <span className="text-white text-5xl font-bold tracking-tight">{initials}</span>
             </div>
           </div>
@@ -123,13 +123,35 @@ const AutoMatchCard = ({
           <div className="absolute bottom-5 left-5 right-5 z-10">
             <div className="flex items-center gap-2">
               <h3 className="text-2xl font-bold text-white truncate">{team.team_name}</h3>
-              <Shield className="w-5 h-5 text-emerald-300 flex-shrink-0" fill="currentColor" />
+              <Shield className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" />
             </div>
-            <p className="text-sm text-white/85 mt-0.5">
+            <p className="text-sm text-white/90 mt-0.5">
               {filledCount}/{totalSlots} members · {openSlots} open
             </p>
           </div>
         </div>
+
+        {/* Info strip */}
+        <div className="bg-card px-5 py-4 space-y-3 border-t border-border">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Needs your role</span>
+            <span className="text-foreground font-semibold">{userRoleLabel}</span>
+          </div>
+          <div className="flex items-start justify-between gap-3 text-sm">
+            <span className="text-muted-foreground flex-shrink-0">Open roles</span>
+            <div className="flex flex-wrap justify-end gap-1.5">
+              {team.open_roles.slice(0, 3).map((r) => (
+                <span
+                  key={r}
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-primary/10 text-primary"
+                >
+                  {getRoleInfo(r).label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
         {/* Info strip */}
         <div className="bg-neutral-900 px-5 py-4 space-y-3">
