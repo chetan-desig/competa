@@ -4,6 +4,9 @@ import { Search, MessageCircle, Users, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { mockStudents } from "@/data/teamMatchingData";
+import { useRole } from "@/hooks/useRole";
+import OrganizerInboxPage from "./OrganizerInboxPage";
+
 
 type ChatTab = "buddies" | "teams" | "events";
 
@@ -98,9 +101,11 @@ const tabs: { id: ChatTab; label: string; icon: typeof MessageCircle }[] = [
 ];
 
 const MessagesListPage = () => {
+  const { isOrganizer } = useRole();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<ChatTab>("buddies");
+  if (isOrganizer) return <OrganizerInboxPage />;
 
   const filtered = mockConversations.filter((c) => {
     const tabMatch = c.type === activeTab;
