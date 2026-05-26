@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Camera, Mail, Shield, CheckCircle, ArrowRight, RefreshCw, Loader2, Building, Globe, AlertCircle, Upload, Image as ImageIcon, Sparkles } from "lucide-react";
+import { X, Camera, Mail, Shield, CheckCircle, ArrowRight, RefreshCw, Loader2, Building, Globe, AlertCircle, Upload, Image as ImageIcon, Sparkles, FileText, BadgeCheck, Users2, Megaphone, BarChart3, Clock, Lock, ChevronRight } from "lucide-react";
 import Confetti from "@/components/Confetti";
 
 type VerificationType = "student" | "organizer";
@@ -13,7 +13,8 @@ interface VerificationModalProps {
 }
 
 type StudentStep = "selfie" | "otp" | "id_upload" | "success";
-type OrganizerStep = "details" | "otp" | "pending" | "success";
+type OrganizerStep = "intro" | "details" | "otp" | "documents" | "pending" | "success";
+type OrgType = "college_club" | "company" | "community" | "institution";
 
 const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModalProps) => {
   const [studentStep, setStudentStep] = useState<StudentStep>("selfie");
@@ -28,10 +29,16 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   const [resendTimer, setResendTimer] = useState(0);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [orgStep, setOrgStep] = useState<OrganizerStep>("details");
+  const [orgStep, setOrgStep] = useState<OrganizerStep>("intro");
   const [orgName, setOrgName] = useState("");
   const [orgWebsite, setOrgWebsite] = useState("");
   const [orgEmail, setOrgEmail] = useState("");
+  const [orgType, setOrgType] = useState<OrgType | null>(null);
+  const [orgRole, setOrgRole] = useState("");
+  const [docUploaded, setDocUploaded] = useState(false);
+  const [docProcessing, setDocProcessing] = useState(false);
+  const [docName, setDocName] = useState("");
+  const [reviewProgress, setReviewProgress] = useState(0);
 
   const [ringProgress, setRingProgress] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -43,7 +50,7 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   useEffect(() => {
     if (open) {
       setStudentStep("selfie");
-      setOrgStep("details");
+      setOrgStep("intro");
       setSelfieDone(false);
       setSelfieCapturing(false);
       setEmail("");
@@ -57,6 +64,12 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
       setOrgName("");
       setOrgWebsite("");
       setOrgEmail("");
+      setOrgType(null);
+      setOrgRole("");
+      setDocUploaded(false);
+      setDocProcessing(false);
+      setDocName("");
+      setReviewProgress(0);
       setIdUploaded(false);
       setIdProcessing(false);
     }
