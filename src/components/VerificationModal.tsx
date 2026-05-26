@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Camera, Mail, Shield, CheckCircle, ArrowRight, RefreshCw, Loader2, Building, Globe, AlertCircle, Upload, Image as ImageIcon, Sparkles } from "lucide-react";
+import { X, Camera, Mail, Shield, CheckCircle, ArrowRight, RefreshCw, Loader2, Building, Globe, AlertCircle, Upload, Image as ImageIcon, Sparkles, FileText, BadgeCheck, Users2, Megaphone, BarChart3, Clock, Lock, ChevronRight } from "lucide-react";
 import Confetti from "@/components/Confetti";
 
 type VerificationType = "student" | "organizer";
@@ -13,7 +13,8 @@ interface VerificationModalProps {
 }
 
 type StudentStep = "selfie" | "otp" | "id_upload" | "success";
-type OrganizerStep = "details" | "otp" | "pending" | "success";
+type OrganizerStep = "intro" | "details" | "otp" | "documents" | "pending" | "success";
+type OrgType = "college_club" | "company" | "community" | "institution";
 
 const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModalProps) => {
   const [studentStep, setStudentStep] = useState<StudentStep>("selfie");
@@ -28,10 +29,16 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   const [resendTimer, setResendTimer] = useState(0);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const [orgStep, setOrgStep] = useState<OrganizerStep>("details");
+  const [orgStep, setOrgStep] = useState<OrganizerStep>("intro");
   const [orgName, setOrgName] = useState("");
   const [orgWebsite, setOrgWebsite] = useState("");
   const [orgEmail, setOrgEmail] = useState("");
+  const [orgType, setOrgType] = useState<OrgType | null>(null);
+  const [orgRole, setOrgRole] = useState("");
+  const [docUploaded, setDocUploaded] = useState(false);
+  const [docProcessing, setDocProcessing] = useState(false);
+  const [docName, setDocName] = useState("");
+  const [reviewProgress, setReviewProgress] = useState(0);
 
   const [ringProgress, setRingProgress] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -43,7 +50,7 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   useEffect(() => {
     if (open) {
       setStudentStep("selfie");
-      setOrgStep("details");
+      setOrgStep("intro");
       setSelfieDone(false);
       setSelfieCapturing(false);
       setEmail("");
@@ -57,6 +64,12 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
       setOrgName("");
       setOrgWebsite("");
       setOrgEmail("");
+      setOrgType(null);
+      setOrgRole("");
+      setDocUploaded(false);
+      setDocProcessing(false);
+      setDocName("");
+      setReviewProgress(0);
       setIdUploaded(false);
       setIdProcessing(false);
     }
@@ -124,10 +137,8 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
         localStorage.setItem("competa_verified", "student");
         setTimeout(() => onVerified(), 2000);
       } else {
-        setOrgStep("success");
-        setShowConfetti(true);
-        localStorage.setItem("competa_verified", "organizer");
-        setTimeout(() => onVerified(), 2000);
+        // Organizer: after OTP, move to document upload (don't grant verified yet)
+        setOrgStep("documents");
       }
     }, 1500);
   };
@@ -147,17 +158,51 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   };
 
   const submitOrgDetails = () => {
-    if (!orgName.trim() || !orgEmail.trim()) return;
+    if (!orgName.trim() || !orgEmail.trim() || !orgType || !orgRole.trim()) return;
     setOrgStep("otp");
     sendOtp(orgEmail);
   };
 
+  const handleDocUpload = () => {
+    setDocProcessing(true);
+    setDocName("authorization_letter.pdf");
+    setTimeout(() => {
+      setDocProcessing(false);
+      setDocUploaded(true);
+    }, 1800);
+  };
+
+  const submitForReview = () => {
+    setOrgStep("pending");
+    setReviewProgress(0);
+    const iv = setInterval(() => {
+      setReviewProgress((p) => {
+        if (p >= 100) {
+          clearInterval(iv);
+          setOrgStep("success");
+          setShowConfetti(true);
+          localStorage.setItem("competa_verified", "organizer");
+          setTimeout(() => onVerified(), 2200);
+          return 100;
+        }
+        return p + 2;
+      });
+    }, 60);
+  };
+
   const currentStep = type === "student" ? studentStep : orgStep;
-  const totalSteps = type === "student" ? 2 : 3;
+  const orgTotalSteps = 4;
+  const orgStepNumber =
+    orgStep === "intro" ? 1 :
+    orgStep === "details" ? 2 :
+    orgStep === "otp" ? 3 :
+    orgStep === "documents" ? 4 :
+    orgStep === "pending" ? 4 : 4;
+  const totalSteps = type === "student" ? 2 : orgTotalSteps;
   const stepNumber =
     type === "student"
-      ? studentStep === "selfie" ? 1 : studentStep === "otp" || studentStep === "id_upload" ? 2 : 2
-      : orgStep === "details" ? 1 : orgStep === "otp" ? 2 : orgStep === "pending" ? 3 : 3;
+      ? studentStep === "selfie" ? 1 : 2
+      : orgStepNumber;
 
   if (!open) return null;
 
@@ -563,56 +608,166 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
           {/* ORGANIZER FLOW */}
           {type === "organizer" && (
             <AnimatePresence mode="wait">
+              {/* Step 1: Intro / Trust */}
+              {orgStep === "intro" && (
+                <motion.div
+                  key="org-intro"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  className="flex flex-col text-center"
+                >
+                  <motion.div
+                    initial={{ scale: 0.5, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", damping: 12 }}
+                    className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-3 shadow-lg"
+                  >
+                    <BadgeCheck className="w-8 h-8 text-primary-foreground" />
+                  </motion.div>
+                  <h2 className="text-xl font-extrabold text-card-foreground">Become a Verified Organizer</h2>
+                  <p className="text-sm text-muted-foreground mt-1 mb-5">
+                    A 2-minute check unlocks the full host toolkit.
+                  </p>
+
+                  <div className="space-y-2.5 text-left mb-5">
+                    {[
+                      { icon: Megaphone, title: "Publish public events", sub: "Reach 10,000+ verified students" },
+                      { icon: Users2, title: "Approve teams & roles", sub: "Moderate registrations safely" },
+                      { icon: BarChart3, title: "Analytics & payouts", sub: "Track signups, collect fees" },
+                      { icon: Shield, title: "Trust badge on profile", sub: "Stand out with the verified mark" },
+                    ].map((b) => {
+                      const Icon = b.icon;
+                      return (
+                        <div key={b.title} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40 border border-border/30">
+                          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                            <Icon className="w-4.5 h-4.5 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[13px] font-bold text-card-foreground leading-tight">{b.title}</p>
+                            <p className="text-[11px] text-muted-foreground">{b.sub}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-center gap-1.5 mb-4 text-[11px] text-muted-foreground">
+                    <Lock className="w-3 h-3" />
+                    <span>Bank-grade encryption · Reviewed by Competa Trust team</span>
+                  </div>
+
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setOrgStep("details")}
+                    className="w-full gradient-primary text-primary-foreground font-bold text-sm py-4 rounded-2xl cta-glow btn-pop flex items-center justify-center gap-2"
+                  >
+                    Start verification <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </motion.div>
+              )}
+
+              {/* Step 2: Organization details */}
               {orgStep === "details" && (
                 <motion.div
                   key="org-details"
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
-                  className="flex flex-col items-center text-center"
+                  className="flex flex-col text-left"
                 >
-                  <div className="w-12 h-12 rounded-2xl gradient-secondary flex items-center justify-center mx-auto mb-3">
-                    <Building className="w-6 h-6 text-secondary-foreground" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-2xl gradient-secondary flex items-center justify-center">
+                      <Building className="w-5 h-5 text-secondary-foreground" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-extrabold text-card-foreground leading-tight">Organization details</h2>
+                      <p className="text-[12px] text-muted-foreground">Help us understand who you're hosting for</p>
+                    </div>
                   </div>
-                  <h2 className="text-xl font-extrabold text-card-foreground">Organization Details 🎤</h2>
-                  <p className="text-sm text-muted-foreground mt-1 mb-6">
-                    Tell us about your organization
-                  </p>
 
-                  <div className="w-full space-y-3">
-                    <input
-                      type="text"
-                      value={orgName}
-                      onChange={(e) => setOrgName(e.target.value)}
-                      placeholder="Organization name"
-                      className="w-full px-5 py-4 rounded-2xl bg-muted/60 backdrop-blur-sm text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
-                    />
-                    <input
-                      type="url"
-                      value={orgWebsite}
-                      onChange={(e) => setOrgWebsite(e.target.value)}
-                      placeholder="Website or LinkedIn (optional)"
-                      className="w-full px-5 py-4 rounded-2xl bg-muted/60 backdrop-blur-sm text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
-                    />
-                    <input
-                      type="email"
-                      value={orgEmail}
-                      onChange={(e) => setOrgEmail(e.target.value)}
-                      placeholder="Official domain email"
-                      className="w-full px-5 py-4 rounded-2xl bg-muted/60 backdrop-blur-sm text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
-                    />
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Type</p>
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {([
+                      { id: "college_club", label: "College Club", emoji: "🎓" },
+                      { id: "institution", label: "Institution", emoji: "🏛️" },
+                      { id: "company", label: "Company", emoji: "🏢" },
+                      { id: "community", label: "Community", emoji: "🌐" },
+                    ] as { id: OrgType; label: string; emoji: string }[]).map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => setOrgType(t.id)}
+                        className={`p-3 rounded-2xl border-2 text-left transition-all ${
+                          orgType === t.id
+                            ? "border-primary bg-primary/10"
+                            : "border-border/40 bg-muted/30 hover:border-border"
+                        }`}
+                      >
+                        <div className="text-lg mb-0.5">{t.emoji}</div>
+                        <p className="text-[12px] font-bold text-card-foreground">{t.label}</p>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="relative">
+                      <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={orgName}
+                        onChange={(e) => setOrgName(e.target.value)}
+                        placeholder="Organization name"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-muted/60 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
+                      />
+                    </div>
+                    <div className="relative">
+                      <BadgeCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={orgRole}
+                        onChange={(e) => setOrgRole(e.target.value)}
+                        placeholder="Your role (e.g. President, Founder)"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-muted/60 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="url"
+                        value={orgWebsite}
+                        onChange={(e) => setOrgWebsite(e.target.value)}
+                        placeholder="Website or LinkedIn (optional)"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-muted/60 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="email"
+                        value={orgEmail}
+                        onChange={(e) => setOrgEmail(e.target.value)}
+                        placeholder="Official domain email"
+                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-muted/60 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary border border-border/30"
+                      />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1 pl-1">
+                      <AlertCircle className="w-3 h-3" />
+                      Use an email on your organization's domain (not gmail/yahoo).
+                    </p>
+
                     <motion.button
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={submitOrgDetails}
-                      disabled={!orgName.trim() || !orgEmail.trim()}
-                      className="w-full gradient-primary text-primary-foreground font-bold text-sm py-4 rounded-2xl cta-glow btn-pop disabled:opacity-50"
+                      disabled={!orgName.trim() || !orgEmail.trim() || !orgType || !orgRole.trim()}
+                      className="w-full gradient-primary text-primary-foreground font-bold text-sm py-4 rounded-2xl cta-glow btn-pop disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
                     >
-                      Continue <ArrowRight className="w-4 h-4 inline ml-1" />
+                      Continue <ArrowRight className="w-4 h-4" />
                     </motion.button>
                   </div>
                 </motion.div>
               )}
 
+              {/* Step 3: Email OTP */}
               {orgStep === "otp" && (
                 <motion.div
                   key="org-otp"
@@ -624,14 +779,14 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                   <div className="w-12 h-12 rounded-2xl gradient-accent flex items-center justify-center mx-auto mb-3">
                     <Mail className="w-6 h-6 text-accent-foreground" />
                   </div>
-                  <h2 className="text-xl font-extrabold text-card-foreground">Verify Email</h2>
+                  <h2 className="text-xl font-extrabold text-card-foreground">Confirm your work email</h2>
                   <div className="bg-muted/40 rounded-2xl px-4 py-2.5 mt-2 mb-4 border border-border/30">
                     <p className="text-xs text-muted-foreground">
                       Code sent to <span className="font-semibold text-foreground">{orgEmail}</span>
                     </p>
                   </div>
 
-                  <div className="flex justify-center gap-2.5 mb-4">
+                  <div className="flex justify-center gap-2 mb-4">
                     {otp.map((digit, i) => (
                       <motion.input
                         key={i}
@@ -645,26 +800,24 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                         value={digit}
                         onChange={(e) => handleOtpChange(i, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                        className={`w-12 h-14 text-center text-xl font-bold rounded-2xl bg-muted/60 backdrop-blur-sm text-foreground focus:outline-none focus:ring-2 transition-all border border-border/30 ${
+                        className={`w-11 h-13 text-center text-xl font-bold rounded-2xl bg-muted/60 text-foreground focus:outline-none focus:ring-2 transition-all border border-border/30 ${
                           otpError ? "ring-2 ring-destructive" : "focus:ring-primary"
                         }`}
+                        style={{ width: 44, height: 52 }}
                       />
                     ))}
                   </div>
 
                   <motion.button
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={verifyOtp}
                     disabled={otp.join("").length < 6 || otpVerifying}
                     className="w-full gradient-primary text-primary-foreground font-bold text-sm py-4 rounded-2xl cta-glow btn-pop disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {otpVerifying ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Verifying...
-                      </>
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</>
                     ) : (
-                      "Verify & Submit"
+                      <>Verify email <ChevronRight className="w-4 h-4" /></>
                     )}
                   </motion.button>
 
@@ -679,6 +832,151 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                 </motion.div>
               )}
 
+              {/* Step 4: Authorization document */}
+              {orgStep === "documents" && (
+                <motion.div
+                  key="org-docs"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  className="flex flex-col text-left"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-11 h-11 rounded-2xl gradient-secondary flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-secondary-foreground" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-extrabold text-card-foreground leading-tight">Proof of authorization</h2>
+                      <p className="text-[12px] text-muted-foreground">Last step — confirm you can host on behalf of {orgName || "your org"}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-primary/5 border border-primary/15 rounded-2xl p-3 mb-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-1.5">Accepted documents</p>
+                    <ul className="space-y-1 text-[12px] text-card-foreground">
+                      <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-primary" /> Authorization letter on letterhead</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-primary" /> Club approval / registration certificate</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="w-3.5 h-3.5 text-primary" /> Company incorporation document</li>
+                    </ul>
+                  </div>
+
+                  {!docUploaded ? (
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={!docProcessing ? handleDocUpload : undefined}
+                      className={`w-full border-2 border-dashed rounded-3xl p-7 flex flex-col items-center gap-3 cursor-pointer transition-all ${
+                        docProcessing ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-primary/5"
+                      }`}
+                    >
+                      {docProcessing ? (
+                        <>
+                          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                          <p className="text-sm font-semibold text-foreground">Scanning document...</p>
+                          <p className="text-xs text-muted-foreground">Checking authenticity</p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center">
+                            <Upload className="w-7 h-7 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm font-semibold text-foreground">Tap to upload PDF or image</p>
+                          <p className="text-xs text-muted-foreground">Max 10 MB · Encrypted in transit</p>
+                        </>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-accent/10 border border-accent/20 rounded-2xl p-4 flex items-center gap-3"
+                    >
+                      <div className="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5 text-accent" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-card-foreground truncate">{docName}</p>
+                        <p className="text-[11px] text-accent flex items-center gap-1 mt-0.5">
+                          <CheckCircle className="w-3 h-3" /> Uploaded · ready to review
+                        </p>
+                      </div>
+                      <button onClick={() => { setDocUploaded(false); setDocName(""); }} className="text-[11px] text-muted-foreground font-semibold">
+                        Replace
+                      </button>
+                    </motion.div>
+                  )}
+
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={submitForReview}
+                    disabled={!docUploaded}
+                    className="w-full gradient-primary text-primary-foreground font-bold text-sm py-4 rounded-2xl cta-glow btn-pop disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+                  >
+                    Submit for review <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+
+                  <p className="text-[11px] text-muted-foreground text-center mt-3 flex items-center justify-center gap-1">
+                    <Lock className="w-3 h-3" /> Docs are confidential and deleted after review
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Step 5: Review pending */}
+              {orgStep === "pending" && (
+                <motion.div
+                  key="org-pending"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center text-center py-6"
+                >
+                  <div className="relative w-28 h-28 mb-5">
+                    <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="46" fill="none" stroke="hsl(var(--muted))" strokeWidth="6" />
+                      <circle
+                        cx="50" cy="50" r="46"
+                        fill="none"
+                        stroke="url(#org-rev-grad)"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={`${reviewProgress * 2.89} 289`}
+                      />
+                      <defs>
+                        <linearGradient id="org-rev-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="hsl(265 85% 60%)" />
+                          <stop offset="100%" stopColor="hsl(180 70% 45%)" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Clock className="w-9 h-9 text-primary" />
+                    </div>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-card-foreground">Your application is under review</h2>
+                  <p className="text-sm text-muted-foreground mt-1 mb-5 max-w-xs">
+                    Our Trust team is verifying your details. This usually takes a few seconds in demo mode.
+                  </p>
+
+                  <div className="w-full space-y-2">
+                    {[
+                      { label: "Email verified", done: true },
+                      { label: "Organization details checked", done: reviewProgress > 25 },
+                      { label: "Authorization document scanned", done: reviewProgress > 60 },
+                      { label: "Trust score calculated", done: reviewProgress > 90 },
+                    ].map((s) => (
+                      <div key={s.label} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-muted/30 border border-border/30">
+                        {s.done ? (
+                          <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                        ) : (
+                          <Loader2 className="w-4 h-4 text-muted-foreground animate-spin shrink-0" />
+                        )}
+                        <p className={`text-[13px] font-medium ${s.done ? "text-card-foreground" : "text-muted-foreground"}`}>{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 6: Success */}
               {orgStep === "success" && (
                 <motion.div
                   key="org-success"
@@ -690,9 +988,12 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: "spring", damping: 8, delay: 0.2 }}
-                    className="w-28 h-28 rounded-full gradient-secondary flex items-center justify-center text-6xl mb-4 shadow-xl"
+                    className="relative w-28 h-28 mb-4"
                   >
-                    🎤
+                    <div className="absolute inset-0 rounded-full gradient-primary shadow-xl" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <BadgeCheck className="w-14 h-14 text-primary-foreground" strokeWidth={2.2} />
+                    </div>
                   </motion.div>
                   <motion.h2
                     initial={{ opacity: 0, y: 10 }}
@@ -700,7 +1001,7 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                     transition={{ delay: 0.4 }}
                     className="text-2xl font-black text-card-foreground"
                   >
-                    Organizer Verified! 🎉
+                    Verified Organizer 🎉
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -708,7 +1009,7 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                     transition={{ delay: 0.6 }}
                     className="text-sm text-muted-foreground mt-2"
                   >
-                    You can now create events & manage teams 🚀
+                    {orgName || "Your org"} is approved. Welcome to the host program 🚀
                   </motion.p>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -716,13 +1017,13 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
                     transition={{ delay: 0.8 }}
                     className="flex flex-wrap justify-center gap-2 mt-5"
                   >
-                    {["Create Events", "Post Roles", "View Analytics"].map((f, i) => (
+                    {["Create Events", "Approve Teams", "Announcements", "Analytics"].map((f, i) => (
                       <motion.span
                         key={f}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.9 + i * 0.1 }}
-                        className="text-xs font-semibold px-4 py-2.5 rounded-2xl bg-secondary/10 text-secondary border border-secondary/20"
+                        transition={{ delay: 0.9 + i * 0.08 }}
+                        className="text-xs font-semibold px-3.5 py-2 rounded-2xl bg-primary/10 text-primary border border-primary/20"
                       >
                         ✅ {f}
                       </motion.span>
