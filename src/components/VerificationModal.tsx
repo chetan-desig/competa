@@ -137,10 +137,8 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
         localStorage.setItem("competa_verified", "student");
         setTimeout(() => onVerified(), 2000);
       } else {
-        setOrgStep("success");
-        setShowConfetti(true);
-        localStorage.setItem("competa_verified", "organizer");
-        setTimeout(() => onVerified(), 2000);
+        // Organizer: after OTP, move to document upload (don't grant verified yet)
+        setOrgStep("documents");
       }
     }, 1500);
   };
@@ -160,17 +158,51 @@ const VerificationModal = ({ open, onClose, type, onVerified }: VerificationModa
   };
 
   const submitOrgDetails = () => {
-    if (!orgName.trim() || !orgEmail.trim()) return;
+    if (!orgName.trim() || !orgEmail.trim() || !orgType || !orgRole.trim()) return;
     setOrgStep("otp");
     sendOtp(orgEmail);
   };
 
+  const handleDocUpload = () => {
+    setDocProcessing(true);
+    setDocName("authorization_letter.pdf");
+    setTimeout(() => {
+      setDocProcessing(false);
+      setDocUploaded(true);
+    }, 1800);
+  };
+
+  const submitForReview = () => {
+    setOrgStep("pending");
+    setReviewProgress(0);
+    const iv = setInterval(() => {
+      setReviewProgress((p) => {
+        if (p >= 100) {
+          clearInterval(iv);
+          setOrgStep("success");
+          setShowConfetti(true);
+          localStorage.setItem("competa_verified", "organizer");
+          setTimeout(() => onVerified(), 2200);
+          return 100;
+        }
+        return p + 2;
+      });
+    }, 60);
+  };
+
   const currentStep = type === "student" ? studentStep : orgStep;
-  const totalSteps = type === "student" ? 2 : 3;
+  const orgTotalSteps = 4;
+  const orgStepNumber =
+    orgStep === "intro" ? 1 :
+    orgStep === "details" ? 2 :
+    orgStep === "otp" ? 3 :
+    orgStep === "documents" ? 4 :
+    orgStep === "pending" ? 4 : 4;
+  const totalSteps = type === "student" ? 2 : orgTotalSteps;
   const stepNumber =
     type === "student"
-      ? studentStep === "selfie" ? 1 : studentStep === "otp" || studentStep === "id_upload" ? 2 : 2
-      : orgStep === "details" ? 1 : orgStep === "otp" ? 2 : orgStep === "pending" ? 3 : 3;
+      ? studentStep === "selfie" ? 1 : 2
+      : orgStepNumber;
 
   if (!open) return null;
 
