@@ -5,6 +5,7 @@ import BottomNav from "@/components/BottomNav";
 import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
 import { mockCertificates, mockEvents } from "@/data/mockData";
+import { getRegistrations } from "@/lib/registrations";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
 import { ROLES_CATALOG, RoleId } from "@/data/teamMatchingData";
@@ -554,26 +555,46 @@ const ProfilePage = () => {
           </div>
         </section>
 
-        {/* Joined events */}
+        {/* My Tickets / Registered events */}
         <section className="mb-6">
           <div className="flex items-center justify-between mb-3 px-1">
-            <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.18em]">Joined Events</h3>
-            <button onClick={() => navigate("/search")} className="text-xs font-semibold text-primary">Explore</button>
+            <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.18em]">My Tickets</h3>
+            <button onClick={() => navigate("/my-tickets")} className="text-xs font-semibold text-primary">View All</button>
           </div>
-          <div className="space-y-3">
-            {mockEvents.slice(0, 3).map((ev) => (
-              <motion.div key={ev.id} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/event/${ev.id}`)}
-                className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border/60 cursor-pointer">
-                <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-display font-bold text-card-foreground truncate">{ev.title}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{ev.date} · {ev.location}</p>
-                  <span className="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-success/10 text-success uppercase tracking-wider">Attending</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </motion.div>
-            ))}
-          </div>
+          {(() => {
+            const regs = getRegistrations();
+            const items = regs
+              .map((r) => ({ reg: r, ev: mockEvents.find((e) => e.id === r.eventId) }))
+              .filter((x) => x.ev)
+              .slice(0, 3);
+            if (items.length === 0) {
+              return (
+                <button
+                  onClick={() => navigate("/search")}
+                  className="w-full bg-card rounded-2xl p-5 border border-dashed border-border text-center"
+                >
+                  <p className="text-sm font-display font-bold text-card-foreground">No registered events yet</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Explore events and grab your first ticket</p>
+                </button>
+              );
+            }
+            return (
+              <div className="space-y-3">
+                {items.map(({ reg, ev }) => (
+                  <motion.div key={reg.eventId} whileTap={{ scale: 0.98 }} onClick={() => navigate(`/ticket/${ev!.id}?mode=${reg.mode}`)}
+                    className="flex items-center gap-3 bg-card rounded-2xl p-3 border border-border/60 cursor-pointer">
+                    <img src={ev!.image} alt={ev!.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-display font-bold text-card-foreground truncate">{ev!.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{ev!.date} · {ev!.location}</p>
+                      <span className="inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-success/10 text-success uppercase tracking-wider">Ticket Ready</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </motion.div>
+                ))}
+              </div>
+            );
+          })()}
         </section>
 
         {/* Achievements */}
