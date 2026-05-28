@@ -143,13 +143,7 @@ const ProfilePage = () => {
       <div className="min-h-screen bg-background pb-24">
         <VerificationModal open={showModal} onClose={() => setShowModal(false)} type={verificationType} onVerified={() => { setShowModal(false); setForceRender(p => p + 1); }} />
 
-        <div className="relative h-56 gradient-primary rounded-b-[3rem] overflow-hidden">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-white/5 blur-2xl" />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
-        </div>
+        <div className="relative h-40 bg-primary rounded-b-[3rem] overflow-hidden" />
 
         <div className="px-6 -mt-20 relative z-10">
           <div className="flex items-end gap-5 mb-8">
