@@ -5,6 +5,7 @@ import { ArrowLeft, Check, CreditCard, Smartphone, Wallet, Shield, Lock, Calenda
 import { mockEvents } from "@/data/mockData";
 import { toast } from "sonner";
 import EventTicket from "@/components/EventTicket";
+import { addRegistration } from "@/lib/registrations";
 
 type Step = "review" | "method" | "processing" | "success";
 type PayMethod = "upi" | "card" | "wallet";
@@ -45,6 +46,7 @@ const PaymentPage = () => {
   const handlePay = () => {
     setStep("processing");
     setTimeout(() => {
+      if (event) addRegistration(event.id, mode, ticketId);
       setStep("success");
     }, 1600);
   };

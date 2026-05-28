@@ -8,13 +8,14 @@ import VerificationModal from "@/components/VerificationModal";
 import { useVerification } from "@/hooks/useVerification";
 import { useRole } from "@/hooks/useRole";
 import { toast } from "sonner";
+import { addRegistration, isRegistered as checkRegistered } from "@/lib/registrations";
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const event = mockEvents.find((e) => e.id === id);
   const [saved, setSaved] = useState(false);
-  const [joined, setJoined] = useState(false);
+  const [joined, setJoined] = useState(() => (id ? checkRegistered(id) : false));
   const { isOrganizer, isStudent } = useRole();
   const { showModal, setShowModal, verificationType, requireVerification } = useVerification();
 
@@ -38,6 +39,7 @@ const EventDetailPage = () => {
       if (event.isPaid) {
         navigate(`/checkout/${event.id}?mode=${mode}`);
       } else {
+        addRegistration(event.id, mode);
         setJoined(true);
         toast.success("You're in! 🎉", { description: "Your ticket is ready." });
         navigate(`/ticket/${event.id}?mode=${mode}`);
