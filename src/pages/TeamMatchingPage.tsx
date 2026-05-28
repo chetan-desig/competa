@@ -86,7 +86,7 @@ const AutoMatchCard = ({
     >
       <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-card border border-border shadow-xl flex flex-col">
         {/* Hero gradient area */}
-        <div className={`relative bg-gradient-to-br ${gradient} flex-1 min-h-0`}>
+        <div className="relative bg-primary flex-1 min-h-0">
           {/* Match badge */}
           <div className="absolute top-4 left-4 z-20">
             <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-black/30 text-white backdrop-blur-md">
@@ -422,9 +422,9 @@ const TeamMatchingPage = () => {
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={() => { setAutoMatchIndex(0); setMatchedTeam(null); setMode("auto_match"); }}
-                className="w-full bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20 rounded-3xl p-4 flex items-center gap-4 text-left"
+                className="w-full bg-primary/5 border border-primary/20 rounded-3xl p-4 flex items-center gap-4 text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div className="flex-1">

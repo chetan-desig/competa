@@ -55,9 +55,8 @@ const EventCard = ({ event, index }: EventCardProps) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        {/* Multi-layer gradient for depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/10" />
+        {/* Dark overlay for legibility */}
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Double-tap heart animation */}

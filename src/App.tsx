@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import OrganizerAnalyticsPage from "./pages/OrganizerAnalyticsPage";
 import PaymentPage from "./pages/PaymentPage";
 import TicketPage from "./pages/TicketPage";
+import MyTicketsPage from "./pages/MyTicketsPage";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
           <Route path="/user/:userId" element={<UserProfilePage />} />
           <Route path="/checkout/:id" element={<PaymentPage />} />
           <Route path="/ticket/:id" element={<TicketPage />} />
+          <Route path="/my-tickets" element={<MyTicketsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
