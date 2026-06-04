@@ -633,7 +633,11 @@ const OnboardingPage = () => {
                 : "bg-muted text-muted-foreground"
             }`}
           >
-            {step === totalSteps - 1 ? "Let's Go! 🎉" : "Continue"}
+            {step === totalSteps - 1
+              ? locationStatus === "granted"
+                ? "Let's Go! 🎉"
+                : "Maybe later"
+              : "Continue"}
             {step < totalSteps - 1 && <ChevronRight className="w-5 h-5" />}
           </motion.button>
         </div>
