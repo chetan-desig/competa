@@ -25,16 +25,25 @@ import OrganizerAnalyticsPage from "./pages/OrganizerAnalyticsPage";
 import PaymentPage from "./pages/PaymentPage";
 import TicketPage from "./pages/TicketPage";
 import MyTicketsPage from "./pages/MyTicketsPage";
+import { useLocationTracker } from "./hooks/useLocationTracker";
 
 const queryClient = new QueryClient();
 
+const LocationBoot = () => {
+  useLocationTracker();
+  return null;
+};
+
 const App = () => (
+
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <LocationBoot />
         <Routes>
+
           <Route path="/" element={<HomePage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/search" element={<SearchPage />} />
