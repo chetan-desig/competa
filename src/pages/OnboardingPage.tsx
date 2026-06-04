@@ -60,7 +60,10 @@ const OnboardingPage = () => {
   const [orgName, setOrgName] = useState("");
   const [orgEventTypes, setOrgEventTypes] = useState<string[]>([]);
 
-  const totalSteps = role === "student" ? 6 : role === "organizer" ? 5 : 2;
+  const [locationStatus, setLocationStatus] = useState<"idle" | "requesting" | "granted" | "denied">("idle");
+
+  const totalSteps = role === "student" ? 7 : role === "organizer" ? 6 : 2;
+  const locationStepIndex = role === "student" ? 6 : 5;
 
   const toggleItem = (list: string[], setList: (v: string[]) => void, item: string, max?: number) => {
     if (list.includes(item)) {
