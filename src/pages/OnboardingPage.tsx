@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Search, Info } from "lucide-react";
+import { ChevronRight, Search, Info, MapPin, Sparkles, Users, ShieldCheck } from "lucide-react";
 import Confetti from "@/components/Confetti";
 import { setUserRole } from "@/hooks/useRole";
+import { supabase } from "@/integrations/supabase/client";
 
 const CITIES = [
   { id: "hyd", name: "Hyderabad", emoji: "🏛️" },
