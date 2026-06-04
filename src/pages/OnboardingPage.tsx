@@ -111,6 +111,40 @@ const OnboardingPage = () => {
     finishOnboarding();
   };
 
+  const requestLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setLocationStatus("denied");
+      return;
+    }
+    setLocationStatus("requesting");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        localStorage.setItem("competa_location_permission", "granted");
+        setLocationStatus("granted");
+        try {
+          let sid = localStorage.getItem("competa_session_id");
+          if (!sid) {
+            sid = (crypto.randomUUID && crypto.randomUUID()) || `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+            localStorage.setItem("competa_session_id", sid);
+          }
+          await supabase.from("user_locations" as any).insert({
+            session_id: sid,
+            role: role ?? null,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy ?? null,
+            user_agent: navigator.userAgent,
+          });
+        } catch {}
+      },
+      () => {
+        localStorage.setItem("competa_location_permission", "denied");
+        setLocationStatus("denied");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   const canContinue = () => {
     if (step === 0) return true;
     if (step === 1) return !!role;
