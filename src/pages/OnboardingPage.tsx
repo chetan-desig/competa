@@ -488,6 +488,74 @@ const OnboardingPage = () => {
       }
     }
 
+    if (role && step === locationStepIndex) {
+      const granted = locationStatus === "granted";
+      const denied = locationStatus === "denied";
+      return (
+        <div className="flex flex-col px-6 flex-1">
+          <div className="flex flex-col items-center text-center mb-6">
+            <motion.div
+              animate={granted ? { scale: [1, 1.1, 1] } : { y: [0, -6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className={`w-24 h-24 rounded-full flex items-center justify-center mb-5 border-2 ${
+                granted ? "bg-primary/15 border-primary" : denied ? "bg-muted border-border" : "bg-primary/10 border-primary/30"
+              }`}
+            >
+              <MapPin className={`w-12 h-12 ${granted ? "text-primary" : denied ? "text-muted-foreground" : "text-primary"}`} />
+            </motion.div>
+            <h2 className="text-2xl font-display font-bold text-foreground mb-2">
+              {granted ? "You're all set! 📍" : denied ? "No worries 👍" : "Find events near you 📍"}
+            </h2>
+            <p className="text-muted-foreground text-sm max-w-xs">
+              {granted
+                ? "We'll show you the closest hackathons, meetups and workshops."
+                : denied
+                ? "You can still explore everything — just enable location anytime from settings for nearby picks."
+                : "Allow location access so Competa can surface the best events happening around you."}
+            </p>
+          </div>
+
+          {!granted && !denied && (
+            <div className="space-y-3 mb-6">
+              {[
+                { icon: Sparkles, title: "Personalized feed", desc: "Events ranked by distance & vibe" },
+                { icon: Users, title: "Meet locals", desc: "Match with teammates in your city" },
+                { icon: ShieldCheck, title: "Private & secure", desc: "Only used to improve recommendations" },
+              ].map((b) => (
+                <div key={b.title} className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <b.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-foreground">{b.title}</p>
+                    <p className="text-xs text-muted-foreground">{b.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {locationStatus !== "granted" && (
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={requestLocation}
+              disabled={locationStatus === "requesting"}
+              className="w-full py-4 rounded-full font-display font-bold text-base flex items-center justify-center gap-2 gradient-primary text-primary-foreground cta-glow btn-pop disabled:opacity-70"
+            >
+              <MapPin className="w-5 h-5" />
+              {locationStatus === "requesting" ? "Requesting..." : denied ? "Try again" : "Allow location access"}
+            </motion.button>
+          )}
+
+          {granted && (
+            <div className="flex items-center justify-center gap-2 text-primary text-sm font-semibold">
+              <ShieldCheck className="w-4 h-4" /> Location enabled
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return null;
   };
 
