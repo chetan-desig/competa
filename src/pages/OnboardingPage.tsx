@@ -60,7 +60,9 @@ const OnboardingPage = () => {
   const [orgName, setOrgName] = useState("");
   const [orgEventTypes, setOrgEventTypes] = useState<string[]>([]);
 
-  const [locationStatus, setLocationStatus] = useState<"idle" | "requesting" | "granted" | "denied">("idle");
+  const [locationStatus, setLocationStatus] = useState<"idle" | "requesting" | "granted" | "denied">(
+    () => (localStorage.getItem("competa_location_permission") === "granted" ? "granted" : "idle")
+  );
 
   const totalSteps = role === "student" ? 7 : role === "organizer" ? 6 : 2;
   const locationStepIndex = role === "student" ? 6 : 5;
