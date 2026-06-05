@@ -617,9 +617,13 @@ const OnboardingPage = () => {
               Step {step} of {totalSteps - 1}
             </span>
           </div>
-          <button onClick={skip} className="text-muted-foreground text-sm font-medium">
-            Skip
-          </button>
+          {step === locationStepIndex ? (
+            <span className="text-transparent text-sm font-medium select-none">Skip</span>
+          ) : (
+            <button onClick={skip} className="text-muted-foreground text-sm font-medium">
+              Skip
+            </button>
+          )}
         </div>
       )}
 
