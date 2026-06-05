@@ -74,12 +74,18 @@ const OnboardingPage = () => {
   };
 
   const finishOnboarding = () => {
+    // Hard requirement: location must be granted to enter the app.
+    if (localStorage.getItem("competa_location_permission") !== "granted") {
+      setStep(locationStepIndex);
+      return;
+    }
     localStorage.setItem("competa_onboarded", "true");
     if (role) setUserRole(role);
 
     // Save onboarding data to profile
     if (role === "student") {
-      const cityName = CITIES.find(c => selectedCities.includes(c.id))?.name || "";
+      const detected = localStorage.getItem("competa_current_city") || "";
+      const cityName = detected || CITIES.find(c => selectedCities.includes(c.id))?.name || "";
       const profileData = {
         name: studentName.trim() || "Student",
         bio: "",
@@ -99,6 +105,11 @@ const OnboardingPage = () => {
 
   const next = () => {
     if (step === totalSteps - 1) {
+      // Last step is the location step — block until granted.
+      if (localStorage.getItem("competa_location_permission") !== "granted") {
+        requestLocation();
+        return;
+      }
       setShowConfetti(true);
       setTimeout(finishOnboarding, 2000);
     } else {
@@ -107,6 +118,11 @@ const OnboardingPage = () => {
   };
 
   const skip = () => {
+    // Skipping is no longer allowed past the location step.
+    if (localStorage.getItem("competa_location_permission") !== "granted") {
+      setStep(locationStepIndex);
+      return;
+    }
     if (role) setUserRole(role);
     finishOnboarding();
   };
@@ -601,9 +617,13 @@ const OnboardingPage = () => {
               Step {step} of {totalSteps - 1}
             </span>
           </div>
-          <button onClick={skip} className="text-muted-foreground text-sm font-medium">
-            Skip
-          </button>
+          {step === locationStepIndex ? (
+            <span className="text-transparent text-sm font-medium select-none">Skip</span>
+          ) : (
+            <button onClick={skip} className="text-muted-foreground text-sm font-medium">
+              Skip
+            </button>
+          )}
         </div>
       )}
 
@@ -626,9 +646,9 @@ const OnboardingPage = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={next}
-            disabled={!canContinue()}
+            disabled={!canContinue() || (step === locationStepIndex && locationStatus !== "granted")}
             className={`w-full py-4 rounded-full font-display font-bold text-lg flex items-center justify-center gap-2 btn-pop transition-all ${
-              canContinue()
+              canContinue() && (step !== locationStepIndex || locationStatus === "granted")
                 ? "gradient-primary text-primary-foreground cta-glow"
                 : "bg-muted text-muted-foreground"
             }`}
@@ -636,7 +656,7 @@ const OnboardingPage = () => {
             {step === totalSteps - 1
               ? locationStatus === "granted"
                 ? "Let's Go! 🎉"
-                : "Maybe later"
+                : "Enable location to continue"
               : "Continue"}
             {step < totalSteps - 1 && <ChevronRight className="w-5 h-5" />}
           </motion.button>

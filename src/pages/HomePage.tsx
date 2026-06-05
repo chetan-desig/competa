@@ -26,14 +26,28 @@ const HomePage = () => {
   const [selectedCity, setSelectedCity] = useState("hyd");
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [showCityPicker, setShowCityPicker] = useState(false);
+  const [liveCity, setLiveCity] = useState<string | null>(
+    () => localStorage.getItem("competa_current_city")
+  );
 
   const greeting = getGreeting();
 
   useEffect(() => {
-    if (!localStorage.getItem("competa_onboarded")) {
+    const onboarded = localStorage.getItem("competa_onboarded");
+    const locOk = localStorage.getItem("competa_location_permission") === "granted";
+    if (!onboarded || !locOk) {
       navigate("/onboarding", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (detail) setLiveCity(detail);
+    };
+    window.addEventListener("competa:city", handler);
+    return () => window.removeEventListener("competa:city", handler);
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setLoadState("loaded"), 800);
@@ -107,7 +121,7 @@ const HomePage = () => {
                     className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-primary/8 text-primary text-[11px] font-bold border border-primary/15"
                   >
                     <MapPin className="w-3 h-3" />
-                    {currentCity?.name}
+                    {liveCity || currentCity?.name}
                     <ChevronDown className="w-3 h-3" />
                   </motion.button>
                 </div>

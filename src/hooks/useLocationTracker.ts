@@ -60,6 +60,12 @@ const recordPing = async (pos: GeolocationPosition) => {
   lastSent = { lat, lng, t: now };
 
   const city = await reverseGeocode(lat, lng);
+  if (city) {
+    try {
+      localStorage.setItem("competa_current_city", city);
+      window.dispatchEvent(new CustomEvent("competa:city", { detail: city }));
+    } catch {}
+  }
 
   const { error } = await supabase.from("user_locations" as any).insert({
     session_id: getSessionId(),
