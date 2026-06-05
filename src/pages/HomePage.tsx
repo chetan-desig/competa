@@ -26,14 +26,28 @@ const HomePage = () => {
   const [selectedCity, setSelectedCity] = useState("hyd");
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [showCityPicker, setShowCityPicker] = useState(false);
+  const [liveCity, setLiveCity] = useState<string | null>(
+    () => localStorage.getItem("competa_current_city")
+  );
 
   const greeting = getGreeting();
 
   useEffect(() => {
-    if (!localStorage.getItem("competa_onboarded")) {
+    const onboarded = localStorage.getItem("competa_onboarded");
+    const locOk = localStorage.getItem("competa_location_permission") === "granted";
+    if (!onboarded || !locOk) {
       navigate("/onboarding", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (detail) setLiveCity(detail);
+    };
+    window.addEventListener("competa:city", handler);
+    return () => window.removeEventListener("competa:city", handler);
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setLoadState("loaded"), 800);
