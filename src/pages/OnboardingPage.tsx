@@ -646,13 +646,20 @@ const OnboardingPage = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={next}
-            disabled={!canContinue()}
+            disabled={!canContinue() || (step === locationStepIndex && locationStatus !== "granted")}
             className={`w-full py-4 rounded-full font-display font-bold text-lg flex items-center justify-center gap-2 btn-pop transition-all ${
-              canContinue()
+              canContinue() && (step !== locationStepIndex || locationStatus === "granted")
                 ? "gradient-primary text-primary-foreground cta-glow"
                 : "bg-muted text-muted-foreground"
             }`}
           >
+            {step === totalSteps - 1
+              ? locationStatus === "granted"
+                ? "Let's Go! 🎉"
+                : "Enable location to continue"
+              : "Continue"}
+            {step < totalSteps - 1 && <ChevronRight className="w-5 h-5" />}
+          </motion.button>
             {step === totalSteps - 1
               ? locationStatus === "granted"
                 ? "Let's Go! 🎉"
