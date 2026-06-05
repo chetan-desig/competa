@@ -74,12 +74,18 @@ const OnboardingPage = () => {
   };
 
   const finishOnboarding = () => {
+    // Hard requirement: location must be granted to enter the app.
+    if (localStorage.getItem("competa_location_permission") !== "granted") {
+      setStep(locationStepIndex);
+      return;
+    }
     localStorage.setItem("competa_onboarded", "true");
     if (role) setUserRole(role);
 
     // Save onboarding data to profile
     if (role === "student") {
-      const cityName = CITIES.find(c => selectedCities.includes(c.id))?.name || "";
+      const detected = localStorage.getItem("competa_current_city") || "";
+      const cityName = detected || CITIES.find(c => selectedCities.includes(c.id))?.name || "";
       const profileData = {
         name: studentName.trim() || "Student",
         bio: "",
@@ -99,6 +105,11 @@ const OnboardingPage = () => {
 
   const next = () => {
     if (step === totalSteps - 1) {
+      // Last step is the location step — block until granted.
+      if (localStorage.getItem("competa_location_permission") !== "granted") {
+        requestLocation();
+        return;
+      }
       setShowConfetti(true);
       setTimeout(finishOnboarding, 2000);
     } else {
@@ -107,6 +118,11 @@ const OnboardingPage = () => {
   };
 
   const skip = () => {
+    // Skipping is no longer allowed past the location step.
+    if (localStorage.getItem("competa_location_permission") !== "granted") {
+      setStep(locationStepIndex);
+      return;
+    }
     if (role) setUserRole(role);
     finishOnboarding();
   };
