@@ -121,7 +121,7 @@ const HomePage = () => {
                     className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-primary/8 text-primary text-[11px] font-bold border border-primary/15"
                   >
                     <MapPin className="w-3 h-3" />
-                    {currentCity?.name}
+                    {liveCity || currentCity?.name}
                     <ChevronDown className="w-3 h-3" />
                   </motion.button>
                 </div>
