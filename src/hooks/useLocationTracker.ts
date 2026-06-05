@@ -82,20 +82,15 @@ export const useLocationTracker = () => {
 
   useEffect(() => {
     if (!("geolocation" in navigator)) return;
-    if (localStorage.getItem(PERMISSION_KEY) === "denied") return;
+    // Only track if user has already explicitly granted permission during onboarding.
+    // Do NOT trigger a browser permission prompt here.
+    if (localStorage.getItem(PERMISSION_KEY) !== "granted") return;
     if (started) return; // guard against StrictMode double-mount
     started = true;
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        localStorage.setItem(PERMISSION_KEY, "granted");
-        recordPing(pos);
-      },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) {
-          localStorage.setItem(PERMISSION_KEY, "denied");
-        }
-      },
+      (pos) => recordPing(pos),
+      () => {},
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
 
